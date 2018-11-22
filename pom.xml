@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>addons-parent-pom</artifactId>
+    <groupId>org.exoplatform.addons</groupId>
+    <version>9</version>
+    <relativePath/>
+  </parent>
+  <groupId>org.exoplatform.addons.kudos</groupId>
+  <artifactId>exo-kudos</artifactId>
+  <version>1.0.x-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>eXo Add-on:: eXo Kudos - Parent POM</name>
+  <description>eXo Kudos Addon</description>
+  <modules>
+    <module>exo-kudos-services</module>
+    <module>exo-kudos-webapps</module>
+  </modules>
+  <scm>
+    <connection>scm:git:git://github.com/exo-addons/kudos.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/exo-addons/kudos.git</developerConnection>
+    <url>https://github.com/exo-addons/kudos</url>
+    <tag>HEAD</tag>
+  </scm>
+  <properties>
+    <!-- 3rd party libraries versions -->
+    <org.exoplatform.platform.version>5.2.0-M06</org.exoplatform.platform.version>
+
+    <org.jackson.version>2.4.0</org.jackson.version>
+
+    <!-- Used to generate default methods for POJO -->
+    <org.lombok.version>1.18.2</org.lombok.version>
+    <org.lombok.plugin.version>1.18.0.0</org.lombok.plugin.version>
+
+    <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
+    <com.github.eirslett.frontend.version>1.6</com.github.eirslett.frontend.version>
+    <!-- **************************************** -->
+    <!-- Jenkins Settings -->
+    <jenkins.job.name>addon-kudos-master-ci</jenkins.job.name>
+    <!-- **************************************** -->
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Import versions from platform project -->
+      <dependency>
+        <groupId>org.exoplatform.platform</groupId>
+        <artifactId>platform</artifactId>
+        <version>${org.exoplatform.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Current project artifacts -->
+      <dependency>
+        <groupId>org.exoplatform.addons.wallet</groupId>
+        <artifactId>exo-kudos-webapps</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.exoplatform.addons.wallet</groupId>
+        <artifactId>exo-kudos-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${org.lombok.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${org.jackson.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${org.jackson.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${org.jackson.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>${com.github.eirslett.frontend.version}</version>
+        </plugin>
+        <!-- Maven Plugin for generating contracts JAVA sources -->
+        <plugin>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok-maven-plugin</artifactId>
+          <version>${org.lombok.plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>delombok</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

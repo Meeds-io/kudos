@@ -1,0 +1,110 @@
+<gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4" xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
+<!-- 
+  We can't use this due to:
+  https://jira.exoplatform.org/browse/PLF-8100
+
+  <portlet-skin>
+    <application-name>exo-kudos</application-name>
+    <portlet-name>KudosAdmin</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/css/kudos.css</css-path>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>exo-kudos</application-name>
+    <portlet-name>KudosAdmin</portlet-name>
+    <skin-name>Default</skin-name>
+    <css-path>/css/kudos.css</css-path>
+  </portlet-skin>
+-->
+
+  <portal-skin>
+    <skin-name>Default</skin-name>
+    <skin-module>kudos</skin-module>
+    <css-path>/css/platform.css</css-path>
+    <css-priority>0</css-priority>
+  </portal-skin>
+
+  <portal-skin>
+    <skin-name>Enterprise</skin-name>
+    <skin-module>kudos</skin-module>
+    <css-path>/css/platform.css</css-path>
+    <css-priority>0</css-priority>
+  </portal-skin>
+
+  <portlet>
+    <name>KudosActivity</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/kudosActivity.bundle.js</path>
+      </script>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+      <depends>
+        <module>fetchPolyfill</module>
+      </depends>
+      <depends>
+        <module>customEventPolyfill</module>
+      </depends>
+      <depends>
+        <module>iePolyfills</module>
+      </depends>
+      <depends>
+        <module>kudosVuetify</module>
+      </depends>
+      <depends>
+        <module>userPopupPlugin</module>
+      </depends>
+      <depends>
+        <module>spacePopupPlugin</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
+    <name>KudosAdmin</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/kudosAdmin.bundle.js</path>
+      </script>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+      <depends>
+        <module>fetchPolyfill</module>
+      </depends>
+      <depends>
+        <module>customEventPolyfill</module>
+      </depends>
+      <depends>
+        <module>iePolyfills</module>
+      </depends>
+      <depends>
+        <module>kudosVuetify</module>
+      </depends>
+      <depends>
+        <module>userPopupPlugin</module>
+      </depends>
+      <depends>
+        <module>spacePopupPlugin</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <module>
+    <name>kudosVuetify</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/lib/vuetify.min.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+  </module>
+
+</gatein-resources>
