@@ -17,6 +17,7 @@
   <modules>
     <module>exo-kudos-services</module>
     <module>exo-kudos-webapps</module>
+    <module>exo-kudos-packaging</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/exo-addons/kudos.git</connection>
@@ -54,16 +55,18 @@
 
       <!-- Current project artifacts -->
       <dependency>
-        <groupId>org.exoplatform.addons.wallet</groupId>
-        <artifactId>exo-kudos-webapps</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo-kudos-services</artifactId>
         <version>${project.version}</version>
-        <type>war</type>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
-        <groupId>org.exoplatform.addons.wallet</groupId>
-        <artifactId>exo-kudos-services</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>exo-kudos-webapps</artifactId>
         <version>${project.version}</version>
+        <scope>provided</scope>
+        <type>war</type>
       </dependency>
 
       <dependency>
@@ -99,7 +102,6 @@
         <version>${org.jackson.version}</version>
         <scope>provided</scope>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
   <build>

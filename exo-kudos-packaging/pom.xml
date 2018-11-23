@@ -16,16 +16,13 @@
       <artifactId>exo-kudos-services</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>exo-kudos-webapps</artifactId>
       <scope>provided</scope>
       <type>war</type>
     </dependency>
-
   </dependencies>
-
   <build>
     <finalName>exo-kudos-addon</finalName>
     <plugins>
@@ -50,5 +47,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

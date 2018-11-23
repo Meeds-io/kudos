@@ -35,7 +35,7 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
 /**
- * A storage service to save/load information used by users and spaces wallets
+ * A service to manage kudos
  */
 public class KudosService {
 
@@ -116,7 +116,7 @@ public class KudosService {
 
     Space space =
                 StringUtils.isBlank(globalSettings.getAccessPermission()) ? null : getSpace(globalSettings.getAccessPermission());
-    // Disable wallet for users not member of the permitted space members
+    // Disable kudos for users not member of the permitted space members
     if (username != null && space != null && !(spaceService.isMember(space, username) || spaceService.isSuperManager(username))) {
       accountSettings.setDisabled(true);
       return accountSettings;
