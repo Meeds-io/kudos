@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Kudos {
+public class Kudos implements Comparable<Kudos> {
   public Long          technicalId;
 
   public String        entityId;
@@ -18,7 +18,22 @@ public class Kudos {
 
   public String        receiverType;
 
-  public short         num;
+  public String        receiverFullName;
+
+  public String        receiverURL;
+
+  public String        message;
 
   public LocalDateTime time;
+
+  @Override
+  public int compareTo(Kudos o) {
+    if (this.getTime() == null) {
+      return -1;
+    }
+    if (o.getTime() == null) {
+      return 1;
+    }
+    return this.getTime().compareTo(o.getTime());
+  }
 }

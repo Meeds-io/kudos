@@ -31,7 +31,8 @@ export function getReceiver(entityType, entityId) {
           && ownerDetails.globalId.localId) {
         return {
           id: ownerDetails.globalId.localId,
-          type: ownerDetails.providerId
+          type: ownerDetails.providerId,
+          fullname: (ownerDetails.profile && ownerDetails.profile.fullname) || ownerDetails.globalId.localId
         };
       } else {
         throw new Error("Owner details not found", ownerDetails);
@@ -70,6 +71,21 @@ export function sendKudos(kudo) {
       body: JSON.stringify(kudo)
     })
     .then(resp => resp && resp.ok);
+  } else {
+    return Promise.resolve(null);
+  }
+}
+
+export function getKudos(userId) {
+  if(userId) {
+    return fetch(`/portal/rest/kudos/api/kudos/getKudos?identityId=${userId}`, {
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(resp => resp && resp.ok && resp.json());
   } else {
     return Promise.resolve(null);
   }

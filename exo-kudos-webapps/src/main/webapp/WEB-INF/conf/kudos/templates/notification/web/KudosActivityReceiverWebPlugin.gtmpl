@@ -1,0 +1,32 @@
+<li class="$READ clearfix" data-id="$NOTIFICATION_ID">
+  <div class="media">
+    <div class="avatarXSmall pull-left">
+      <img src="$AVATAR" alt="<%=_ctx.escapeHTML(USER)%>" />
+    </div> 
+    <div class="media-body">
+      <%
+       String message = "";
+       String profileUrl = "<a class=\"user-name text-bold\" href=\"javascript:void(0)\">" + _ctx.escapeHTML(USER) + "</a>";
+       if (Boolean.parseBoolean(IS_SPACE_RECEIVER)) {
+         String spaceUrl = "<a class=\"user-name text-bold\" href=\""+ SPACE_URL +"\">" + _ctx.escapeHTML(SPACE) + "</a>";
+         message = _ctx.appRes("Notification.kudos.spaceReceived", spaceUrl, profileUrl);
+       } else {
+         message = _ctx.appRes("Notification.kudos.received", profileUrl);
+       }
+      %> 
+      <div class="contentSmall" data-link="$VIEW_FULL_DISCUSSION_ACTION_URL">
+        <div class="status"><%=message%></div>
+        <div class="content"><i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>$ACTIVITY</div>
+        <% if(org.apache.commons.lang3.StringUtils.isNotBlank(KUDOS_MESSAGE)) { %>
+          <div class="content">
+            <blockquote>
+              <%= KUDOS_MESSAGE %>
+            </blockquote>
+          </div>
+        <% } %>
+        <div class="lastUpdatedTime">$LAST_UPDATED_TIME</div>
+      </div>
+    </div>
+  </div>
+  <span class="remove-item" data-rest=""><i class="uiIconClose uiIconLightGray"></i></span>
+</li>

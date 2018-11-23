@@ -8,11 +8,26 @@
 .v-btn--icon {
   border: 0;
 }
-.uiIconFavorite.uiIconLightGray {
+.uiIconKudos.uiIconLightGray {
   color: #c6c6c6;
 }
-.SendKudosButtonTemplate .uiIconFavorite {
-  font-size: 18px;
+.uiIconKudos.uiIconBlue {
+  color: #578dc9;
+}
+#kudosMessage {
+  margin: 5px 0 0;
+}
+.SendKudosButtonTemplate{
+  button {
+    width: auto;
+  }
+  button:hover:before,
+  button:focus:before {
+    background-color: transparent;
+  }
+  .uiIconKudos {
+    font-size: 18px;
+  }
 }
 #KudosActivityApp {
   .v-card__text {

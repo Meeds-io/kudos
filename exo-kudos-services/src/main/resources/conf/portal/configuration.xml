@@ -32,4 +32,146 @@
     <type>org.exoplatform.addon.kudos.rest.KudosREST</type>
   </component>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
+    <component-plugin profiles="all">
+      <name>notification.groups</name>
+      <set-method>registerGroupConfig</set-method>
+      <type>org.exoplatform.commons.api.notification.plugin.GroupProviderPlugin</type>
+      <description>Kudos group</description>
+      <init-params>
+        <object-param>
+          <name>group.kudos</name>
+          <description>The information of group kudos</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.GroupConfig">
+            <field name="id">
+              <string>kudos</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.group.Kudos</string>
+            </field>
+            <field name="order">
+              <string>200</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.service.setting.PluginContainer</target-component>
+
+    <!-- Kudos activity receiver notification plugin -->
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.addon.kudos.notification.plugin.KudosActivityReceiverNotificationPlugin</type>
+      <init-params>
+        <object-param>
+          <name>template.KudosActivityReceiverNotificationPlugin</name>
+          <description>The template of KudosActivityReceiverNotificationPlugin</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>KudosActivityReceiverNotificationPlugin</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.KudosActivityReceiverNotificationPlugin</string>
+            </field>
+            <field name="order">
+              <string>4</string>
+            </field>
+            <field name="defaultConfig">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>Instantly</string>
+                </value>
+              </collection>
+            </field>
+            <field name="groupId">
+              <string>kudos</string>
+            </field>
+            <field name="bundlePath">
+              <string>locale.notification.KudosNotification</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
+    <component-plugin>
+      <name>web.channel.kudos.template</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.addon.kudos.notification.provider.WebTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>WEB_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>mail.channel.kudos.template</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.addon.kudos.notification.provider.MailTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>MAIL_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>push.channel.kudos.template</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.addon.kudos.notification.provider.MobilePushTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>PUSH_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    <component-plugin>
+      <name>exo.addons.kudos.sent</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.addon.kudos.listener.NewKudosSentNotificationListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.addons.kudos.sent</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.addon.kudos.listener.NewKudosSentActivityCommentListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.social.core.processor.I18NActivityProcessor</target-component>
+      <component-plugin>
+        <name>exokudos:activity</name>
+        <set-method>addActivityResourceBundlePlugin</set-method>
+        <type>org.exoplatform.social.core.processor.ActivityResourceBundlePlugin</type>
+        <init-params>
+          <object-param>
+            <name>locale.addon.Kudos</name>
+            <description>activity key type resource bundle mapping for exokudos:activity</description>
+            <object type="org.exoplatform.social.core.processor.ActivityResourceBundlePlugin">
+              <field name="activityKeyTypeMapping">
+                <map type="java.util.HashMap">
+                  <entry>
+                    <key><string>activity_kudos</string></key>
+                    <value><string>NewKudosSentActivityComment.activity_kudos</string></value>
+                  </entry>
+                </map>
+              </field>
+            </object>
+          </object-param>
+        </init-params>
+      </component-plugin>
+  </external-component-plugins>
 </configuration>

@@ -4,23 +4,54 @@
       <v-card class="elevation-12">
         <div class="popupHeader ClearFix">
           <a class="uiIconClose pull-right" aria-hidden="true" @click="dialog = false"></a>
-          <span class="PopupTitle popupTitle">Send Kudos</span>
+          <span class="PopupTitle popupTitle">Send a kudos</span>
         </div>
         <v-card flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
           <v-card-text>
-            <auto-complete
-              ref="receiverAutoComplete"
-              input-label="Kudos receiver"
-              input-placeholder="Select a user or a space"
-              disabled
-              @item-selected="receiverType = $event.type;receiverId = $event.id;"/>
+            <v-container flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
+              <v-layout
+                row
+                wrap>
+                <v-card
+                  v-for="(kudos, index) in allKudos"
+                  :key="index"
+                  flat
+                  class="text-xs-center"
+                  width="150px"
+                  max-width="100%"
+                  height="100px">
+                  <v-card-text class="pb-0">
+                    <v-icon :class="kudos.receiverFullName? 'uiIconBlue' : 'uiIconLightGray'" size="64" class="uiIconKudos">fa-award</v-icon>
+                  </v-card-text>
+                  <v-card-text class="pt-0">
+                    <a v-if="kudos.receiverFullName" :href="kudos.receiverURL">{{ kudos.receiverFullName }}</a>
+                  </v-card-text>
+                </v-card>
+              </v-layout>
+            </v-container>
+            <div v-if="remainingKudos === 0" class="alert alert-info mt-5">
+              <i class="uiIconInfo"></i>
+              No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} days.
+            </div>
+            <v-textarea
+              v-else
+              id="kudosMessage"
+              v-model="kudosMessage"
+              :disabled="loading"
+              name="kudosMessage"
+              label="Message"
+              placeholder="Enter a message to send with your kudos"
+              class="mt-4 mb-0"
+              rows="3"
+              flat
+              no-resize />
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <button :disabled="loading" class="btn btn-primary mr-3" @click="send">Send</button>
+            <button v-if="remainingKudos > 0" :disabled="loading || error" class="btn btn-primary mr-3" @click="send">Send</button>
             <button :disabled="loading" class="btn" @click="dialog = false">Close</button>
             <v-spacer />
           </v-card-actions>
@@ -31,34 +62,33 @@
 </template>
 
 <script>
-import {getReceiver, getEntityKudos, sendKudos} from '../js/KudosIdentity.js';
+import {getReceiver, getEntityKudos, sendKudos, getKudos} from '../js/KudosIdentity.js';
 import {initSettings} from '../js/KudosSettings.js';
 
-import AutoComplete from './AutoComplete.vue';
-
 export default {
-  components: {
-    AutoComplete
-  },
   data() {
     return {
       dialog: false,
       disabled: false,
-      remainingKudos: null,
+      remainingKudos: 0,
+      remainingDaysToReset: 0,
       entityIds: [],
       entityId: null,
       entityType: null,
       receiverType: null,
       receiverId: null,
       error: null,
+      allKudosSent: [],
+      allKudos: [],
+      kudosMessage: null,
       loading: false,
       htmlToAppend: `<li class="SendKudosButtonTemplate">
-          <button type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudo-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">
+          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudo-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">
             <div class="v-btn__content">
-              <i aria-hidden="true" class="material-icons uiIconFavorite uiIconLightGray">favorite</i>
+              <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGray"></i>
             </div>
           </button>
-          <a href="javascript:void(0);">(kudosCount)</a>
+          <a href="javascript:void(0);">kudosCount</a>
         </li>`
     };
   },
@@ -67,26 +97,42 @@ export default {
       if(!this.dialog) {
         this.entityId = null;
         this.entityType = null;
+        this.error = null;
       }
     },
     entityId() {
       if(this.entityId && this.entityType) {
-        getReceiver(this.entityType, this.entityId)
-          .then(receiverDetails => {
-            if (receiverDetails && receiverDetails.id && receiverDetails.type) {
-              if((receiverDetails.type !== 'organization' && receiverDetails.type !== 'user') || receiverDetails.id !== eXo.env.portal.userName) {
-                this.$refs.receiverAutoComplete.selectItem(receiverDetails.id, receiverDetails.type);
+        this.allKudos = this.allKudosSent.slice(0);
+        if (this.remainingKudos > 0) {
+          getReceiver(this.entityType, this.entityId)
+            .then(receiverDetails => {
+              if (receiverDetails && receiverDetails.id && receiverDetails.type) {
+                receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
+                if(!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
+                  this.receiverId = receiverDetails.id;
+                  this.receiverType = receiverDetails.type;
+  
+                  this.allKudos.push({
+                    receiverId: receiverDetails.id,
+                    receiverType: receiverDetails.type,
+                    receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
+                    receiverFullName: receiverDetails.fullname
+                  });
+                  for(let i = 0; i < (this.remainingKudos - 1); i++) {
+                    this.allKudos.push({});
+                  }
+                } else {
+                  throw new Error("You can't send kudos to yourself !");
+                }
               } else {
-                throw new Error("You can't send kudos to yourself !");
+                throw new Error("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
               }
-            } else {
-              throw new Error("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
-            }
-          })
-          .catch(e => {
-            this.error = String(e);
-            console.debug("Error retrieving entity details with type and id", this.entityType, this.entityId, e);
-          });
+            })
+            .catch(e => {
+              this.error = String(e);
+              console.debug("Error retrieving entity details with type and id", this.entityType, this.entityId, e);
+            });
+        }
       }
     }
   },
@@ -114,6 +160,14 @@ export default {
           this.disabled = window.kudosSettings && window.kudosSettings.disabled;
           this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
         })
+        .then(settings => {
+          this.remainingDaysToReset = this.getRemainingDays();
+          // Get Kudos in an async way
+          getKudos(eXo.env.portal.userName)
+            .then(allKudos => {
+              this.allKudosSent = allKudos ? allKudos : [];
+            });
+        })
         .catch(e => {
           this.error = e;
         });
@@ -125,7 +179,6 @@ export default {
           let activityId = $(element).closest('.activityStream').attr('id');
           if (activityId && this.entityIds.indexOf(activityId) < 0) {
             $(element).addClass('kudoContainer');
-
             const entityId = activityId;
             this.entityIds.push(entityId);
             activityId = activityId ? activityId.replace('activityContainer', '') : null;
@@ -145,12 +198,9 @@ export default {
         .then(kudosList => {
           const linkId = `SendKudosButtonACTIVITY${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
-          const kudosCount = kudosList ? kudosList.reduce((a, b) => a + b.num, 0) : 0;
+          const kudosCount = kudosList ? kudosList.length : 0;
           const $sendKudosLink = $(this.htmlToAppend.replace('entityId', entityId).replace('entityType', entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
           $sendKudosLink.attr('id', linkId);
-          if (this.remainingKudos <= 0) {
-            $sendKudosLink.find('button').attr("disabled", "disabled");
-          }
           $sendKudosLink.data("kudosList", kudosList);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
@@ -177,8 +227,13 @@ export default {
         entityId: this.entityId,
         receiverType: this.receiverType,
         receiverId: this.receiverId,
-        num: 1
+        message: this.kudosMessage
       })
+        .then(status => {
+          if(!status) {
+            throw new Error("Error sending Kudo, please contact your administrator.");
+          }
+        })
         .catch(e => {
           console.debug("Error saving kudo", e);
           this.error = String(e);
@@ -202,6 +257,13 @@ export default {
           this.error = String(e);
         })
         .finally(() => this.loading = false);
+    },
+    getRemainingDays() {
+      const now = new Date();
+      const endOfMonth = new Date(now.getTime());
+      endOfMonth.setMonth(now.getMonth() + 1);
+      endOfMonth.setDate(0);
+      return endOfMonth.getDate() > now.getDate() ? endOfMonth.getDate() - now.getDate() : 0;
     }
   }
 };

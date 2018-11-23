@@ -19,4 +19,6 @@ public interface KudosStorage {
 
   long countKudosByMonthAndSender(YearMonth yearMonth, String senderId);
 
+  List<Kudos> getKudosByMonthAndSender(YearMonth yearMonth, String senderId);
+
 }

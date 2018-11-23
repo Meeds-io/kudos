@@ -11,10 +11,12 @@
         <init-params>
           <values-param>
             <name>classpath.resources</name>
+            <value>locale.addon.Kudos</value>
             <value>locale.notification.KudosNotification</value>
           </values-param>
           <values-param>
             <name>portal.resource.names</name>
+            <value>locale.addon.Kudos</value>
             <value>locale.notification.KudosNotification</value>
           </values-param>
         </init-params>

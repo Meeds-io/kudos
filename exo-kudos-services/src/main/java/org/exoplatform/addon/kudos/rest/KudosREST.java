@@ -18,6 +18,7 @@ package org.exoplatform.addon.kudos.rest;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.getCurrentUserId;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -76,19 +77,33 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
       return Response.status(400).build();
     }
-    if (kudos.getNum() == 0) {
-      LOG.warn("Bad request sent to server with a empty 'number of kudos to send'");
-      return Response.status(400).build();
-    }
 
     kudos.setSenderId(getCurrentUserId());
     try {
-      kudosService.saveKudos(getCurrentUserId(), kudos);
+      kudosService.sendKudos(getCurrentUserId(), kudos);
     } catch (Exception e) {
       LOG.warn("Error saving kudos", e);
       return Response.serverError().build();
     }
     return Response.ok().build();
+  }
+
+  /**
+   * Retrieves the user/space kudos
+   * 
+   * @return
+   */
+  @Path("getKudos")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  public Response getKudos(@QueryParam("identityId") String identityId) {
+    if (StringUtils.isBlank(identityId)) {
+      LOG.warn("Bad request sent to server with empty 'identity id'");
+      return Response.status(400).build();
+    }
+    List<Kudos> allKudosBySender = kudosService.getAllKudosByMonthAndSender(YearMonth.now(), identityId);
+    return Response.ok(allKudosBySender).build();
   }
 
   /**

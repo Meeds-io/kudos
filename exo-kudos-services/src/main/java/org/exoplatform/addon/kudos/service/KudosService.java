@@ -20,12 +20,14 @@ import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.addon.kudos.model.*;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -33,6 +35,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.notification.LinkProviderUtils;
 
 /**
  * A service to manage kudos
@@ -45,14 +48,21 @@ public class KudosService {
 
   private SpaceService     spaceService;
 
+  private ListenerService  listenerService;
+
   private KudosStorage     kudosStorage;
 
   private GlobalSettings   globalSettings = new GlobalSettings();
 
-  public KudosService(KudosStorage kudosStorage, SpaceService spaceService, IdentityManager identityManager, InitParams params) {
+  public KudosService(KudosStorage kudosStorage,
+                      SpaceService spaceService,
+                      IdentityManager identityManager,
+                      ListenerService listenerService,
+                      InitParams params) {
     this.kudosStorage = kudosStorage;
     this.identityManager = identityManager;
     this.spaceService = spaceService;
+    this.listenerService = listenerService;
 
     if (params != null) {
       if (params.containsKey(DEFAULT_ACCESS_PERMISSION)) {
@@ -114,10 +124,7 @@ public class KudosService {
   public AccountSettings getAccountSettings(String username) {
     AccountSettings accountSettings = new AccountSettings();
 
-    Space space =
-                StringUtils.isBlank(globalSettings.getAccessPermission()) ? null : getSpace(globalSettings.getAccessPermission());
-    // Disable kudos for users not member of the permitted space members
-    if (username != null && space != null && !(spaceService.isMember(space, username) || spaceService.isSuperManager(username))) {
+    if (!isUserAuthorized(username)) {
       accountSettings.setDisabled(true);
       return accountSettings;
     }
@@ -126,7 +133,7 @@ public class KudosService {
     return accountSettings;
   }
 
-  public void saveKudos(String senderId, Kudos kudos) throws Exception {
+  public void sendKudos(String senderId, Kudos kudos) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
       throw new IllegalAccessException("User '" + senderId + "' is not authorized to send kudos on behalf of "
           + kudos.getSenderId());
@@ -137,8 +144,14 @@ public class KudosService {
     if (kudosStorage.countKudosByMonthAndSender(YearMonth.now(), senderId) >= globalSettings.getKudosPerMonth()) {
       throw new IllegalAccessException("User '" + senderId + "' is not authorized to send more kudos");
     }
+
+    checkStatus(OrganizationIdentityProvider.NAME, senderId);
+    checkStatus(kudos.getReceiverType(), kudos.getReceiverId());
+
     kudos.setTime(LocalDateTime.now());
     kudosStorage.saveKudos(kudos);
+
+    listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
   }
 
   public List<Kudos> getAllKudosByMonth(YearMonth yearMonth) {
@@ -153,8 +166,76 @@ public class KudosService {
     return kudosStorage.getAllKudosByEntity(entityType, entityId);
   }
 
+  public List<Kudos> getAllKudosByMonthAndSender(YearMonth yearMonth, String identityId) {
+    List<Kudos> kudosBySender = kudosStorage.getKudosByMonthAndSender(yearMonth, identityId);
+    if (kudosBySender != null) {
+      for (Kudos kudos : kudosBySender) {
+        computeKudosExtraFields(kudos);
+      }
+    }
+    Collections.sort(kudosBySender);
+    return kudosBySender;
+  }
+
   public long countKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
     return kudosStorage.countKudosByMonthAndSender(yearMonth, senderId);
+  }
+
+  private void computeKudosExtraFields(Kudos kudos) {
+    if (StringUtils.isBlank(kudos.getReceiverFullName())) {
+      String receiverType = kudos.getReceiverType();
+      String receiverId = kudos.getReceiverId();
+      kudos.setReceiverFullName(getFullName(receiverType, receiverId));
+      String receiverURL = LinkProviderUtils.getRedirectUrl(getReceiverType(receiverType), receiverId);
+      kudos.setReceiverURL(receiverURL);
+    }
+  }
+
+  private String getFullName(String type, String id) {
+    if (USER_ACCOUNT_TYPE.equals(type) || OrganizationIdentityProvider.NAME.equals(type)) {
+      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
+      if (identity == null || !identity.isEnable() || identity.isDeleted()) {
+        return null;
+      }
+      return identity.getProfile().getFullName();
+    } else {
+      Space space = getSpace(id);
+      if (space == null) {
+        return null;
+      }
+      return space.getDisplayName();
+    }
+  }
+
+  private void checkStatus(String type, String id) {
+    if (USER_ACCOUNT_TYPE.equals(type) || OrganizationIdentityProvider.NAME.equals(type)) {
+      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
+      if (identity == null || !identity.isEnable() || identity.isDeleted()) {
+        throw new IllegalStateException("User '" + id + "' doesn't have a valid and enabled social identity");
+      }
+      if (!isUserAuthorized(id)) {
+        throw new IllegalStateException("User '" + id + "' isn't member of authorized group to send/receive kudos: "
+            + globalSettings.getAccessPermission());
+      }
+    } else {
+      Space space = getSpace(id);
+      if (space == null) {
+        throw new IllegalStateException("Space '" + id + "' wasn't found, thus it can't receive/send kudos");
+      }
+    }
+  }
+
+  private boolean isUserAuthorized(String username) {
+    if (StringUtils.isBlank(username)) {
+      return false;
+    }
+    if (globalSettings == null || StringUtils.isBlank(globalSettings.getAccessPermission())) {
+      return true;
+    }
+    Space space = getSpace(globalSettings.getAccessPermission());
+
+    // Disable kudos for users not member of the permitted space members
+    return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
   }
 
 }

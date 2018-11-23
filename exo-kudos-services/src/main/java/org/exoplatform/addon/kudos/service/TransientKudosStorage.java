@@ -54,11 +54,19 @@ public class TransientKudosStorage implements KudosStorage {
   }
 
   @Override
+  public List<Kudos> getKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
+    return kudosVector.stream()
+                      .filter(kudos -> StringUtils.equals(senderId, kudos.getSenderId())
+                          && yearMonth.compareTo(YearMonth.from(kudos.getTime())) == 0)
+                      .collect(Collectors.toList());
+  }
+
+  @Override
   public long countKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
     return kudosVector.stream()
                       .filter(kudos -> StringUtils.equals(senderId, kudos.getSenderId())
                           && yearMonth.compareTo(YearMonth.from(kudos.getTime())) == 0)
-                      .collect(Collectors.summingLong(kudos -> kudos.getNum()));
+                      .count();
   }
 
 }

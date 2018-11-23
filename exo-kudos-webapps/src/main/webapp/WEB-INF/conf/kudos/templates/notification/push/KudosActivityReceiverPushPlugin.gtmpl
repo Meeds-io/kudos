@@ -1,0 +1,10 @@
+<%
+  String message = "";
+  if (IS_SPACE_RECEIVER) {
+    message = _ctx.appRes("Notification.kudos.spaceReceived", SPACE, USER);
+  } else {
+    message = _ctx.appRes("Notification.kudos.received", USER);
+  }
+%>
+$message
+$ACTIVITY
