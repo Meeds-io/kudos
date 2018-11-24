@@ -19,7 +19,8 @@ const config = merge(webpackCommonConfig, {
     ]
   },
   entry: {
-    kudosActivity: './src/main/webapp/vue-app/kudosActivity.js'
+    kudosActivity: './src/main/webapp/vue-app/kudosActivity.js',
+    kudosAdmin: './src/main/webapp/vue-app/kudosAdmin.js'
   },
   output: {
     path: path.join(__dirname, 'target/exo-kudos/'),

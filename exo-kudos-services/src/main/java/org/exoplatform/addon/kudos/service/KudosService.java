@@ -24,8 +24,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.picocontainer.Startable;
 
 import org.exoplatform.addon.kudos.model.*;
+import org.exoplatform.commons.api.settings.SettingService;
+import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
@@ -39,7 +42,7 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 /**
  * A service to manage kudos
  */
-public class KudosService {
+public class KudosService implements Startable {
 
   private static final Log LOG            = ExoLogger.getLogger(KudosService.class);
 
@@ -51,9 +54,12 @@ public class KudosService {
 
   private KudosStorage     kudosStorage;
 
+  private SettingService   settingService;
+
   private GlobalSettings   globalSettings = new GlobalSettings();
 
   public KudosService(KudosStorage kudosStorage,
+                      SettingService settingService,
                       SpaceService spaceService,
                       IdentityManager identityManager,
                       ListenerService listenerService,
@@ -61,6 +67,7 @@ public class KudosService {
     this.kudosStorage = kudosStorage;
     this.identityManager = identityManager;
     this.spaceService = spaceService;
+    this.settingService = settingService;
     this.listenerService = listenerService;
 
     if (params != null) {
@@ -73,6 +80,18 @@ public class KudosService {
         globalSettings.setKudosPerMonth(Long.parseLong(defaultKudosPerMonth));
       }
     }
+  }
+
+  @Override
+  public void start() {
+    GlobalSettings loadedGlobalSettings = loadGlobalSettings();
+    if (loadedGlobalSettings != null) {
+      this.globalSettings = loadedGlobalSettings;
+    }
+  }
+
+  @Override
+  public void stop() {
   }
 
   /**
@@ -214,6 +233,27 @@ public class KudosService {
 
     // Disable kudos for users not member of the permitted space members
     return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
+  }
+
+  public GlobalSettings getGlobalSettings() {
+    if (globalSettings == null) {
+      globalSettings = loadGlobalSettings();
+    }
+    return globalSettings;
+  }
+
+  public void saveGlobalSettings(GlobalSettings settings) {
+    settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toString()));
+    this.globalSettings = null;
+  }
+
+  private GlobalSettings loadGlobalSettings() {
+    SettingValue<?> globalSettingsValue = settingService.get(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME);
+    if (globalSettingsValue == null || StringUtils.isBlank(globalSettingsValue.getValue().toString())) {
+      return null;
+    } else {
+      return GlobalSettings.parseStringToObject(globalSettingsValue.getValue().toString());
+    }
   }
 
 }

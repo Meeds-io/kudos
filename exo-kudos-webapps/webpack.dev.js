@@ -22,6 +22,7 @@ module.exports = merge(webpackCommonConfig, {
   },
   entry: {
     kudosActivity: './src/main/webapp/vue-app/kudosActivity-dev.js',
+    kudosAdmin: './src/main/webapp/vue-app/kudosAdmin-dev.js'
   },
   output: {
     path: '/exo-server/webapps/exo-kudos/',

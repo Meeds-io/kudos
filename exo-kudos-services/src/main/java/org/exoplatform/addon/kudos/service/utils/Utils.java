@@ -10,6 +10,8 @@ import org.exoplatform.addon.kudos.entity.KudosEntity;
 import org.exoplatform.addon.kudos.model.Kudos;
 import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
+import org.exoplatform.commons.api.settings.data.Context;
+import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -21,6 +23,14 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
 
 public class Utils {
+
+  public static final String                 SCOPE_NAME                              = "ADDONS_KUDOS";
+
+  public static final String                 SETTINGS_KEY_NAME                       = "ADDONS_KUDOS_SETTINGS";
+
+  public static final Context                KUDOS_CONTEXT                           = Context.GLOBAL;
+
+  public static final Scope                  KUDOS_SCOPE                             = Scope.APPLICATION.id(SCOPE_NAME);
 
   public static final String                 SPACE_ACCOUNT_TYPE                      = "space";
 

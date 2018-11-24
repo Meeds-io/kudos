@@ -23,18 +23,6 @@
             <field name="contentId">
               <string>exo-kudos/KudosActivity</string>
             </field>
-            <field name="portletPrefs">
-              <map type="java.util.HashMap">
-                <entry>
-                  <key>
-                    <string>kudoAppMaximized</string>
-                  </key>
-                  <value>
-                    <string>false</string>
-                  </value>
-                </entry>
-              </map>
-            </field>
           </object>
         </object-param>
       </init-params>

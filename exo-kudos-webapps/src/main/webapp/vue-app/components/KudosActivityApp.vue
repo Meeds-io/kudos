@@ -33,7 +33,7 @@
                 </v-card>
               </v-layout>
             </v-container>
-            <div v-if="remainingKudos === 0" class="alert alert-info mt-5">
+            <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
               <i class="uiIconInfo"></i>
               No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} days.
             </div>

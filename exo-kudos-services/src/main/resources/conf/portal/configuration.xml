@@ -36,6 +36,10 @@
     <type>org.exoplatform.addon.kudos.rest.KudosREST</type>
   </component>
 
+  <component>
+    <type>org.exoplatform.addon.kudos.rest.KudosSettingsREST</type>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.service.setting.PluginSettingService</target-component>
     <component-plugin profiles="all">
