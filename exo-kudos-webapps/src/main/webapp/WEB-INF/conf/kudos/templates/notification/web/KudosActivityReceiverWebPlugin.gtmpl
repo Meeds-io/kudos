@@ -15,13 +15,26 @@
        }
       %> 
       <div class="contentSmall" data-link="$VIEW_FULL_DISCUSSION_ACTION_URL">
-        <div class="status"><%=message%></div>
-        <div class="content"><i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>$ACTIVITY</div>
+        <div class="status">
+          <% if(org.apache.commons.lang3.StringUtils.isBlank(KUDOS_MESSAGE) && org.apache.commons.lang3.StringUtils.isBlank(ACTIVITY)) { %>
+            <i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>
+          <% } %>
+          <%=message%>
+        </div>
+        <% if(org.apache.commons.lang3.StringUtils.isNotBlank(ACTIVITY)) { %>
+          <div class="content">
+            <% if(org.apache.commons.lang3.StringUtils.isBlank(KUDOS_MESSAGE)) { %>
+              <i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>
+            <% } %>
+            <blockquote style="display:inline-block;">
+              $ACTIVITY
+            </blockquote>
+          </div>
+        <% } %>
         <% if(org.apache.commons.lang3.StringUtils.isNotBlank(KUDOS_MESSAGE)) { %>
           <div class="content">
-            <blockquote>
-              <%= KUDOS_MESSAGE %>
-            </blockquote>
+            <i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>
+            <%= KUDOS_MESSAGE %>
           </div>
         <% } %>
         <div class="lastUpdatedTime">$LAST_UPDATED_TIME</div>
