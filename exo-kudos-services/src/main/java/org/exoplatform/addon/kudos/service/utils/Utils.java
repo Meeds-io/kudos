@@ -1,18 +1,24 @@
 package org.exoplatform.addon.kudos.service.utils;
 
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.addon.kudos.entity.KudosEntity;
 import org.exoplatform.addon.kudos.model.Kudos;
+import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.notification.LinkProviderUtils;
 
 public class Utils {
 
@@ -96,6 +102,58 @@ public class Utils {
   public static String getReceiverType(String receiverType) {
     return SpaceIdentityProvider.NAME.equals(receiverType) || SPACE_ACCOUNT_TYPE.equals(receiverType) ? SPACE_ACCOUNT_TYPE
                                                                                                       : USER_ACCOUNT_TYPE;
+  }
+
+  public static Kudos fromEntity(KudosEntity kudosEntity) {
+    Kudos kudos = new Kudos();
+    kudos.setTechnicalId(kudosEntity.getId());
+    kudos.setMessage(kudosEntity.getMessage());
+    kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
+
+    kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
+    Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
+    kudos.setReceiverId(receiverIdentity.getRemoteId());
+    kudos.setReceiverType(kudosEntity.isReceiverUser() ? USER_ACCOUNT_TYPE : SPACE_ACCOUNT_TYPE);
+    if (kudosEntity.isReceiverUser()) {
+      kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
+      kudos.setReceiverURL(LinkProviderUtils.getRedirectUrl(kudos.getReceiverType(), receiverIdentity.getRemoteId()));
+    } else {
+      Space space = getSpace(receiverIdentity.getRemoteId());
+      kudos.setReceiverFullName(space.getDisplayName());
+      kudos.setReceiverURL(LinkProviderUtils.getRedirectUrl(kudos.getReceiverType(), space.getId()));
+    }
+    Identity senderIdentity = getIdentityById(kudosEntity.getSenderId());
+    kudos.setSenderId(senderIdentity.getRemoteId());
+    kudos.setTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(kudosEntity.getCreatedDate()), TimeZone.getDefault().toZoneId()));
+    return kudos;
+  }
+
+  public static KudosEntity toNewEntity(Kudos kudos) {
+    KudosEntity kudosEntity = new KudosEntity();
+    kudosEntity.setMessage(kudos.getMessage());
+    kudosEntity.setEntityId(Long.parseLong(kudos.getEntityId()));
+    kudosEntity.setEntityType(KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
+    kudosEntity.setSenderId(Long.parseLong(getIdentity(OrganizationIdentityProvider.NAME, kudos.getSenderId()).getId()));
+
+    boolean isReceiverUser = OrganizationIdentityProvider.NAME.equals(kudos.getReceiverType())
+        || USER_ACCOUNT_TYPE.equals(kudos.getReceiverType());
+    kudosEntity.setReceiverUser(isReceiverUser);
+    kudosEntity.setReceiverId(Long.parseLong(getIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
+                                                                        : SpaceIdentityProvider.NAME,
+                                                         kudos.getReceiverId()).getId()));
+    kudosEntity.setCreatedDate(kudos.getTime().atZone(ZoneOffset.systemDefault()).toEpochSecond());
+    return kudosEntity;
+  }
+
+  @SuppressWarnings("deprecation")
+  private static Identity getIdentityById(long identityId) {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    return identityManager.getIdentity(String.valueOf(identityId));
+  }
+
+  private static Identity getIdentity(String providerId, String remoteId) {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    return identityManager.getOrCreateIdentity(providerId, remoteId, true);
   }
 
 }

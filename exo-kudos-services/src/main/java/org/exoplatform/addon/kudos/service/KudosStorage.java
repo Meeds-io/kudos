@@ -9,7 +9,7 @@ public interface KudosStorage {
 
   Kudos getKudoById(long id);
 
-  void saveKudos(Kudos kudos);
+  void createKudos(Kudos kudos);
 
   List<Kudos> getAllKudosByMonth(YearMonth yearMonth);
 
@@ -17,8 +17,10 @@ public interface KudosStorage {
 
   List<Kudos> getAllKudosByEntity(String entityType, String entityId);
 
-  long countKudosByMonthAndSender(YearMonth yearMonth, String senderId);
-
   List<Kudos> getKudosByMonthAndSender(YearMonth yearMonth, String senderId);
+
+  List<Kudos> getKudosByMonthAndReceiver(YearMonth yearMonth, String receiverType, String receiverId);
+
+  long countKudosByMonthAndSender(YearMonth yearMonth, String senderId);
 
 }

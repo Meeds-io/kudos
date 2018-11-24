@@ -6,25 +6,25 @@ import lombok.Data;
 
 @Data
 public class Kudos implements Comparable<Kudos> {
-  public Long          technicalId;
+  private Long          technicalId;
 
-  public String        entityId;
+  private String        entityId;
 
-  public String        entityType;
+  private String        entityType;
 
-  public String        senderId;
+  private String        senderId;
 
-  public String        receiverId;
+  private String        receiverId;
 
-  public String        receiverType;
+  private String        receiverType;
 
-  public String        receiverFullName;
+  private String        receiverFullName;
 
-  public String        receiverURL;
+  private String        receiverURL;
 
-  public String        message;
+  private String        message;
 
-  public LocalDateTime time;
+  private LocalDateTime time;
 
   @Override
   public int compareTo(Kudos o) {

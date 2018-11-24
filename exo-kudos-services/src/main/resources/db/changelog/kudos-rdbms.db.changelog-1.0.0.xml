@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2003-2018 eXo Platform SAS. This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version. This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+  License for more details. You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org. -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <!-- Managing both DB that use sequences and db that use auto increment -->
+  <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb"/>
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+
+  <changeSet author="kudos" id="1.0.0-1">
+    <createTable tableName="ADDONS_KUDOS">
+      <column name="KUDOS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ADDONS_KUDOS"/>
+      </column>
+      <column name="SENDER_ID" type="BIGINT"/>
+      <column name="RECEIVER_ID" type="BIGINT"/>
+      <column name="IS_RECEIVER_USER" type="BOOLEAN">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ENTITY_ID" type="BIGINT"/>
+      <column name="ENTITY_TYPE" type="INT"/>
+      <column name="MESSAGE" type="LONGTEXT"/>
+      <column name="CREATED_DATE" type="BIGINT"/>
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+    </modifySql>
+  </changeSet>
+  <changeSet author="kudos" id="1.0.0-1.1">
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_01">
+      <column name="CREATED_DATE" descending="true"/>
+    </createIndex>
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_02">
+      <column name="CREATED_DATE" descending="true"/>
+      <column name="SENDER_ID" />
+    </createIndex>
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_03">
+      <column name="CREATED_DATE" descending="true"/>
+      <column name="RECEIVER_ID" />
+      <column name="IS_RECEIVER_USER" />
+    </createIndex>
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_04">
+      <column name="CREATED_DATE" descending="true"/>
+      <column name="ENTITY_ID" />
+      <column name="ENTITY_TYPE" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="kudos" id="1.0.0-2" dbms="oracle,postgresql">
+    <createSequence sequenceName="SEQ_ADDONS_KUDOS_ID" startValue="1"/>
+  </changeSet>
+
+  <changeSet author="kudos" id="1.0.0-3">
+    <addUniqueConstraint columnNames="CREATED_DATE" constraintName="UK_ADDONS_KUDOS_01" tableName="ADDONS_KUDOS"/>
+  </changeSet>
+
+</databaseChangeLog>

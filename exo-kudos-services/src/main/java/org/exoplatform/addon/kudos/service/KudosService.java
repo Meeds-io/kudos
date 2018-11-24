@@ -35,7 +35,6 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.notification.LinkProviderUtils;
 
 /**
  * A service to manage kudos
@@ -149,7 +148,7 @@ public class KudosService {
     checkStatus(kudos.getReceiverType(), kudos.getReceiverId());
 
     kudos.setTime(LocalDateTime.now());
-    kudosStorage.saveKudos(kudos);
+    kudosStorage.createKudos(kudos);
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
   }
@@ -169,42 +168,21 @@ public class KudosService {
   public List<Kudos> getAllKudosByMonthAndSender(YearMonth yearMonth, String identityId) {
     List<Kudos> kudosBySender = kudosStorage.getKudosByMonthAndSender(yearMonth, identityId);
     if (kudosBySender != null) {
-      for (Kudos kudos : kudosBySender) {
-        computeKudosExtraFields(kudos);
-      }
+      Collections.sort(kudosBySender);
     }
-    Collections.sort(kudosBySender);
     return kudosBySender;
+  }
+
+  public List<Kudos> getKudosByMonthAndReceiver(YearMonth yearMonth, String receiverType, String receiverId) {
+    List<Kudos> kudosList = kudosStorage.getKudosByMonthAndReceiver(yearMonth, receiverType, receiverId);
+    if (kudosList != null) {
+      Collections.sort(kudosList);
+    }
+    return kudosList;
   }
 
   public long countKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
     return kudosStorage.countKudosByMonthAndSender(yearMonth, senderId);
-  }
-
-  private void computeKudosExtraFields(Kudos kudos) {
-    if (StringUtils.isBlank(kudos.getReceiverFullName())) {
-      String receiverType = kudos.getReceiverType();
-      String receiverId = kudos.getReceiverId();
-      kudos.setReceiverFullName(getFullName(receiverType, receiverId));
-      String receiverURL = LinkProviderUtils.getRedirectUrl(getReceiverType(receiverType), receiverId);
-      kudos.setReceiverURL(receiverURL);
-    }
-  }
-
-  private String getFullName(String type, String id) {
-    if (USER_ACCOUNT_TYPE.equals(type) || OrganizationIdentityProvider.NAME.equals(type)) {
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
-      if (identity == null || !identity.isEnable() || identity.isDeleted()) {
-        return null;
-      }
-      return identity.getProfile().getFullName();
-    } else {
-      Space space = getSpace(id);
-      if (space == null) {
-        return null;
-      }
-      return space.getDisplayName();
-    }
   }
 
   private void checkStatus(String type, String id) {
