@@ -14,7 +14,8 @@
             <v-container flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
               <v-layout
                 row
-                wrap>
+                wrap
+                class="kudosIconsContainer">
                 <v-card
                   v-for="(kudos, index) in allKudos"
                   :key="index"
@@ -93,13 +94,6 @@ export default {
     };
   },
   watch: {
-    dialog() {
-      if(!this.dialog) {
-        this.entityId = null;
-        this.entityType = null;
-        this.error = null;
-      }
-    },
     entityId() {
       if(this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
@@ -154,6 +148,12 @@ export default {
       });
   },
   methods: {
+    resetForm() {
+      this.entityId = null;
+      this.entityType = null;
+      this.kudosMessage = null;
+      this.error = null;
+    },
     init() {
       return initSettings()
         .then(settings => {
@@ -206,7 +206,7 @@ export default {
           if ($existingLink.length) {
             $existingLink.html($sendKudosLink.html());
           } else if(element) {
-            $sendKudosLink.appendTo($(element));
+            $sendKudosLink.prependTo($(element));
           } else {
             console.warn("Can't refresh entity with type/id", entityType, entityId);
           }
@@ -256,7 +256,15 @@ export default {
           console.debug("Error saving kudo");
           this.error = String(e);
         })
-        .finally(() => this.loading = false);
+        .finally(() => {
+          this.loading = false;
+          if(!this.dialog) {
+            if(this.entityType === 'ACTIVITY') {
+              this.refreshActivity(this.entityId);
+            }
+            this.resetForm();
+          }
+        });
     },
     getRemainingDays() {
       const now = new Date();
@@ -264,6 +272,12 @@ export default {
       endOfMonth.setMonth(now.getMonth() + 1);
       endOfMonth.setDate(0);
       return endOfMonth.getDate() > now.getDate() ? endOfMonth.getDate() - now.getDate() : 0;
+    },
+    refreshActivity(activityId) {
+      const $activityItem = $(`#UIActivityLoader${activityId}`);
+      $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
+      $activityItem.addClass("activity-loadding");
+      UIActivityLoader.renderActivity($activityItem);
     }
   }
 };

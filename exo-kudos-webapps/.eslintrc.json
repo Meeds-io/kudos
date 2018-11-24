@@ -12,7 +12,8 @@
         "global": true,
         "eXo": true,
         "Vue": true,
-        "Vuetify": true
+        "Vuetify": true,
+        "UIActivityLoader": true
     },
     "parserOptions": {
         "sourceType": "module",

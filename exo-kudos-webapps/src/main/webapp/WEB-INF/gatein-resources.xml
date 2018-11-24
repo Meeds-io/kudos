@@ -61,6 +61,10 @@
       <depends>
         <module>spacePopupPlugin</module>
       </depends>
+      <depends>
+        <module>social-ui-activities-loader</module>
+        <as>UIActivityLoader</as>
+      </depends>
     </module>
   </portlet>
 

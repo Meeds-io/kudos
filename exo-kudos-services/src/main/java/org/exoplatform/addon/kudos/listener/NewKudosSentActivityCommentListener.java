@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.addon.kudos.model.Kudos;
 import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.addon.kudos.service.KudosService;
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.log.ExoLogger;
@@ -20,6 +21,7 @@ import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.notification.LinkProviderUtils;
 
@@ -72,18 +74,40 @@ public class NewKudosSentActivityCommentListener extends Listener<KudosService, 
     String senderLink = "<a href='" + senderURL + "'>" + senderIdentity.getProfile().getFullName() + "</a>";
     senderLink = StringEscapeUtils.unescapeHtml(senderLink);
 
-    String receiverURL = LinkProviderUtils.getRedirectUrl(getReceiverType(receiverType), receiverId);
-    Identity receiverIdentity = identityManager.getOrCreateIdentity(getReceiverIdentityProviderType(receiverType),
-                                                                    receiverId,
-                                                                    true);
-    String receiverLink = "<a href='" + receiverURL + "'>" + receiverIdentity.getProfile().getFullName() + "</a>";
-    receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
+    receiverType = getReceiverType(receiverType);
+    String receiverProviderId = getReceiverIdentityProviderType(receiverType);
+    boolean isReceiverUser = OrganizationIdentityProvider.NAME.equals(receiverProviderId);
+    String fullName = receiverId;
+    String receiverURLId = receiverId;
+    if (isReceiverUser) {
+      Identity receiverIdentity = identityManager.getOrCreateIdentity(receiverProviderId, receiverId, true);
+      if (receiverIdentity == null) {
+        LOG.warn("Can't find user with username : {}", receiverId);
+      } else {
+        fullName = receiverIdentity.getProfile().getFullName();
+      }
+    } else {
+      Space space = getSpace(receiverId);
+      if (space == null) {
+        LOG.warn("Can't find space with pretty name : {}", receiverId);
+      } else {
+        fullName = space.getDisplayName();
+        receiverURLId = space.getId();
+      }
+    }
+    String receiverURL = LinkProviderUtils.getRedirectUrl(receiverType, receiverURLId);
+    String receiverLink = StringEscapeUtils.unescapeHtml("<a href='" + receiverURL + "'>" + fullName + "</a>");
 
     message =
             StringUtils.isBlank(message) ? "."
                                          : StringEscapeUtils.escapeHtml(": " + message.replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
                                                                                                RESOURCE_BUNDLE_ESCAPE_CHARACTER));
 
+    try {
+      message = HTMLSanitizer.sanitize(message);
+    } catch (Exception e) {
+      LOG.warn("Error while sanitizing message", message);
+    }
     Map<String, String> templateParams = new LinkedHashMap<String, String>();
     templateParams.put(RESOURCE_BUNDLE_VALUES_PARAM,
                        senderLink + RESOURCE_BUNDLE_VALUES_CHARACTER + receiverLink + RESOURCE_BUNDLE_VALUES_CHARACTER + message);
