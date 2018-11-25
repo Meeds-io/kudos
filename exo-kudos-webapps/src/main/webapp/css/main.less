@@ -2,6 +2,14 @@
 @import './lib/materialdesign-icons.css';
 @import './lib/vuetify.css';
 
+.v-btn,
+.v-input,
+.v-select,
+.v-textarea {
+  background-color: transparent;
+  border-style: none;
+  color: inherit;
+}
 .hide-scroll {
   overflow: hidden;
 }
@@ -114,5 +122,9 @@
   }
   .v-card__text {
     box-sizing: border-box;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 }

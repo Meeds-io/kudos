@@ -17,6 +17,7 @@
 package org.exoplatform.addon.kudos.rest;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.getCurrentUserId;
+import static org.exoplatform.addon.kudos.service.utils.Utils.timeFromSeconds;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -122,6 +123,24 @@ public class KudosREST implements ResourceContainer {
     }
     List<Kudos> allKudosByEntity = kudosService.getAllKudosByEntity(entityType, entityId);
     return Response.ok(allKudosByEntity).build();
+  }
+
+  /**
+   * Retrieves all kudos by a designed month
+   * 
+   * @return
+   */
+  @Path("getKudosByMonth")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  public Response getKudosByMonth(@QueryParam("month") long monthInSeconds) {
+    if (monthInSeconds == 0) {
+      LOG.warn("Bad request sent to server with empty 'month' parameter");
+      return Response.status(400).build();
+    }
+    List<Kudos> allKudosByMonth = kudosService.getAllKudosByMonth(YearMonth.from(timeFromSeconds(monthInSeconds)));
+    return Response.ok(allKudosByMonth).build();
   }
 
 }

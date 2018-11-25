@@ -1,5 +1,6 @@
 <template>
   <v-app v-if="!disabled" id="KudosActivityApp" color="transaprent" flat>
+    <kudos-api />
     <v-dialog v-model="dialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="dialog = false">
       <v-card class="elevation-12">
         <div class="popupHeader ClearFix">
@@ -63,10 +64,16 @@
 </template>
 
 <script>
-import {getReceiver, getEntityKudos, sendKudos, getKudos} from '../js/KudosIdentity.js';
+import KudosApi from './KudosAPI.vue';
+
+import {getReceiver} from '../js/KudosIdentity.js';
+import {getEntityKudos, sendKudos, getKudos, getKudosByMonth} from '../js/Kudos.js';
 import {initSettings} from '../js/KudosSettings.js';
 
 export default {
+  components: {
+    KudosApi
+  },
   data() {
     return {
       dialog: false,

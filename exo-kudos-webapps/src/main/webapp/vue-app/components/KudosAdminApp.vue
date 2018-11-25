@@ -6,70 +6,84 @@
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
-          <v-card flat>
-            <v-card-text>
-              <v-flex
-                id="accessPermissionAutoComplete"
-                class="contactAutoComplete mt-4">
-                <v-autocomplete
-                  ref="accessPermissionAutoComplete"
-                  v-model="accessPermission"
-                  :items="accessPermissionOptions"
-                  :loading="isLoadingSuggestions"
-                  :search-input.sync="accessPermissionSearchTerm"
-                  attach="#accessPermissionAutoComplete"
-                  label="Kudos access permission (Spaces only)"
-                  class="contactAutoComplete"
-                  placeholder="Start typing to Search a space"
-                  content-class="contactAutoCompleteContent"
-                  max-width="100%"
-                  item-text="name"
-                  item-value="id"
-                  hide-details
-                  hide-selected
-                  chips
-                  cache-items
-                  dense
-                  flat>
-                  <template slot="no-data">
-                    <v-list-tile>
-                      <v-list-tile-title>
-                        Search for a <strong>Space</strong>
-                      </v-list-tile-title>
-                    </v-list-tile>
-                  </template>
-                  <template slot="selection" slot-scope="{ item, selected }">
-                    <v-chip v-if="item.error" :selected="selected" class="autocompleteSelectedItem">
-                      <del><span>{{ item.name }}</span></del>
-                    </v-chip>
-                    <v-chip v-else :selected="selected" class="autocompleteSelectedItem">
-                      <span>{{ item.name }}</span>
-                    </v-chip>
-                  </template>
-                  <template slot="item" slot-scope="{ item, tile }">
-                    <v-list-tile-avatar v-if="item.avatar" tile size="20">
-                      <img :src="item.avatar">
-                    </v-list-tile-avatar>
-                    <v-list-tile-title v-text="item.name" />
-                  </template>
-                </v-autocomplete>
-              </v-flex>
-              <v-text-field
-                v-model="kudosPerMonth"
-                :rules="mandatoryRule"
-                label="Kudos per month"
-                placeholder="Kudos allowed to send by a user per month"
-                type="number"
-                name="kudosPerMonth" />
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer />
-              <button class="btn btn-primary mb-3" @click="saveGlobalSettings">
-                Save
-              </button>
-              <v-spacer />
-            </v-card-actions>
-          </v-card>
+          <v-tabs v-model="selectedTab" grow>
+            <v-tabs-slider color="primary" />
+            <v-tab key="general">Settings</v-tab>
+            <v-tab key="kudosList">Kudos list</v-tab>
+          </v-tabs>
+
+          <v-tabs-items v-model="selectedTab">
+            <v-tab-item id="general">
+              <v-progress-circular v-if="loading" indeterminate color="white" class="mr-2"></v-progress-circular>
+              <v-card v-else flat>
+                <v-card-text>
+                  <v-flex
+                    id="accessPermissionAutoComplete"
+                    class="contactAutoComplete mt-4">
+                    <v-autocomplete
+                      ref="accessPermissionAutoComplete"
+                      v-model="accessPermission"
+                      :items="accessPermissionOptions"
+                      :loading="isLoadingSuggestions"
+                      :search-input.sync="accessPermissionSearchTerm"
+                      attach="#accessPermissionAutoComplete"
+                      label="Kudos access permission (Spaces only)"
+                      class="contactAutoComplete"
+                      placeholder="Start typing to Search a space"
+                      content-class="contactAutoCompleteContent"
+                      max-width="100%"
+                      item-text="name"
+                      item-value="id"
+                      hide-details
+                      hide-selected
+                      chips
+                      cache-items
+                      dense
+                      flat>
+                      <template slot="no-data">
+                        <v-list-tile>
+                          <v-list-tile-title>
+                            Search for a <strong>Space</strong>
+                          </v-list-tile-title>
+                        </v-list-tile>
+                      </template>
+                      <template slot="selection" slot-scope="{ item, selected }">
+                        <v-chip v-if="item.error" :selected="selected" class="autocompleteSelectedItem">
+                          <del><span>{{ item.name }}</span></del>
+                        </v-chip>
+                        <v-chip v-else :selected="selected" class="autocompleteSelectedItem">
+                          <span>{{ item.name }}</span>
+                        </v-chip>
+                      </template>
+                      <template slot="item" slot-scope="{ item, tile }">
+                        <v-list-tile-avatar v-if="item.avatar" tile size="20">
+                          <img :src="item.avatar">
+                        </v-list-tile-avatar>
+                        <v-list-tile-title v-text="item.name" />
+                      </template>
+                    </v-autocomplete>
+                  </v-flex>
+                  <v-text-field
+                    v-model="kudosPerMonth"
+                    :rules="mandatoryRule"
+                    label="Kudos per month"
+                    placeholder="Kudos allowed to send by a user per month"
+                    type="number"
+                    name="kudosPerMonth" />
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <button class="btn btn-primary mb-3" @click="saveGlobalSettings">
+                    Save
+                  </button>
+                  <v-spacer />
+                </v-card-actions>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item id="kudosList" class="text-xs-center">
+              <kudos-list />
+            </v-tab-item>
+          </v-tabs-items>
         </v-flex>
       </v-layout>
     </main>
@@ -77,19 +91,24 @@
 </template>
 
 <script>
+import KudosList from './KudosList.vue';
+
 import {getSettings, saveSettings} from '../js/KudosSettings.js';
 import {searchSpaces} from '../js/KudosIdentity.js';
 
 export default {
-  data() {
+  components: {
+    KudosList
+  },
+  data: vm => {
     return {
       loading: false,
+      selectedTab: true,
       error: null,
       accessPermission: null,
       accessPermissionOptions: [],
       accessPermissionSearchTerm: null,
       isLoadingSuggestions: false,
-      kudosPerMonth: 0,
       mandatoryRule: [
         (v) => !!v || 'Field is required'
       ]

@@ -18,6 +18,8 @@ public class Kudos implements Comparable<Kudos> {
 
   private String        senderURL;
 
+  private String        senderAvatar;
+
   private String        senderFullName;
 
   private String        receiverId;
@@ -29,6 +31,8 @@ public class Kudos implements Comparable<Kudos> {
   private String        receiverFullName;
 
   private String        receiverURL;
+
+  private String        receiverAvatar;
 
   private String        message;
 
