@@ -31,8 +31,6 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -44,19 +42,17 @@ import org.exoplatform.social.core.space.spi.SpaceService;
  */
 public class KudosService implements Startable {
 
-  private static final Log LOG            = ExoLogger.getLogger(KudosService.class);
+  private IdentityManager identityManager;
 
-  private IdentityManager  identityManager;
+  private SpaceService    spaceService;
 
-  private SpaceService     spaceService;
+  private ListenerService listenerService;
 
-  private ListenerService  listenerService;
+  private KudosStorage    kudosStorage;
 
-  private KudosStorage     kudosStorage;
+  private SettingService  settingService;
 
-  private SettingService   settingService;
-
-  private GlobalSettings   globalSettings = new GlobalSettings();
+  private GlobalSettings  globalSettings = new GlobalSettings();
 
   public KudosService(KudosStorage kudosStorage,
                       SettingService settingService,
@@ -95,47 +91,6 @@ public class KudosService implements Startable {
   }
 
   /**
-   * Retrieve User account details DTO
-   * 
-   * @param id
-   * @return
-   */
-  public AccountDetail getAccountDetails(String type, String id) {
-    if (StringUtils.isBlank(type)) {
-      throw new IllegalArgumentException("type parameter is mandatory");
-    }
-    if (StringUtils.isBlank(id)) {
-      throw new IllegalArgumentException("id parameter is mandatory");
-    }
-    if (USER_ACCOUNT_TYPE.equals(type)) {
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
-      if (identity == null || identity.getProfile() == null) {
-        return null;
-      }
-
-      String avatarUrl = identity.getProfile().getAvatarUrl();
-      if (StringUtils.isBlank(avatarUrl)) {
-        avatarUrl = "/rest/v1/social/users/" + id + "/avatar";
-      }
-      return new AccountDetail(id, identity.getId(), USER_ACCOUNT_TYPE, identity.getProfile().getFullName(), avatarUrl);
-    } else if (SPACE_ACCOUNT_TYPE.equals(type)) {
-      Space space = getSpace(id);
-      if (space == null) {
-        return null;
-      }
-
-      String avatarUrl = space.getAvatarUrl();
-      if (StringUtils.isBlank(avatarUrl)) {
-        avatarUrl = "/rest/v1/social/spaces/" + id + "/avatar";
-      }
-      return new AccountDetail(id, space.getId(), SPACE_ACCOUNT_TYPE, space.getDisplayName(), avatarUrl);
-    } else {
-      LOG.warn("Type is not recognized: " + type);
-      return null;
-    }
-  }
-
-  /**
    * @param username
    * @return kudos settings of a user
    */
@@ -167,7 +122,7 @@ public class KudosService implements Startable {
     checkStatus(kudos.getReceiverType(), kudos.getReceiverId());
 
     kudos.setTime(LocalDateTime.now());
-    kudosStorage.createKudos(kudos);
+    kudos = kudosStorage.createKudos(kudos);
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
   }

@@ -1,5 +1,5 @@
 <template>
-  <v-app id="KudosAdminApp" color="transaprent" flat>
+  <v-app id="KudosAdminApp" color="transaprent">
     <main>
       <v-layout>
         <v-flex class="white text-xs-center" flat>

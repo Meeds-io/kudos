@@ -1,5 +1,5 @@
 <li class="$READ clearfix" data-id="$NOTIFICATION_ID">
-  <div class="media">
+  <div class="media kudosWebNotifContent">
     <div class="avatarXSmall pull-left">
       <img src="$AVATAR" alt="<%=_ctx.escapeHTML(USER)%>" />
     </div> 

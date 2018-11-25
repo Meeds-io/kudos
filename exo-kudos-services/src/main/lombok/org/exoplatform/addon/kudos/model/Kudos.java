@@ -14,7 +14,15 @@ public class Kudos implements Comparable<Kudos> {
 
   private String        senderId;
 
+  private String        senderIdentityId;
+
+  private String        senderURL;
+
+  private String        senderFullName;
+
   private String        receiverId;
+
+  private String        receiverIdentityId;
 
   private String        receiverType;
 

@@ -18,9 +18,10 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.notification.LinkProviderUtils;
+import org.exoplatform.social.service.rest.Util;
 
 public class Utils {
 
@@ -119,22 +120,28 @@ public class Utils {
     kudos.setTechnicalId(kudosEntity.getId());
     kudos.setMessage(kudosEntity.getMessage());
     kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
-
     kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
+    kudos.setTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(kudosEntity.getCreatedDate()), TimeZone.getDefault().toZoneId()));
+
     Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
     kudos.setReceiverId(receiverIdentity.getRemoteId());
+    kudos.setReceiverIdentityId(receiverIdentity.getId());
     kudos.setReceiverType(kudosEntity.isReceiverUser() ? USER_ACCOUNT_TYPE : SPACE_ACCOUNT_TYPE);
     if (kudosEntity.isReceiverUser()) {
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
-      kudos.setReceiverURL(LinkProviderUtils.getRedirectUrl(kudos.getReceiverType(), receiverIdentity.getRemoteId()));
+      kudos.setReceiverURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
     } else {
       Space space = getSpace(receiverIdentity.getRemoteId());
       kudos.setReceiverFullName(space.getDisplayName());
-      kudos.setReceiverURL(LinkProviderUtils.getRedirectUrl(kudos.getReceiverType(), space.getId()));
+      kudos.setReceiverURL(Util.getBaseUrl()
+          + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
     }
+
     Identity senderIdentity = getIdentityById(kudosEntity.getSenderId());
     kudos.setSenderId(senderIdentity.getRemoteId());
-    kudos.setTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(kudosEntity.getCreatedDate()), TimeZone.getDefault().toZoneId()));
+    kudos.setSenderIdentityId(senderIdentity.getId());
+    kudos.setSenderFullName(senderIdentity.getProfile().getFullName());
+    kudos.setSenderURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(senderIdentity.getRemoteId()));
     return kudos;
   }
 

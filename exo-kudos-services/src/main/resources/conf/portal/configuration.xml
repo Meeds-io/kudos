@@ -8,8 +8,7 @@
   </component>
 
   <component>
-    <key>org.exoplatform.addon.kudos.service.KudosStorage</key>
-    <type>org.exoplatform.addon.kudos.service.PersistentKudosStorage</type>
+    <type>org.exoplatform.addon.kudos.service.KudosStorage</type>
   </component>
 
   <component>

@@ -28,7 +28,7 @@
                     <v-icon :class="kudos.receiverFullName? 'uiIconBlue' : 'uiIconLightGray'" size="64" class="uiIconKudos">fa-award</v-icon>
                   </v-card-text>
                   <v-card-text class="pt-0">
-                    <a v-if="kudos.receiverFullName" :href="kudos.receiverURL">{{ kudos.receiverFullName }}</a>
+                    <a v-if="kudos.receiverFullName" :href="kudos.receiverURL" rel="nofollow" target="_blank">{{ kudos.receiverFullName }}</a>
                   </v-card-text>
                 </v-card>
               </v-layout>
@@ -215,6 +215,7 @@ export default {
     openDialog(event) {
       if (!this.disabled) {
         this.dialog = true;
+        this.resetForm();
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
       }

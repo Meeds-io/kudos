@@ -16,31 +16,35 @@ export function getActivityDetails(activityId) {
 export function getReceiver(entityType, entityId) {
   if (entityType === 'ACTIVITY') {
     return getActivityDetails(entityId)
-    .then(activityDetails => {
-      if (activityDetails && activityDetails.identity) {
-        return fetch(activityDetails.identity, {credentials: 'include'});
-      } else {
-        throw new Error("Uknown activity details", activityDetails);
-      }
-    })
-    .then(resp => resp && resp.ok && resp.json())
-    .then(ownerDetails => {
-      if(ownerDetails
-          && ownerDetails.providerId
-          && ownerDetails.globalId
-          && ownerDetails.globalId.localId) {
-        return {
-          id: ownerDetails.globalId.localId,
-          type: ownerDetails.providerId,
-          fullname: (ownerDetails.profile && ownerDetails.profile.fullname) || ownerDetails.globalId.localId
-        };
-      } else {
-        throw new Error("Owner details not found", ownerDetails);
-      }
-    })
-    .catch(e => {
-      console.debug("Error retrieving activity details with id", activityId, e);
-    });
+      .then(activityDetails => {
+        // TODO workaround for SOC-6128 to get receiver details
+        // which is not convenient because we can't retrieve
+        // Space display name with space identity URL
+        // (when fixed, we can user activityDetails.owner.href)
+        if (activityDetails && activityDetails.identity) {
+          return fetch(activityDetails.identity, {credentials: 'include'});
+        } else {
+          throw new Error("Uknown activity details", activityDetails);
+        }
+      })
+      .then(resp => resp && resp.ok && resp.json())
+      .then(ownerDetails => {
+        if(ownerDetails
+            && ownerDetails.providerId
+            && ownerDetails.globalId
+            && ownerDetails.globalId.localId) {
+          return {
+            id: ownerDetails.globalId.localId,
+            type: ownerDetails.providerId,
+            fullname: (ownerDetails.profile && ownerDetails.profile.fullname) || ownerDetails.globalId.localId
+          };
+        } else {
+          throw new Error("Owner details not found", ownerDetails);
+        }
+      })
+      .catch(e => {
+        console.debug("Error retrieving activity details with id", activityId, e);
+      });
   }
 }
 
@@ -92,65 +96,6 @@ export function getKudos(userId) {
 }
 
 /*
- * Return an Array of users and spaces that matches the filter (used in suggestion) :
- * {
- *  name: Full name,
- *  id: id,
- *  avatar: Avatar URL/URI
- * }
- */
-export function searchContact(filter) {
-  let items = null;
-  return searchUsers(filter)
-    .then(users => items = users && users.length ? users : [])
-    .then(() => searchSpaces(filter))
-    .then(spaces => items = items.concat(spaces))
-    .catch((e) => {
-      console.debug("searchContact method - error", e);
-    });
-}
-
-
-/*
- * Search users from eXo Platform, used for suggester
- */
-export function searchUsers(filter, includeCurrentUserInResults) {
-  const params = $.param({
-    nameToSearch: filter,
-    typeOfRelation: 'mention_activity_stream',
-    currentUser: includeCurrentUserInResults ? '' : eXo.env.portal.userName,
-    spaceURL: isOnlySpaceMembers() ? getAccessPermission() : null
-  });
-  return fetch(`/portal/rest/social/people/suggest.json?${params}`, {credentials: 'include'})
-    .then(resp =>  {
-      if (resp.ok) {
-        return resp.json();
-      } else {
-        return null;
-      }
-    })
-    .then(items => {
-      if (items) {
-        if (items.options) {
-          items = items.options;
-        }
-        items.forEach((item) => {
-          if (item.id && item.id.indexOf('@') === 0) {
-            item.id = item.id.substring(1);
-            item.id_type = `user_${item.id}`;
-            if (!item.avatar) {
-              item.avatar = item.avatarUrl ? item.avatarUrl : `/rest/v1/social/users/${item.id}/avatar`;
-            }
-          }
-        });
-      } else {
-        items = [];
-      }
-      return items;
-    });
-}
-
-/*
  * Search spaces from eXo Platform, used for suggester
  */
 export function searchSpaces(filter) {
@@ -174,31 +119,5 @@ export function searchSpaces(filter) {
         });
       });
       return result;
-    });
-}
-
-/*
- * Return the user or space object
- * {
- *  "name": display name of space of user,
- *  "id": Id of space of user,
- *  "avatar": avatar URL/URI,
- *  "type": 'user' or 'space',
- *  "creator": space creator username for space type
- * }
- */
-export function searchUserOrSpaceObject(id, type) {
-  return fetch(`/portal/rest/kudos/api/account/detailsById?id=${id}&type=${type}`, {credentials: 'include'})
-    .then(resp =>  {
-      if (resp.ok) {
-        return resp.json();
-      } else {
-        return null;
-      }
-    }).then(item =>  {
-      if(item && item.id && item.type) {
-        item.id_type = `${item.type}_${item.id}`;
-      }
-      return item;
     });
 }

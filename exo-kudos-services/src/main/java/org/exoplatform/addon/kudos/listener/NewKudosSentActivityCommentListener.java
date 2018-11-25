@@ -18,12 +18,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
-import org.exoplatform.social.notification.LinkProviderUtils;
 
 /**
  * A listener to add comment on activity
@@ -33,11 +28,8 @@ public class NewKudosSentActivityCommentListener extends Listener<KudosService, 
 
   private ActivityStorage  activityStorage;
 
-  private IdentityManager  identityManager;
-
-  public NewKudosSentActivityCommentListener(ActivityStorage activityStorage, IdentityManager identityManager) {
+  public NewKudosSentActivityCommentListener(ActivityStorage activityStorage) {
     this.activityStorage = activityStorage;
-    this.identityManager = identityManager;
   }
 
   @Override
@@ -52,56 +44,30 @@ public class NewKudosSentActivityCommentListener extends Listener<KudosService, 
       if (activity == null) {
         throw new IllegalStateException("Activity with id '" + activityId + "' wasn't found");
       }
-      ExoSocialActivity activityComment = createComment(kudos.getSenderId(),
-                                                        kudos.getReceiverType(),
-                                                        kudos.getReceiverId(),
-                                                        kudos.getMessage());
+      ExoSocialActivity activityComment = createComment(kudos);
       activityStorage.saveComment(activity, activityComment);
     } catch (Exception e) {
       LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
     }
   }
 
-  private ExoSocialActivity createComment(String senderId, String receiverType, String receiverId, String message) {
+  private ExoSocialActivity createComment(Kudos kudos) {
     ExoSocialActivityImpl comment = new ExoSocialActivityImpl();
     comment.setTitle("");
     comment.setType(KUDOS_ACTIVITY_COMMENT_TYPE);
     comment.setTitleId(KUDOS_ACTIVITY_COMMENT_TITLE_ID);
-    Identity senderIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
-    comment.setUserId(senderIdentity.getId());
+    comment.setUserId(kudos.getSenderIdentityId());
 
-    String senderURL = LinkProviderUtils.getRedirectUrl("user", senderId);
-    String senderLink = "<a href='" + senderURL + "'>" + senderIdentity.getProfile().getFullName() + "</a>";
+    String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
     senderLink = StringEscapeUtils.unescapeHtml(senderLink);
+    String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
+    receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
 
-    receiverType = getReceiverType(receiverType);
-    String receiverProviderId = getReceiverIdentityProviderType(receiverType);
-    boolean isReceiverUser = OrganizationIdentityProvider.NAME.equals(receiverProviderId);
-    String fullName = receiverId;
-    String receiverURLId = receiverId;
-    if (isReceiverUser) {
-      Identity receiverIdentity = identityManager.getOrCreateIdentity(receiverProviderId, receiverId, true);
-      if (receiverIdentity == null) {
-        LOG.warn("Can't find user with username : {}", receiverId);
-      } else {
-        fullName = receiverIdentity.getProfile().getFullName();
-      }
-    } else {
-      Space space = getSpace(receiverId);
-      if (space == null) {
-        LOG.warn("Can't find space with pretty name : {}", receiverId);
-      } else {
-        fullName = space.getDisplayName();
-        receiverURLId = space.getId();
-      }
-    }
-    String receiverURL = LinkProviderUtils.getRedirectUrl(receiverType, receiverURLId);
-    String receiverLink = StringEscapeUtils.unescapeHtml("<a href='" + receiverURL + "'>" + fullName + "</a>");
-
-    message =
-            StringUtils.isBlank(message) ? "."
-                                         : StringEscapeUtils.escapeHtml(": " + message.replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
-                                                                                               RESOURCE_BUNDLE_ESCAPE_CHARACTER));
+    String message = StringUtils.isBlank(kudos.getMessage()) ? "."
+                                                             : StringEscapeUtils.escapeHtml(": "
+                                                                 + kudos.getMessage()
+                                                                        .replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
+                                                                                 RESOURCE_BUNDLE_ESCAPE_CHARACTER));
 
     try {
       message = HTMLSanitizer.sanitize(message);

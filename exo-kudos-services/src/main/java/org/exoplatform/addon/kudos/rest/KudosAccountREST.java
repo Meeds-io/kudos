@@ -16,23 +16,16 @@
  */
 package org.exoplatform.addon.kudos.rest;
 
-import static org.exoplatform.addon.kudos.service.utils.Utils.*;
+import static org.exoplatform.addon.kudos.service.utils.Utils.getCurrentUserId;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
-
-import org.exoplatform.addon.kudos.model.AccountDetail;
 import org.exoplatform.addon.kudos.model.AccountSettings;
 import org.exoplatform.addon.kudos.service.KudosService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 
 /**
  * This class provide a REST endpoint to retrieve detailed information about
@@ -42,41 +35,10 @@ import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 @RolesAllowed("users")
 public class KudosAccountREST implements ResourceContainer {
 
-  private static final Log LOG = ExoLogger.getLogger(KudosAccountREST.class);
-
-  private KudosService     kudosService;
+  private KudosService kudosService;
 
   public KudosAccountREST(KudosService kudosService) {
     this.kudosService = kudosService;
-  }
-
-  /**
-   * Retrieves the user or space details by username or spacePrettyName
-   * 
-   * @param id
-   * @param type
-   * @return
-   */
-  @Path("detailsById")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  public Response getAccountByTypeAndID(@QueryParam("type") String type, @QueryParam("id") String id) {
-    if (StringUtils.isBlank(id) || StringUtils.isBlank(type)) {
-      LOG.warn("Bad request sent to server with id '{}' and type '{}'", id, type);
-      return Response.status(400).build();
-    }
-    if (OrganizationIdentityProvider.NAME.equals(type)) {
-      type = USER_ACCOUNT_TYPE;
-    } else if (SpaceIdentityProvider.NAME.equals(type)) {
-      type = SPACE_ACCOUNT_TYPE;
-    }
-    AccountDetail accountDetail = kudosService.getAccountDetails(type, id);
-    if (accountDetail == null) {
-      LOG.warn("Identity not found with type '{}' and id '{}'", type, id);
-      return Response.status(400).build();
-    }
-    return Response.ok(accountDetail).build();
   }
 
   /**
