@@ -39,7 +39,7 @@
               No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} days.
             </div>
             <v-textarea
-              v-else
+              v-else-if="kudosToSend"
               id="kudosMessage"
               v-model="kudosMessage"
               :disabled="loading"
@@ -88,6 +88,7 @@ export default {
       error: null,
       allKudosSent: [],
       allKudos: [],
+      kudosToSend: null,
       kudosMessage: null,
       loading: false,
       htmlToAppend: `<li class="SendKudosButtonTemplate">
@@ -101,6 +102,11 @@ export default {
     };
   },
   watch: {
+    dialog() {
+      if(!this.dialog) {
+        this.resetForm();
+      }
+    },
     entityId() {
       if(this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
@@ -112,13 +118,13 @@ export default {
                 if(!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
-  
-                  this.allKudos.push({
+                  this.kudosToSend = {
                     receiverId: receiverDetails.id,
                     receiverType: receiverDetails.type,
                     receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
                     receiverFullName: receiverDetails.fullname
-                  });
+                  };
+                  this.allKudos.push(this.kudosToSend);
                   for(let i = 0; i < (this.remainingKudos - 1); i++) {
                     this.allKudos.push({});
                   }
@@ -159,6 +165,7 @@ export default {
       this.entityId = null;
       this.entityType = null;
       this.kudosMessage = null;
+      this.kudosToSend = null;
       this.error = null;
     },
     init() {
