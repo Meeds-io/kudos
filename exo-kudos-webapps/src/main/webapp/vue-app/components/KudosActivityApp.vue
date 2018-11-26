@@ -53,7 +53,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <button v-if="remainingKudos > 0" :disabled="loading || error" class="btn btn-primary mr-3" @click="send">Send</button>
+            <button v-if="kudosToSend" :disabled="loading || error" class="btn btn-primary mr-3" @click="send">Send</button>
             <button :disabled="loading" class="btn" @click="dialog = false">Close</button>
             <v-spacer />
           </v-card-actions>
