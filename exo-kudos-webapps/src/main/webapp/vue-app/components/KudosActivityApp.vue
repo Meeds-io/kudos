@@ -37,8 +37,13 @@
                     <v-icon class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
-                  <v-card-text class="pt-0">
-                    <a v-if="kudos.receiverFullName" :href="kudos.receiverURL" rel="nofollow" target="_blank">{{ kudos.receiverFullName }}</a>
+                  <v-card-text class="kudosIconLink">
+                    <receiver-link
+                       v-if="kudos.receiverFullName"
+                       :technicalId="kudos.receiverIdentityId"
+                       :id="kudos.receiverId"
+                       :type="kudos.receiverType"
+                       :name="kudos.receiverFullName" />
                   </v-card-text>
                 </v-card>
               </v-layout>
@@ -74,6 +79,7 @@
 
 <script>
 import KudosApi from './KudosAPI.vue';
+import ReceiverLink from './ReceiverLink.vue';
 
 import {getReceiver} from '../js/KudosIdentity.js';
 import {getEntityKudos, sendKudos, getKudos} from '../js/Kudos.js';
@@ -81,7 +87,8 @@ import {initSettings} from '../js/KudosSettings.js';
 
 export default {
   components: {
-    KudosApi
+    KudosApi,
+    ReceiverLink
   },
   data() {
     return {
@@ -130,6 +137,7 @@ export default {
                   this.kudosToSend = {
                     receiverId: receiverDetails.id,
                     receiverType: receiverDetails.type,
+                    receiverIdentityId: receiverDetails.identityId,
                     receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
                     receiverFullName: receiverDetails.fullname,
                     isCurrent: true

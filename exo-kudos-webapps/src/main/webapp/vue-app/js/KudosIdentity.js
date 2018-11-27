@@ -36,6 +36,7 @@ export function getReceiver(entityType, entityId) {
           return {
             id: ownerDetails.globalId.localId,
             type: ownerDetails.providerId,
+            identityId: ownerDetails.id,
             fullname: (ownerDetails.profile && ownerDetails.profile.fullname) || ownerDetails.globalId.localId
           };
         } else {
