@@ -20,14 +20,23 @@
                 <v-card
                   v-for="(kudos, index) in allKudos"
                   :key="index"
+                  :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
                   flat
-                  class="text-xs-center"
+                  class="text-xs-center kudosIconContainerTop"
                   width="150px"
                   max-width="100%"
                   height="100px">
-                  <v-card-text class="pb-0">
-                    <v-icon :class="kudos.receiverFullName? 'uiIconBlue' : 'uiIconLightGray'" size="64" class="uiIconKudos">fa-award</v-icon>
+                  <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
+                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                    <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
                   </v-card-text>
+                  <v-card-text v-else-if="kudos.isCurrent" class="kudosIconContainer">
+                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                  </v-card-text>
+                  <v-card-text v-else class="kudosIconContainer">
+                    <v-icon class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
+                  </v-card-text>
+                  <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <v-card-text class="pt-0">
                     <a v-if="kudos.receiverFullName" :href="kudos.receiverURL" rel="nofollow" target="_blank">{{ kudos.receiverFullName }}</a>
                   </v-card-text>
@@ -122,7 +131,8 @@ export default {
                     receiverId: receiverDetails.id,
                     receiverType: receiverDetails.type,
                     receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
-                    receiverFullName: receiverDetails.fullname
+                    receiverFullName: receiverDetails.fullname,
+                    isCurrent: true
                   };
                   this.allKudos.push(this.kudosToSend);
                   for(let i = 0; i < (this.remainingKudos - 1); i++) {

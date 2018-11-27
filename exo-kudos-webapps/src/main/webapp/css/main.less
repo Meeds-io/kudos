@@ -19,8 +19,10 @@
 .uiIconKudos.uiIconLightGray {
   color: #c6c6c6;
 }
-.uiIconKudos.uiIconBlue {
-  color: #578dc9;
+.uiIconKudos, .uiIconKudosCheck {
+  &.uiIconBlue {
+    color: #578dc9;
+  }
 }
 #kudosMessage {
   margin: 5px 0 0;
@@ -32,6 +34,33 @@
 }
 .kudosDateSelector {
   width: 288px;
+}
+.kudosIconContainerTop {
+  position: relative;
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  .kudosIconContainer {
+    padding-top: 0;
+    padding-bottom: 0;
+
+    .uiIconKudosCheck {
+      position: absolute;
+      left: 67px;
+      top: 20px;
+    }
+  }
+  .kudosIconContainerCurrent {
+    left: 8px;
+    top: 0;
+    position: absolute;
+    background-color: #578dc9;
+    opacity: .2;
+    width: 90%;
+    height: 90%;
+    border-radius: 5px;
+    border: 1px solid #072648;
+  }
 }
 .SendKudosButtonTemplate{
   button {
