@@ -1,12 +1,11 @@
 package org.exoplatform.addon.kudos.dao;
 
-import java.time.YearMonth;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.addon.kudos.entity.KudosEntity;
+import org.exoplatform.addon.kudos.model.KudosPeriod;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
@@ -25,15 +24,15 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     throw new IllegalStateException("Kudos removal is disabled");
   }
 
-  public List<KudosEntity> getAllKudosByMonth(YearMonth yearMonth) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByMonth", KudosEntity.class);
-    setMonthParameters(query, yearMonth);
+  public List<KudosEntity> getAllKudosByPeriod(KudosPeriod kudosPeriod) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriod", KudosEntity.class);
+    setPeriodParameters(query, kudosPeriod);
     return query.getResultList();
   }
 
-  public List<KudosEntity> getAllKudosByMonthAndEntityType(YearMonth yearMonth, int entityType) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByMonthAndEntityType", KudosEntity.class);
-    setMonthParameters(query, yearMonth);
+  public List<KudosEntity> getAllKudosByPeriodAndEntityType(KudosPeriod kudosPeriod, int entityType) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriodAndEntityType", KudosEntity.class);
+    setPeriodParameters(query, kudosPeriod);
     query.setParameter("entityType", entityType);
     return query.getResultList();
   }
@@ -45,33 +44,31 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     return query.getResultList();
   }
 
-  public List<KudosEntity> getKudosByMonthAndReceiver(YearMonth yearMonth, long receiverId, boolean isReceiverUser) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByMonthAndReceiver", KudosEntity.class);
-    setMonthParameters(query, yearMonth);
+  public List<KudosEntity> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, long receiverId, boolean isReceiverUser) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndReceiver", KudosEntity.class);
+    setPeriodParameters(query, kudosPeriod);
     query.setParameter("receiverId", receiverId);
     query.setParameter("isReceiverUser", isReceiverUser);
     return query.getResultList();
   }
 
-  public List<KudosEntity> getKudosByMonthAndSender(YearMonth yearMonth, long senderId) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByMonthAndSender", KudosEntity.class);
-    setMonthParameters(query, yearMonth);
+  public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndSender", KudosEntity.class);
+    setPeriodParameters(query, kudosPeriod);
     query.setParameter("senderId", senderId);
     return query.getResultList();
   }
 
-  public long countKudosByMonthAndSender(YearMonth yearMonth, long senderId) {
-    TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByMonthAndSender", Long.class);
-    setMonthParameters(query, yearMonth);
+  public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
+    TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndSender", Long.class);
+    setPeriodParameters(query, kudosPeriod);
     query.setParameter("senderId", senderId);
     return query.getSingleResult();
   }
 
-  private void setMonthParameters(TypedQuery<?> query, YearMonth yearMonth) {
-    long monthStartTimeInSeconds = yearMonth.atDay(1).atStartOfDay(ZoneOffset.systemDefault()).toEpochSecond();
-    long monthEndTimeInSeconds = yearMonth.atEndOfMonth().atStartOfDay(ZoneOffset.systemDefault()).toEpochSecond();
-    query.setParameter("startDate", monthStartTimeInSeconds);
-    query.setParameter("endDate", monthEndTimeInSeconds);
+  private void setPeriodParameters(TypedQuery<?> query, KudosPeriod kudosPeriod) {
+    query.setParameter("startDate", kudosPeriod.getStartDateInSeconds());
+    query.setParameter("endDate", kudosPeriod.getEndDateInSeconds());
   }
 
 }

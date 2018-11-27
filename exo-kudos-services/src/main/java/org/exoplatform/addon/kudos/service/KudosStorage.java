@@ -2,14 +2,12 @@ package org.exoplatform.addon.kudos.service;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.addon.kudos.dao.KudosDAO;
 import org.exoplatform.addon.kudos.entity.KudosEntity;
-import org.exoplatform.addon.kudos.model.Kudos;
-import org.exoplatform.addon.kudos.model.KudosEntityType;
+import org.exoplatform.addon.kudos.model.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -48,9 +46,9 @@ public class KudosStorage {
     return fromEntity(kudosEntity);
   }
 
-  public List<Kudos> getAllKudosByMonth(YearMonth yearMonth) {
+  public List<Kudos> getAllKudosByPeriod(KudosPeriod kudosPeriod) {
     List<Kudos> kudosList = new ArrayList<>();
-    List<KudosEntity> kudosEntities = kudosDAO.getAllKudosByMonth(yearMonth);
+    List<KudosEntity> kudosEntities = kudosDAO.getAllKudosByPeriod(kudosPeriod);
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
@@ -61,10 +59,10 @@ public class KudosStorage {
     return kudosList;
   }
 
-  public List<Kudos> getAllKudosByMonthAndEntityType(YearMonth yearMonth, String entityType) {
+  public List<Kudos> getAllKudosByPeriodAndEntityType(KudosPeriod kudosPeriod, String entityType) {
     List<Kudos> kudosList = new ArrayList<>();
-    List<KudosEntity> kudosEntities = kudosDAO.getAllKudosByMonthAndEntityType(yearMonth,
-                                                                               KudosEntityType.valueOf(entityType).ordinal());
+    List<KudosEntity> kudosEntities = kudosDAO.getAllKudosByPeriodAndEntityType(kudosPeriod,
+                                                                                KudosEntityType.valueOf(entityType).ordinal());
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
@@ -89,16 +87,16 @@ public class KudosStorage {
     return kudosList;
   }
 
-  public List<Kudos> getKudosByMonthAndReceiver(YearMonth yearMonth, String receiverType, String receiverId) {
+  public List<Kudos> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
     List<Kudos> kudosList = new ArrayList<>();
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
     Identity identity = identityManager.getOrCreateIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
                                                                            : SpaceIdentityProvider.NAME,
                                                             receiverId,
                                                             true);
-    List<KudosEntity> kudosEntities = kudosDAO.getKudosByMonthAndReceiver(yearMonth,
-                                                                          Long.parseLong(identity.getId()),
-                                                                          isReceiverUser);
+    List<KudosEntity> kudosEntities = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod,
+                                                                           Long.parseLong(identity.getId()),
+                                                                           isReceiverUser);
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
@@ -109,10 +107,10 @@ public class KudosStorage {
     return kudosList;
   }
 
-  public List<Kudos> getKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
+  public List<Kudos> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, String senderId) {
     List<Kudos> kudosList = new ArrayList<>();
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
-    List<KudosEntity> kudosEntities = kudosDAO.getKudosByMonthAndSender(yearMonth, Long.parseLong(identity.getId()));
+    List<KudosEntity> kudosEntities = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, Long.parseLong(identity.getId()));
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
@@ -123,9 +121,9 @@ public class KudosStorage {
     return kudosList;
   }
 
-  public long countKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
+  public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, String senderId) {
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
-    return kudosDAO.countKudosByMonthAndSender(yearMonth, Long.parseLong(identity.getId()));
+    return kudosDAO.countKudosByPeriodAndSender(kudosPeriod, Long.parseLong(identity.getId()));
   }
 
 }

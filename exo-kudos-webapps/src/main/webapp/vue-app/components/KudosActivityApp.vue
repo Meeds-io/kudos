@@ -67,7 +67,7 @@
 import KudosApi from './KudosAPI.vue';
 
 import {getReceiver} from '../js/KudosIdentity.js';
-import {getEntityKudos, sendKudos, getKudos, getKudosByMonth} from '../js/Kudos.js';
+import {getEntityKudos, sendKudos, getKudos} from '../js/Kudos.js';
 import {initSettings} from '../js/KudosSettings.js';
 
 export default {
@@ -92,7 +92,7 @@ export default {
       kudosMessage: null,
       loading: false,
       htmlToAppend: `<li class="SendKudosButtonTemplate">
-          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudo-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">
+          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">
             <div class="v-btn__content">
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGray"></i>
             </div>
@@ -149,7 +149,7 @@ export default {
         if (this.disabled) {
           return;
         }
-        document.addEventListener('exo-kudo-open-send-modal', this.openDialog);
+        document.addEventListener('exo-kudos-open-send-modal', this.openDialog);
 
         // Attach link to activities
         $(window.parentToWatch).bind("DOMSubtreeModified", event => {
@@ -170,11 +170,11 @@ export default {
     },
     init() {
       return initSettings()
-        .then(settings => {
+        .then(() => {
           this.disabled = window.kudosSettings && window.kudosSettings.disabled;
           this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
         })
-        .then(settings => {
+        .then(() => {
           this.remainingDaysToReset = this.getRemainingDays();
           // Get Kudos in an async way
           getKudos(eXo.env.portal.userName)
@@ -282,11 +282,11 @@ export default {
         });
     },
     getRemainingDays() {
-      const now = new Date();
-      const endOfMonth = new Date(now.getTime());
-      endOfMonth.setMonth(now.getMonth() + 1);
-      endOfMonth.setDate(0);
-      return endOfMonth.getDate() > now.getDate() ? endOfMonth.getDate() - now.getDate() : 0;
+      const remainingDateInMillis = window.kudosSettings.endPeriodDateInSeconds * 1000 - Date.now();
+      if(remainingDateInMillis < 0) {
+        return 0;
+      }
+      return parseInt(remainingDateInMillis / 86400000);
     },
     refreshActivity(activityId) {
       const $activityItem = $(`#UIActivityLoader${activityId}`);

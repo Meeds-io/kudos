@@ -42,10 +42,35 @@ export function getKudos(userId) {
   }
 }
 
-export function getKudosByMonth(month) {
+export function getAllKudosByPeriod(startDate, endDate) {
   // convert from milliseconds to seconds
-  month = parseInt(month.getTime() / 1000);
-  return fetch(`/portal/rest/kudos/api/kudos/getKudosByMonth?month=${month}`, {
+  startDate = parseInt(startDate.getTime() / 1000);
+  endDate = parseInt(endDate.getTime() / 1000);
+  return fetch(`/portal/rest/kudos/api/kudos/getAllKudosByPeriod?startDateInSeconds=${startDate}&endDateInSeconds=${endDate}`, {
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(resp => resp && resp.ok && resp.json());
+}
+
+export function getAllKudosByPeriodOfDate(date) {
+  // convert from milliseconds to seconds
+  date = parseInt(date.getTime() / 1000);
+  return fetch(`/portal/rest/kudos/api/kudos/getAllKudosByPeriodOfDate?dateInSeconds=${date}`, {
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }).then(resp => resp && resp.ok && resp.json());
+}
+
+export function getPeriodDates(date, periodType) {
+  // convert from milliseconds to seconds
+  date = parseInt(date.getTime() / 1000);
+  return fetch(`/portal/rest/kudos/api/kudos/getPeriodDates?dateInSeconds=${date}&periodType=${periodType}`, {
     credentials: 'include',
     headers: {
       'Accept': 'application/json',

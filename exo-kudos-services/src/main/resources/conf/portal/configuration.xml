@@ -20,9 +20,9 @@
         <value>${exo.addon.kudos.defaultAccessPermission:}</value>
       </value-param>
       <value-param>
-        <name>defaultKudosPerMonth</name>
-        <description>Default number of kudos per user per month</description>
-        <value>${exo.addon.kudos.defaultKudosPerMonth:3}</value>
+        <name>defaultKudosPerPeriod</name>
+        <description>Default number of kudos per user per period of time</description>
+        <value>${exo.addon.kudos.defaultKudosPerPeriod:3}</value>
       </value-param>
     </init-params>
   </component>

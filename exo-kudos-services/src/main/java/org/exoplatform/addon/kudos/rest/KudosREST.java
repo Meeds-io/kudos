@@ -19,7 +19,6 @@ package org.exoplatform.addon.kudos.rest;
 import static org.exoplatform.addon.kudos.service.utils.Utils.getCurrentUserId;
 import static org.exoplatform.addon.kudos.service.utils.Utils.timeFromSeconds;
 
-import java.time.YearMonth;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -29,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 
-import org.exoplatform.addon.kudos.model.Kudos;
+import org.exoplatform.addon.kudos.model.*;
 import org.exoplatform.addon.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -103,7 +102,7 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'identity id'");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosBySender = kudosService.getAllKudosByMonthAndSender(YearMonth.now(), identityId);
+    List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(identityId);
     return Response.ok(allKudosBySender).build();
   }
 
@@ -126,21 +125,62 @@ public class KudosREST implements ResourceContainer {
   }
 
   /**
-   * Retrieves all kudos by a designed month
+   * Retrieves all kudos by a designed start and end date
    * 
    * @return
    */
-  @Path("getKudosByMonth")
+  @Path("getAllKudosByPeriod")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  public Response getKudosByMonth(@QueryParam("month") long monthInSeconds) {
-    if (monthInSeconds == 0) {
-      LOG.warn("Bad request sent to server with empty 'month' parameter");
+  public Response getAllKudosByPeriod(@QueryParam("startDateInSeconds") long startDateInSeconds,
+                                      @QueryParam("endDateInSeconds") long endDateInSeconds) {
+    if (startDateInSeconds == 0 || endDateInSeconds == 0) {
+      LOG.warn("Bad request sent to server with empty 'start or end' dates parameter");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosByMonth = kudosService.getAllKudosByMonth(YearMonth.from(timeFromSeconds(monthInSeconds)));
-    return Response.ok(allKudosByMonth).build();
+    List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriod(startDateInSeconds, endDateInSeconds);
+    return Response.ok(allKudosByPeriod).build();
   }
 
+  /**
+   * Retrieves all kudos by a period of a designed time
+   * 
+   * @return
+   */
+  @Path("getAllKudosByPeriodOfDate")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  public Response getAllKudosByPeriodOfDate(@QueryParam("dateInSeconds") long dateInSeconds) {
+    if (dateInSeconds == 0) {
+      LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
+      return Response.status(400).build();
+    }
+    List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriodOfDate(dateInSeconds);
+    return Response.ok(allKudosByPeriod).build();
+  }
+
+  /**
+   * Retrieves all kudos by a period of a designed time
+   * 
+   * @return
+   */
+  @Path("getPeriodDates")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  public Response getPeriodDates(@QueryParam("periodType") String periodType, @QueryParam("dateInSeconds") long dateInSeconds) {
+    if (dateInSeconds == 0) {
+      LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
+      return Response.status(400).build();
+    }
+    if (StringUtils.isBlank(periodType)) {
+      LOG.warn("Bad request sent to server with empty 'periodType' parameter");
+      return Response.status(400).build();
+    }
+    KudosPeriodType kudosPeriodType = KudosPeriodType.valueOf(periodType);
+    KudosPeriod kudosPeriod = kudosPeriodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+    return Response.ok(kudosPeriod.toString()).build();
+  }
 }

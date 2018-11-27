@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.addon.kudos.entity.KudosEntity;
-import org.exoplatform.addon.kudos.model.Kudos;
-import org.exoplatform.addon.kudos.model.KudosEntityType;
+import org.exoplatform.addon.kudos.model.*;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -24,6 +25,7 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.service.rest.Util;
 
 public class Utils {
+  private static final Log                   LOG                                     = ExoLogger.getLogger(Utils.class);
 
   public static final String                 SCOPE_NAME                              = "ADDONS_KUDOS";
 
@@ -39,7 +41,7 @@ public class Utils {
 
   public static final String                 DEFAULT_ACCESS_PERMISSION               = "defaultAccessPermission";
 
-  public static final String                 DEFAULT_KUDOS_PER_MONTH                 = "defaultKudosPerMonth";
+  public static final String                 DEFAULT_KUDOS_PER_PERIOD                = "defaultKudosPerPeriod";
 
   public static final String                 KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID = "KudosActivityReceiverNotificationPlugin";
 
@@ -171,6 +173,22 @@ public class Utils {
 
   public static long timeToSeconds(LocalDateTime time) {
     return time.atZone(ZoneOffset.systemDefault()).toEpochSecond();
+  }
+
+  public static KudosPeriod getCurrentPeriod(GlobalSettings globalSettings) {
+    return getPeriodOfTime(globalSettings, LocalDateTime.now());
+  }
+
+  public static KudosPeriod getPeriodOfTime(GlobalSettings globalSettings, LocalDateTime localDateTime) {
+    KudosPeriodType kudosPeriodType = null;
+    if (globalSettings == null || globalSettings.getKudosPeriodType() == null) {
+      LOG.warn("Provided globalSettings doesn't have a parametred kudos period type, using MONTH period type: " + globalSettings,
+               new RuntimeException());
+      kudosPeriodType = KudosPeriodType.DEFAULT;
+    } else {
+      kudosPeriodType = globalSettings.getKudosPeriodType();
+    }
+    return kudosPeriodType.getPeriodOfTime(localDateTime);
   }
 
   @SuppressWarnings("deprecation")

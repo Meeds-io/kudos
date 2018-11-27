@@ -13,17 +13,17 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @DynamicUpdate
 @Table(name = "ADDONS_KUDOS")
 @NamedQueries({
-    @NamedQuery(name = "Kudos.getAllKudosByMonth", query = "select k from Kudos k" + " where k.createdDate > :startDate"
+    @NamedQuery(name = "Kudos.getAllKudosByPeriod", query = "select k from Kudos k" + " where k.createdDate > :startDate"
         + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.getAllKudosByMonthAndEntityType", query = "select k from Kudos k"
+    @NamedQuery(name = "Kudos.getAllKudosByPeriodAndEntityType", query = "select k from Kudos k"
         + " where k.entityType = :entityType" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
     @NamedQuery(name = "Kudos.getAllKudosByEntity", query = "select k from Kudos k" + " where k.entityType = :entityType"
         + " AND k.entityId = :entityId"),
-    @NamedQuery(name = "Kudos.getKudosByMonthAndSender", query = "select k from Kudos k" + " where k.senderId = :senderId"
+    @NamedQuery(name = "Kudos.getKudosByPeriodAndSender", query = "select k from Kudos k" + " where k.senderId = :senderId"
         + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.countKudosByMonthAndSender", query = "select count(k) from Kudos k"
+    @NamedQuery(name = "Kudos.countKudosByPeriodAndSender", query = "select count(k) from Kudos k"
         + " where k.senderId = :senderId" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.getKudosByMonthAndReceiver", query = "select k from Kudos k" + " where k.receiverId = :receiverId"
+    @NamedQuery(name = "Kudos.getKudosByPeriodAndReceiver", query = "select k from Kudos k" + " where k.receiverId = :receiverId"
         + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate") })
 public class KudosEntity implements Serializable {
 

@@ -17,6 +17,13 @@
               <v-progress-circular v-if="loading" indeterminate color="white" class="mr-2"></v-progress-circular>
               <v-card v-else flat>
                 <v-card-text>
+                  <v-radio-group v-model="kudosPeriodType" label="Select period type to use">
+                    <v-radio label="Week" value="WEEK" />
+                    <v-radio label="Month" value="MONTH" />
+                    <v-radio label="Quarter" value="QUARTER" />
+                    <v-radio label="Semester" value="SEMESTER" />
+                    <v-radio label="Year" value="YEAR" />
+                  </v-radio-group>
                   <v-flex
                     id="accessPermissionAutoComplete"
                     class="contactAutoComplete mt-4">
@@ -64,12 +71,12 @@
                     </v-autocomplete>
                   </v-flex>
                   <v-text-field
-                    v-model="kudosPerMonth"
+                    v-model="kudosPerPeriod"
                     :rules="mandatoryRule"
-                    label="Kudos per month"
-                    placeholder="Kudos allowed to send by a user per month"
+                    label="Kudos per period"
+                    placeholder="Kudos allowed to send by a user per period"
                     type="number"
-                    name="kudosPerMonth" />
+                    name="kudosPerPeriod" />
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
@@ -81,7 +88,8 @@
               </v-card>
             </v-tab-item>
             <v-tab-item id="kudosList" class="text-xs-center">
-              <kudos-list />
+              <kudos-list
+                :default-kudos-period-type="kudosPeriodType" />
             </v-tab-item>
           </v-tabs-items>
         </v-flex>
@@ -93,7 +101,7 @@
 <script>
 import KudosList from './KudosList.vue';
 
-import {getSettings, saveSettings} from '../js/KudosSettings.js';
+import {initSettings, saveSettings} from '../js/KudosSettings.js';
 import {searchSpaces} from '../js/KudosIdentity.js';
 
 export default {
@@ -108,6 +116,7 @@ export default {
       accessPermission: null,
       accessPermissionOptions: [],
       accessPermissionSearchTerm: null,
+      kudosPeriodType: null,
       isLoadingSuggestions: false,
       mandatoryRule: [
         (v) => !!v || 'Field is required'
@@ -145,10 +154,11 @@ export default {
   },
   methods: {
     init() {
-      return getSettings()
-        .then(settings => {
-          this.accessPermission = settings && settings.accessPermission;
-          this.kudosPerMonth = settings && settings.kudosPerMonth;
+      return initSettings()
+        .then(() => {
+          this.accessPermission = window.kudosSettings && window.kudosSettings.accessPermission;
+          this.kudosPerPeriod = window.kudosSettings && window.kudosSettings.kudosPerPeriod;
+          this.kudosPeriodType = window.kudosSettings && window.kudosSettings.kudosPeriodType;
           if (this.accessPermission) {
             searchSpaces(this.accessPermission)
               .then(items => {
@@ -172,7 +182,8 @@ export default {
       this.error = null;
       saveSettings({
         accessPermission: this.accessPermission,
-        kudosPerMonth: this.kudosPerMonth
+        kudosPerPeriod: this.kudosPerPeriod,
+        kudosPeriodType: this.kudosPeriodType
       })
         .then(status => {
           if(!status) {

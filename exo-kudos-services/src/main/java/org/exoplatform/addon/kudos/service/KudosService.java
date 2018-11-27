@@ -19,7 +19,6 @@ package org.exoplatform.addon.kudos.service;
 import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class KudosService implements Startable {
 
   private SettingService  settingService;
 
-  private GlobalSettings  globalSettings = new GlobalSettings();
+  private GlobalSettings  globalSettings;
 
   public KudosService(KudosStorage kudosStorage,
                       SettingService settingService,
@@ -67,13 +66,14 @@ public class KudosService implements Startable {
     this.listenerService = listenerService;
 
     if (params != null) {
+      this.globalSettings = new GlobalSettings();
       if (params.containsKey(DEFAULT_ACCESS_PERMISSION)) {
         String defaultAccessPermission = params.getValueParam(DEFAULT_ACCESS_PERMISSION).getValue();
         globalSettings.setAccessPermission(defaultAccessPermission);
       }
-      if (params.containsKey(DEFAULT_KUDOS_PER_MONTH)) {
-        String defaultKudosPerMonth = params.getValueParam(DEFAULT_KUDOS_PER_MONTH).getValue();
-        globalSettings.setKudosPerMonth(Long.parseLong(defaultKudosPerMonth));
+      if (params.containsKey(DEFAULT_KUDOS_PER_PERIOD)) {
+        String defaultKudosPerPeriod = params.getValueParam(DEFAULT_KUDOS_PER_PERIOD).getValue();
+        globalSettings.setKudosPerPeriod(Long.parseLong(defaultKudosPerPeriod));
       }
     }
   }
@@ -101,8 +101,8 @@ public class KudosService implements Startable {
       accountSettings.setDisabled(true);
       return accountSettings;
     }
-    long sentKudos = countKudosByMonthAndSender(YearMonth.now(), getCurrentUserId());
-    accountSettings.setRemainingKudos(globalSettings.getKudosPerMonth() - sentKudos);
+    long sentKudos = countKudosBySenderInCurrentPeriod(getCurrentUserId());
+    accountSettings.setRemainingKudos(getKudosPerPeriod() - sentKudos);
     return accountSettings;
   }
 
@@ -114,7 +114,9 @@ public class KudosService implements Startable {
     if (StringUtils.equals(senderId, kudos.getReceiverId())) {
       throw new IllegalAccessException("User '" + senderId + "' is not authorized to send kudos to himseld!");
     }
-    if (kudosStorage.countKudosByMonthAndSender(YearMonth.now(), senderId) >= globalSettings.getKudosPerMonth()) {
+    KudosPeriod currentPeriod = getCurrentKudosPeriod();
+
+    if (kudosStorage.countKudosByPeriodAndSender(currentPeriod, senderId) >= getKudosPerPeriod()) {
       throw new IllegalAccessException("User '" + senderId + "' is not authorized to send more kudos");
     }
 
@@ -127,36 +129,72 @@ public class KudosService implements Startable {
     listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
   }
 
-  public List<Kudos> getAllKudosByMonth(YearMonth yearMonth) {
-    return kudosStorage.getAllKudosByMonth(yearMonth);
+  public List<Kudos> getAllKudosByPeriod(long startDateInSeconds, long endDateInSeconds) {
+    KudosPeriod period = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    return kudosStorage.getAllKudosByPeriod(period);
   }
 
-  public List<Kudos> getAllKudosByMonthAndEntityType(YearMonth yearMonth, String entityType) {
-    return kudosStorage.getAllKudosByMonthAndEntityType(yearMonth, entityType);
+  public List<Kudos> getAllKudosByPeriodOfDate(long dateInSeconds) {
+    KudosPeriod period = getKudosPeriodOfTime(dateInSeconds);
+    return kudosStorage.getAllKudosByPeriod(period);
   }
 
   public List<Kudos> getAllKudosByEntity(String entityType, String entityId) {
     return kudosStorage.getAllKudosByEntity(entityType, entityId);
   }
 
-  public List<Kudos> getAllKudosByMonthAndSender(YearMonth yearMonth, String identityId) {
-    List<Kudos> kudosBySender = kudosStorage.getKudosByMonthAndSender(yearMonth, identityId);
+  public List<Kudos> getAllKudosByEntityTypeInCurrentPeriod(String entityType) {
+    return kudosStorage.getAllKudosByPeriodAndEntityType(getCurrentKudosPeriod(), entityType);
+  }
+
+  public List<Kudos> getAllKudosBySenderInCurrentPeriod(String identityId) {
+    List<Kudos> kudosBySender = kudosStorage.getKudosByPeriodAndSender(getCurrentKudosPeriod(), identityId);
     if (kudosBySender != null) {
       Collections.sort(kudosBySender);
     }
     return kudosBySender;
   }
 
-  public List<Kudos> getKudosByMonthAndReceiver(YearMonth yearMonth, String receiverType, String receiverId) {
-    List<Kudos> kudosList = kudosStorage.getKudosByMonthAndReceiver(yearMonth, receiverType, receiverId);
+  public List<Kudos> getKudosByReceiverInCurrentPeriod(String receiverType, String receiverId) {
+    List<Kudos> kudosList = kudosStorage.getKudosByPeriodAndReceiver(getCurrentKudosPeriod(), receiverType, receiverId);
     if (kudosList != null) {
       Collections.sort(kudosList);
     }
     return kudosList;
   }
 
-  public long countKudosByMonthAndSender(YearMonth yearMonth, String senderId) {
-    return kudosStorage.countKudosByMonthAndSender(yearMonth, senderId);
+  public long countKudosBySenderInCurrentPeriod(String senderId) {
+    return kudosStorage.countKudosByPeriodAndSender(getCurrentKudosPeriod(), senderId);
+  }
+
+  public void saveGlobalSettings(GlobalSettings settings) {
+    settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toStringToPersist()));
+    this.globalSettings = null;
+  }
+
+  public GlobalSettings getGlobalSettings() {
+    if (this.globalSettings == null) {
+      this.globalSettings = loadGlobalSettings();
+    }
+    return this.globalSettings;
+  }
+
+  public long getKudosPerPeriod() {
+    GlobalSettings globalSettings = getGlobalSettings();
+    return globalSettings == null ? 0 : globalSettings.getKudosPerPeriod();
+  }
+
+  public String getAccessPermission() {
+    GlobalSettings globalSettings = getGlobalSettings();
+    return globalSettings == null ? null : globalSettings.getAccessPermission();
+  }
+
+  private KudosPeriod getCurrentKudosPeriod() {
+    return getCurrentPeriod(getGlobalSettings());
+  }
+
+  private KudosPeriod getKudosPeriodOfTime(long dateInSeconds) {
+    return getPeriodOfTime(getGlobalSettings(), timeFromSeconds(dateInSeconds));
   }
 
   private void checkStatus(String type, String id) {
@@ -167,7 +205,7 @@ public class KudosService implements Startable {
       }
       if (!isUserAuthorized(id)) {
         throw new IllegalStateException("User '" + id + "' isn't member of authorized group to send/receive kudos: "
-            + globalSettings.getAccessPermission());
+            + getAccessPermission());
       }
     } else {
       Space space = getSpace(id);
@@ -181,25 +219,14 @@ public class KudosService implements Startable {
     if (StringUtils.isBlank(username)) {
       return false;
     }
-    if (globalSettings == null || StringUtils.isBlank(globalSettings.getAccessPermission())) {
+    String accessPermission = getAccessPermission();
+    if (StringUtils.isBlank(accessPermission)) {
       return true;
     }
-    Space space = getSpace(globalSettings.getAccessPermission());
+    Space space = getSpace(accessPermission);
 
     // Disable kudos for users not member of the permitted space members
     return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
-  }
-
-  public GlobalSettings getGlobalSettings() {
-    if (globalSettings == null) {
-      globalSettings = loadGlobalSettings();
-    }
-    return globalSettings;
-  }
-
-  public void saveGlobalSettings(GlobalSettings settings) {
-    settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toString()));
-    this.globalSettings = null;
   }
 
   private GlobalSettings loadGlobalSettings() {
