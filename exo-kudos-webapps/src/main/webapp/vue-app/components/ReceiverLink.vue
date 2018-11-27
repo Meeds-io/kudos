@@ -55,7 +55,6 @@ export default {
       } else {
         return `${eXo.env.portal.context}/g/:spaces:${this.id}/`;
       }
-      return '#';
     }
   },
   watch: {

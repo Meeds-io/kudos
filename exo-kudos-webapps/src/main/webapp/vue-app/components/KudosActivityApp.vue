@@ -39,11 +39,11 @@
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <v-card-text class="kudosIconLink">
                     <receiver-link
-                       v-if="kudos.receiverFullName"
-                       :technicalId="kudos.receiverIdentityId"
-                       :id="kudos.receiverId"
-                       :type="kudos.receiverType"
-                       :name="kudos.receiverFullName" />
+                      v-if="kudos.receiverFullName"
+                      :technical-id="kudos.receiverIdentityId"
+                      :id="kudos.receiverId"
+                      :type="kudos.receiverType"
+                      :name="kudos.receiverFullName" />
                   </v-card-text>
                 </v-card>
               </v-layout>
@@ -118,11 +118,6 @@ export default {
     };
   },
   watch: {
-    dialog() {
-      if(!this.dialog) {
-        this.resetForm();
-      }
-    },
     entityId() {
       if(this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
@@ -179,13 +174,6 @@ export default {
       });
   },
   methods: {
-    resetForm() {
-      this.entityId = null;
-      this.entityType = null;
-      this.kudosMessage = null;
-      this.kudosToSend = null;
-      this.error = null;
-    },
     init() {
       return initSettings()
         .then(() => {
@@ -247,9 +235,11 @@ export default {
     openDialog(event) {
       if (!this.disabled) {
         this.dialog = true;
-        this.resetForm();
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
+        this.kudosMessage = null;
+        this.kudosToSend = null;
+        this.error = null;
       }
     },
     send() {
@@ -295,7 +285,6 @@ export default {
             if(this.entityType === 'ACTIVITY') {
               this.refreshActivity(this.entityId);
             }
-            this.resetForm();
           }
         });
     },
