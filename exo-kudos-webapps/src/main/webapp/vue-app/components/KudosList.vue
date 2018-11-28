@@ -1,13 +1,25 @@
 <template>
   <v-card flat>
     <v-card-text>
-      <v-radio-group v-model="kudosPeriodType" label="Select period type to list kudos">
-        <v-radio label="Week" value="WEEK" />
-        <v-radio label="Month" value="MONTH" />
-        <v-radio label="Quarter" value="QUARTER" />
-        <v-radio label="Semester" value="SEMESTER" />
-        <v-radio label="Year" value="YEAR" />
-      </v-radio-group>
+      <v-combobox
+        v-model="kudosPeriodType"
+        :items="periods"
+        :return-object="false"
+        label="Period type"
+        hide-no-data
+        hide-selected
+        small-chips
+        class="kudosPeriodTypeInput">
+        <template slot="selection" slot-scope="data">
+          <v-chip
+            :selected="data.selected"
+            :disabled="data.disabled"
+            :key="data.value"
+            @input="data.parent.selectItem(data.item)">
+            {{ selectedPeriodType }}
+          </v-chip>
+        </template>
+      </v-combobox>
       <v-menu
         ref="selectedDateMenu"
         v-model="selectedDateMenu"
@@ -79,6 +91,28 @@ export default {
       pagination: {
         descending: true
       },
+      periods: [
+        {
+          text: 'Week',
+          value: 'WEEK'
+        },
+        {
+          text: 'Month',
+          value: 'MONTH'
+        },
+        {
+          text: 'Quarter',
+          value: 'QUARTER'
+        },
+        {
+          text: 'Semester',
+          value: 'SEMESTER'
+        },
+        {
+          text: 'Year',
+          value: 'YEAR'
+        }
+      ],
       kudosIdentitiesHeaders: [
         {
           text: '',
@@ -117,6 +151,10 @@ export default {
       } else {
         return '';
       }
+    },
+    selectedPeriodType() {
+      const selectedPeriodType = this.periods.find(period => period.value === this.kudosPeriodType);
+      return selectedPeriodType ? selectedPeriodType.text : this.kudosPeriodType;
     }
   },
   watch: {

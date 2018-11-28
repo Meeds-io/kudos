@@ -17,13 +17,33 @@
               <v-progress-circular v-if="loading" indeterminate color="white" class="mr-2"></v-progress-circular>
               <v-card v-else flat>
                 <v-card-text>
-                  <v-radio-group v-model="kudosPeriodType" label="Select period type to use">
-                    <v-radio label="Week" value="WEEK" />
-                    <v-radio label="Month" value="MONTH" />
-                    <v-radio label="Quarter" value="QUARTER" />
-                    <v-radio label="Semester" value="SEMESTER" />
-                    <v-radio label="Year" value="YEAR" />
-                  </v-radio-group>
+                  <div class="text-xs-left kudosPeriodConfiguration">
+                    <v-text-field
+                      v-model="kudosPerPeriod"
+                      :rules="mandatoryRule"
+                      label="Number of Kudos"
+                      type="number"
+                      name="kudosPerPeriod" />
+                    <span> kudos per </span>
+                    <v-combobox
+                      v-model="kudosPeriodType"
+                      :items="periods"
+                      :return-object="false"
+                      label="Period type"
+                      hide-no-data
+                      hide-selected
+                      small-chips>
+                      <template slot="selection" slot-scope="data">
+                        <v-chip
+                          :selected="data.selected"
+                          :disabled="data.disabled"
+                          :key="data.value"
+                          @input="data.parent.selectItem(data.item)">
+                          {{ selectedPeriodType }}
+                        </v-chip>
+                      </template>
+                    </v-combobox>
+                  </div>
                   <v-flex
                     id="accessPermissionAutoComplete"
                     class="contactAutoComplete mt-4">
@@ -70,13 +90,6 @@
                       </template>
                     </v-autocomplete>
                   </v-flex>
-                  <v-text-field
-                    v-model="kudosPerPeriod"
-                    :rules="mandatoryRule"
-                    label="Kudos per period"
-                    placeholder="Kudos allowed to send by a user per period"
-                    type="number"
-                    name="kudosPerPeriod" />
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
@@ -118,10 +131,38 @@ export default {
       accessPermissionSearchTerm: null,
       kudosPeriodType: null,
       isLoadingSuggestions: false,
+      periods: [
+        {
+          text: 'Week',
+          value: 'WEEK'
+        },
+        {
+          text: 'Month',
+          value: 'MONTH'
+        },
+        {
+          text: 'Quarter',
+          value: 'QUARTER'
+        },
+        {
+          text: 'Semester',
+          value: 'SEMESTER'
+        },
+        {
+          text: 'Year',
+          value: 'YEAR'
+        }
+      ],
       mandatoryRule: [
         (v) => !!v || 'Field is required'
       ]
     };
+  },
+  computed: {
+    selectedPeriodType() {
+      const selectedPeriodType = this.periods.find(period => period.value === this.kudosPeriodType);
+      return selectedPeriodType ? selectedPeriodType.text : this.kudosPeriodType;
+    }
   },
   watch: {
     accessPermissionSearchTerm() {
