@@ -22,10 +22,7 @@
                   :key="index"
                   :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
                   flat
-                  class="text-xs-center kudosIconContainerTop"
-                  width="150px"
-                  max-width="100%"
-                  height="100px">
+                  class="text-xs-center kudosIconContainerTop">
                   <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                     <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>

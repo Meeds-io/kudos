@@ -31,6 +31,8 @@
   max-height: ~"calc(100vh - 350px)";
   overflow: auto;
   min-height: 120px;
+  width: fit-content;
+  margin: 0 auto !important;
 }
 .kudosDateSelector {
   width: 288px;
@@ -39,34 +41,36 @@
   position: relative;
   padding-top: 5px;
   padding-bottom: 5px;
+  width: 115px;
+  max-width: 100%;
+  height: 82px;
 
   .kudosIconContainer {
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
 
     .uiIconKudosCheck {
       position: absolute;
-      left: 67px;
+      left: ~"calc(50% - 8px)";
       top: 20px;
     }
   }
   .kudosIconContainerCurrent {
-    left: 8px;
+    left: 0;
     top: 0;
     position: absolute;
     background-color: #578dc9;
     opacity: .2;
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
     border-radius: 5px;
     border: 1px solid #072648;
     z-index: 1;
   }
   .kudosIconLink {
-    padding-bottom: 0;
+    padding: 0 0 0;
     position: absolute;
     z-index: 2;
-    top: 58px;
+    bottom: 0;
   }
 }
 .SendKudosButtonTemplate{
