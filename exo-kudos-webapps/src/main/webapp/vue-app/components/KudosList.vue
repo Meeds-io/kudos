@@ -29,6 +29,7 @@
         <v-date-picker
           v-model="selectedDate"
           :first-day-of-week="1"
+          :type="!kudosPeriodType || kudosPeriodType === 'WEEK' ? 'date' : 'month'"
           @input="selectedDateMenu = false" />
       </v-menu>
     
