@@ -127,7 +127,7 @@ public class Utils {
 
     Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
     kudos.setReceiverId(receiverIdentity.getRemoteId());
-    kudos.setReceiverIdentityId(receiverIdentity.getId());
+    kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
     kudos.setReceiverType(kudosEntity.isReceiverUser() ? USER_ACCOUNT_TYPE : SPACE_ACCOUNT_TYPE);
     if (kudosEntity.isReceiverUser()) {
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
@@ -143,11 +143,21 @@ public class Utils {
 
     Identity senderIdentity = getIdentityById(kudosEntity.getSenderId());
     kudos.setSenderId(senderIdentity.getRemoteId());
-    kudos.setSenderIdentityId(senderIdentity.getId());
+    kudos.setSenderIdentityId(getIdentityIdByType(senderIdentity));
     kudos.setSenderFullName(senderIdentity.getProfile().getFullName());
     kudos.setSenderURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(senderIdentity.getRemoteId()));
     kudos.setSenderAvatar(getAvatar(senderIdentity, null));
     return kudos;
+  }
+
+  private static String getIdentityIdByType(Identity receiverIdentity) {
+    if (SpaceIdentityProvider.NAME.equals(receiverIdentity.getProviderId())) {
+      Space space = getSpace(receiverIdentity.getRemoteId());
+      if (space != null) {
+        return space.getId();
+      }
+    }
+    return receiverIdentity.getId();
   }
 
   public static KudosEntity toNewEntity(Kudos kudos) {

@@ -15,36 +15,32 @@ export function getActivityDetails(activityId) {
 
 export function getReceiver(entityType, entityId) {
   if (entityType === 'ACTIVITY') {
+    let ownerIdentityId;
     return getActivityDetails(entityId)
       .then(activityDetails => {
-        // TODO workaround for SOC-6128 to get receiver details
-        // which is not convenient because we can't retrieve
-        // Space display name with space identity URL
-        // (when fixed, we can user activityDetails.owner.href)
-        if (activityDetails && activityDetails.identity) {
-          return fetch(activityDetails.identity, {credentials: 'include'});
+        if (activityDetails && activityDetails.owner && activityDetails.owner.href) {
+          ownerIdentityId = activityDetails.identity.substring(activityDetails.identity.lastIndexOf('/') + 1);
+          return fetch(activityDetails.owner.href, {credentials: 'include'});
         } else {
           throw new Error("Uknown activity details", activityDetails);
         }
       })
       .then(resp => resp && resp.ok && resp.json())
       .then(ownerDetails => {
-        if(ownerDetails
-            && ownerDetails.providerId
-            && ownerDetails.globalId
-            && ownerDetails.globalId.localId) {
+        if(ownerDetails) {
+          const isSpace = ownerDetails.subscription;
           return {
-            id: ownerDetails.globalId.localId,
-            type: ownerDetails.providerId,
-            identityId: ownerDetails.id,
-            fullname: (ownerDetails.profile && ownerDetails.profile.fullname) || ownerDetails.globalId.localId
+            id: isSpace ? ownerDetails.groupId && ownerDetails.groupId.replace('/spaces/', '') : ownerDetails.username,
+            type: isSpace ? 'space' : 'user',
+            identityId: ownerIdentityId,
+            fullname: isSpace ? ownerDetails.displayName : ownerDetails.fullname
           };
         } else {
           throw new Error("Owner details not found", ownerDetails);
         }
       })
       .catch(e => {
-        console.debug("Error retrieving activity details with id", activityId, e);
+        console.debug("Error retrieving activity details with id", entityId, e);
       });
   }
 }

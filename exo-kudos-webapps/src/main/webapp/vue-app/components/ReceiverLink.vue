@@ -74,9 +74,6 @@ export default {
   methods: {
     initTiptip() {
       if (this.type === 'space') {
-        // TODO because of SOC-6128, we disable this,
-        // we can't get socialId
-        /*
         this.$nextTick(() => {
           $(`#${this.componentId}`).spacePopup({
             userName: eXo.env.portal.userName,
@@ -94,7 +91,6 @@ export default {
             maxWidth: "240px"
           });
         });
-        */
       } else {
         this.$nextTick(() => {
           $(`#${this.componentId}`).userPopup({
