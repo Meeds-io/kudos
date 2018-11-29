@@ -24,7 +24,7 @@
                       label="Number of Kudos"
                       type="number"
                       name="kudosPerPeriod" />
-                    <span> kudos per </span>
+                    <span class="ml-2 mr-2"> kudos per </span>
                     <v-combobox
                       v-model="kudosPeriodType"
                       :items="periods"
@@ -34,13 +34,7 @@
                       hide-selected
                       small-chips>
                       <template slot="selection" slot-scope="data">
-                        <v-chip
-                          :selected="data.selected"
-                          :disabled="data.disabled"
-                          :key="data.value"
-                          @input="data.parent.selectItem(data.item)">
-                          {{ selectedPeriodType }}
-                        </v-chip>
+                        {{ selectedPeriodType }}
                       </template>
                     </v-combobox>
                   </div>

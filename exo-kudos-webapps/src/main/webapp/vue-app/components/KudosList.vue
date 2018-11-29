@@ -11,13 +11,7 @@
         small-chips
         class="kudosPeriodTypeInput">
         <template slot="selection" slot-scope="data">
-          <v-chip
-            :selected="data.selected"
-            :disabled="data.disabled"
-            :key="data.value"
-            @input="data.parent.selectItem(data.item)">
-            {{ selectedPeriodType }}
-          </v-chip>
+          {{ selectedPeriodType }}
         </template>
       </v-combobox>
       <v-menu
@@ -166,9 +160,9 @@ export default {
     },
     defaultKudosPeriodType() {
       if(!this.kudosPeriodType && this.defaultKudosPeriodType) {
-        this.kudosPeriodType = this.defaultKudosPeriodType;
         this.selectedDate = new Date().toISOString().substr(0, 10);
       }
+      this.kudosPeriodType = this.defaultKudosPeriodType;
     }
   },
   created() {
