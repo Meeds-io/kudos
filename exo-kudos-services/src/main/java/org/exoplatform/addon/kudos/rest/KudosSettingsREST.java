@@ -43,7 +43,7 @@ public class KudosSettingsREST implements ResourceContainer {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed("users")
   public Response getSettings() {
     return Response.ok(kudosService.getGlobalSettings()).build();
   }
