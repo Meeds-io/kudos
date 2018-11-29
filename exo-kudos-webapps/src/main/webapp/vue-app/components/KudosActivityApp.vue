@@ -116,6 +116,9 @@ export default {
   },
   watch: {
     entityId() {
+      this.kudosMessage = null;
+      this.kudosToSend = null;
+      this.error = null;
       if(this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
         if (this.remainingKudos > 0) {
@@ -234,9 +237,6 @@ export default {
         this.dialog = true;
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
-        this.kudosMessage = null;
-        this.kudosToSend = null;
-        this.error = null;
       }
     },
     send() {
