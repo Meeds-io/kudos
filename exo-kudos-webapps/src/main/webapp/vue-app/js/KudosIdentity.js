@@ -15,11 +15,22 @@ export function getActivityDetails(activityId) {
 
 export function getReceiver(entityType, entityId) {
   if (entityType === 'ACTIVITY') {
+    let ownerId;
     let ownerIdentityId;
+    let ownerType;
+    let isSpace = false;
     return getActivityDetails(entityId)
       .then(activityDetails => {
         if (activityDetails && activityDetails.owner && activityDetails.owner.href) {
-          ownerIdentityId = activityDetails.identity.substring(activityDetails.identity.lastIndexOf('/') + 1);
+          isSpace = activityDetails.owner.href.indexOf('/spaces/') >= 0;
+          ownerType = isSpace ? 'space' : 'user';
+          if (isSpace) {
+            ownerIdentityId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
+            ownerId = activityDetails.activityStream && activityDetails.activityStream.id;
+          } else {
+            ownerIdentityId = activityDetails.identity.substring(activityDetails.identity.lastIndexOf('/') + 1);
+            ownerId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
+          }
           return fetch(activityDetails.owner.href, {credentials: 'include'});
         } else {
           throw new Error("Uknown activity details", activityDetails);
@@ -28,10 +39,9 @@ export function getReceiver(entityType, entityId) {
       .then(resp => resp && resp.ok && resp.json())
       .then(ownerDetails => {
         if(ownerDetails) {
-          const isSpace = ownerDetails.subscription;
           return {
-            id: isSpace ? ownerDetails.groupId && ownerDetails.groupId.replace('/spaces/', '') : ownerDetails.username,
-            type: isSpace ? 'space' : 'user',
+            id: ownerId,
+            type: ownerType,
             identityId: ownerIdentityId,
             fullname: isSpace ? ownerDetails.displayName : ownerDetails.fullname
           };
