@@ -34,9 +34,17 @@
                     <v-icon class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
-                  <v-card-text class="kudosIconLink">
+                  <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
+                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
                     <receiver-link
-                      v-if="kudos.receiverFullName"
+                      :technical-id="kudos.receiverIdentityId"
+                      :id="kudos.receiverId"
+                      :type="kudos.receiverType"
+                      :name="kudos.receiverFullName" />
+                  </v-card-text>
+                  <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
+                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
+                    <receiver-link
                       :technical-id="kudos.receiverIdentityId"
                       :id="kudos.receiverId"
                       :type="kudos.receiverType"
