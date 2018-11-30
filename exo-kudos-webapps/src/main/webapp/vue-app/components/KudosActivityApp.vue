@@ -50,6 +50,9 @@
                       :type="kudos.receiverType"
                       :name="kudos.receiverFullName" />
                   </v-card-text>
+                  <v-card-text v-else class="pb-0 pt-0">
+                    <a href="javascript:void(0);">X {{ remainingKudos }}</a>
+                  </v-card-text>
                 </v-card>
               </v-layout>
             </v-container>
@@ -146,7 +149,7 @@ export default {
                     isCurrent: true
                   };
                   this.allKudos.push(this.kudosToSend);
-                  for(let i = 0; i < (this.remainingKudos - 1); i++) {
+                  if (this.remainingKudos > 0) {
                     this.allKudos.push({});
                   }
                 } else {
