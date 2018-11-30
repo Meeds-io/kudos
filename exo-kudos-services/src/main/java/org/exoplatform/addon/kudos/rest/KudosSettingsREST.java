@@ -45,7 +45,7 @@ public class KudosSettingsREST implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   public Response getSettings() {
-    return Response.ok(kudosService.getGlobalSettings()).build();
+    return Response.ok(kudosService.getGlobalSettings().toString()).build();
   }
 
   /**

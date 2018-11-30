@@ -47,7 +47,7 @@
             </v-container>
             <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
               <i class="uiIconInfo"></i>
-              No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} days.
+              No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} {{ remainingDaysToReset === 1 ? 'day' : 'days' }}.
             </div>
             <v-textarea
               v-else-if="kudosToSend"
@@ -181,7 +181,8 @@ export default {
           this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
         })
         .then(() => {
-          this.remainingDaysToReset = this.getRemainingDays();
+          const remainingDaysToReset = Number(this.getRemainingDays());
+          this.remainingDaysToReset = remainingDaysToReset ? remainingDaysToReset : 0;
           // Get Kudos in an async way
           getKudos(eXo.env.portal.userName)
             .then(allKudos => {
@@ -290,7 +291,7 @@ export default {
       if(remainingDateInMillis < 0) {
         return 0;
       }
-      return parseInt(remainingDateInMillis / 86400000);
+      return parseInt(remainingDateInMillis / 86400000) + 1;
     },
     refreshActivity(activityId) {
       const $activityItem = $(`#UIActivityLoader${activityId}`);
