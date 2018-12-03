@@ -31,7 +31,7 @@
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                   </v-card-text>
                   <v-card-text v-else class="kudosIconContainer">
-                    <v-icon class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
+                    <v-icon :title="`${remainingKudos -1} kudos left to send`" class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
@@ -51,7 +51,7 @@
                       :name="kudos.receiverFullName" />
                   </v-card-text>
                   <v-card-text v-else class="pb-0 pt-0">
-                    <a href="javascript:void(0);">X {{ remainingKudos }}</a>
+                    <a :title="`${remainingKudos -1} kudos left to send`" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
                   </v-card-text>
                 </v-card>
               </v-layout>
@@ -140,7 +140,7 @@ export default {
                 if(!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
-                  this.kudosToSend = {
+                  const kudosToSend = {
                     receiverId: receiverDetails.id,
                     receiverType: receiverDetails.type,
                     receiverIdentityId: receiverDetails.identityId,
@@ -148,8 +148,13 @@ export default {
                     receiverFullName: receiverDetails.fullname,
                     isCurrent: true
                   };
-                  this.allKudos.push(this.kudosToSend);
-                  if (this.remainingKudos > 0) {
+                  if(receiverDetails.notAuthorized) {
+                    this.error = "Current selected user isn't authorized to receive Kudos.";
+                  } else {
+                    this.kudosToSend = kudosToSend;
+                  }
+                  this.allKudos.push(kudosToSend);
+                  if (this.remainingKudos > 1) {
                     this.allKudos.push({});
                   }
                 } else {
@@ -271,6 +276,7 @@ export default {
           this.error = String(e);
           throw e;
         })
+        .then(() => this.dialog = false)
         .then(() =>
           this.init()
             .catch(e => {
@@ -283,7 +289,6 @@ export default {
               console.debug("Error refreshing number of kudos", e);
             })
         )
-        .then(() => this.dialog = false)
         .catch(e => {
           console.debug("Error saving kudo");
           this.error = String(e);

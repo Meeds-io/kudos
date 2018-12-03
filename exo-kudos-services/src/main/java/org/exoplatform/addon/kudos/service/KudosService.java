@@ -97,7 +97,7 @@ public class KudosService implements Startable {
   public AccountSettings getAccountSettings(String username) {
     AccountSettings accountSettings = new AccountSettings();
 
-    if (!isUserAuthorized(username)) {
+    if (!isAuthorized(username)) {
       accountSettings.setDisabled(true);
       return accountSettings;
     }
@@ -189,6 +189,26 @@ public class KudosService implements Startable {
     return globalSettings == null ? null : globalSettings.getAccessPermission();
   }
 
+  /**
+   * Check if user is authorized to send/receive Kudos
+   * 
+   * @param username
+   * @return
+   */
+  public boolean isAuthorized(String username) {
+    if (StringUtils.isBlank(username)) {
+      return false;
+    }
+    String accessPermission = getAccessPermission();
+    if (StringUtils.isBlank(accessPermission)) {
+      return true;
+    }
+    Space space = getSpace(accessPermission);
+
+    // Disable kudos for users not member of the permitted space members
+    return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
+  }
+
   private KudosPeriod getCurrentKudosPeriod() {
     return getCurrentPeriod(getGlobalSettings());
   }
@@ -203,7 +223,7 @@ public class KudosService implements Startable {
       if (identity == null || !identity.isEnable() || identity.isDeleted()) {
         throw new IllegalStateException("User '" + id + "' doesn't have a valid and enabled social identity");
       }
-      if (!isUserAuthorized(id)) {
+      if (!isAuthorized(id)) {
         throw new IllegalStateException("User '" + id + "' isn't member of authorized group to send/receive kudos: "
             + getAccessPermission());
       }
@@ -213,20 +233,6 @@ public class KudosService implements Startable {
         throw new IllegalStateException("Space '" + id + "' wasn't found, thus it can't receive/send kudos");
       }
     }
-  }
-
-  private boolean isUserAuthorized(String username) {
-    if (StringUtils.isBlank(username)) {
-      return false;
-    }
-    String accessPermission = getAccessPermission();
-    if (StringUtils.isBlank(accessPermission)) {
-      return true;
-    }
-    Space space = getSpace(accessPermission);
-
-    // Disable kudos for users not member of the permitted space members
-    return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
   }
 
   private GlobalSettings loadGlobalSettings() {

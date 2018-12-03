@@ -58,4 +58,22 @@ public class KudosAccountREST implements ResourceContainer {
     return Response.ok(accountDetail).build();
   }
 
+  /**
+   * Chacks if username is authorized to use Kudos
+   * 
+   * @param username
+   * @return
+   */
+  @Path("isAuthorized")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  public Response isAuthorized(@QueryParam("username") String username) {
+    if (kudosService.isAuthorized(username)) {
+      return Response.ok().build();
+    } else {
+      return Response.status(403).build();
+    }
+  }
+
 }

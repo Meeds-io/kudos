@@ -39,12 +39,27 @@ export function getReceiver(entityType, entityId) {
       .then(resp => resp && resp.ok && resp.json())
       .then(ownerDetails => {
         if(ownerDetails) {
-          return {
+          ownerDetails = {
             id: ownerId,
             type: ownerType,
             identityId: ownerIdentityId,
             fullname: isSpace ? ownerDetails.displayName : ownerDetails.fullname
           };
+          if (window.kudosSettings.accessPermission && ownerType === 'user') {
+            // check if user is authorized to receive Kudos
+            return fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${ownerId}`, {credentials: 'include'})
+              .then(resp => {
+                if (!resp || !resp.ok) {
+                  ownerDetails.notAuthorized = true;
+                }
+                return ownerDetails;
+              })
+              .catch(e => {
+                return ownerDetails;
+              });
+          } else {
+            return ownerDetails;
+          }
         } else {
           throw new Error("Owner details not found", ownerDetails);
         }
