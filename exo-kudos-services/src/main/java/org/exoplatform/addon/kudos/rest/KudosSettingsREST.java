@@ -29,7 +29,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
  * This class provide a REST endpoint to manage global settings
  */
 @Path("/kudos/api/settings")
-@RolesAllowed("administrators")
+@RolesAllowed("users")
 public class KudosSettingsREST implements ResourceContainer {
 
   private KudosService kudosService;
