@@ -121,7 +121,7 @@ export default {
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGray"></i>
             </div>
           </button>
-          <a href="javascript:void(0);">kudosCount</a>
+          <a rel="tooltip" data-placement="bottom" title="Kudos received by activity" href="javascript:void(0);">kudosCount</a>
         </li>`
     };
   },
