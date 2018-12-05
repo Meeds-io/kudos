@@ -126,7 +126,10 @@ export default {
     };
   },
   watch: {
-    entityId() {
+    dialog() {
+      if(!this.dialog) {
+        return;
+      }
       this.kudosMessage = null;
       this.kudosToSend = null;
       this.error = null;

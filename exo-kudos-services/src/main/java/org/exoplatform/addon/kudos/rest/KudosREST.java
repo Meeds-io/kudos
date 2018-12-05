@@ -164,12 +164,14 @@ public class KudosREST implements ResourceContainer {
   /**
    * Retrieves all kudos by a period of a designed time
    * 
+   * @param periodType
+   * @param dateInSeconds
    * @return
    */
   @Path("getPeriodDates")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed("users")
   public Response getPeriodDates(@QueryParam("periodType") String periodType, @QueryParam("dateInSeconds") long dateInSeconds) {
     if (dateInSeconds == 0) {
       LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
