@@ -121,7 +121,7 @@ export default {
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGray"></i>
             </div>
           </button>
-          <a rel="tooltip" data-placement="bottom" title="Kudos received by activity" href="javascript:void(0);">kudosCount</a>
+          <a rel="tooltip" data-placement="bottom" title="Kudos received by activity" href="javascript:void(0);" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">kudosCount</a>
         </li>`
     };
   },
@@ -182,6 +182,7 @@ export default {
           return;
         }
         document.addEventListener('exo-kudos-open-send-modal', this.openDialog);
+        document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
 
         // Attach link to activities
         $(window.parentToWatch).bind("DOMSubtreeModified", event => {
