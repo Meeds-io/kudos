@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
@@ -48,7 +49,13 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
 
     NotificationInfo notification = ctx.getNotificationInfo();
     String activityId = notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey());
-    ExoSocialActivity activity = Utils.getActivityManager().getActivity(activityId);
+    String entityType = notification.getValueOwnerParameter("ENTITY_TYPE");
+    ExoSocialActivity activity = null;
+    if (entityType == null || KudosEntityType.ACTIVITY == KudosEntityType.valueOf(entityType)) {
+      activity = Utils.getActivityManager().getActivity(activityId);
+    } else if (KudosEntityType.COMMENT == KudosEntityType.valueOf(entityType)) {
+      activity = Utils.getActivityManager().getActivity("comment" + activityId);
+    }
     if (activity == null) {
       return null;
     }
@@ -103,7 +110,13 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
     String title = SocialNotificationUtils.processImageTitle(activity.getTitle(), imagePlaceHolder);
     templateContext.put("SUBJECT", title);
     templateContext.put("PROFILE_URL", LinkProviderUtils.getRedirectUrl("user", senderIdentity.getRemoteId()));
-    String activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
+    String activityURL = null;
+    if (activity.isComment()) {
+      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
+    } else {
+      activityURL = LinkProviderUtils.getRedirectUrl("reply_activity_highlight_comment",
+                                                     activity.getParentId() + "-" + activity.getId());
+    }
     templateContext.put("VIEW_FULL_DISCUSSION_ACTION_URL", activityURL);
     MessageInfo messageInfo = new MessageInfo();
     if (pushNotification) {

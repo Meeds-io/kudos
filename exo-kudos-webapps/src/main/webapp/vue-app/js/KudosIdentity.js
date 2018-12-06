@@ -14,11 +14,14 @@ export function getActivityDetails(activityId) {
 }
 
 export function getReceiver(entityType, entityId) {
-  if (entityType === 'ACTIVITY') {
+  if (entityType === 'ACTIVITY' || entityType === 'COMMENT') {
     let ownerId;
     let ownerIdentityId;
     let ownerType;
     let isSpace = false;
+    if(entityType === 'COMMENT') {
+      entityId = `comment${entityId}`;
+    }
     return getActivityDetails(entityId)
       .then(activityDetails => {
         if (activityDetails && activityDetails.owner && activityDetails.owner.href) {

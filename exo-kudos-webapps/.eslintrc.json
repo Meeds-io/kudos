@@ -13,7 +13,8 @@
         "eXo": true,
         "Vue": true,
         "Vuetify": true,
-        "UIActivityLoader": true
+        "UIActivityLoader": true,
+        "UIActivity": true
     },
     "parserOptions": {
         "sourceType": "module",

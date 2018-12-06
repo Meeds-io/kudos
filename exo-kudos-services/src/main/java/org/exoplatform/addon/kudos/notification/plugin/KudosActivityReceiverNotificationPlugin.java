@@ -43,7 +43,8 @@ public class KudosActivityReceiverNotificationPlugin extends BaseNotificationPlu
   public boolean isValid(NotificationContext ctx) {
     Kudos kudos = ctx.value(KUDOS_ACTIVITY_DETAILS_PARAMETER);
     return kudos != null && kudos.getEntityType() != null
-        && KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY;
+        && (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
+            || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT);
   }
 
   @Override
@@ -62,6 +63,7 @@ public class KudosActivityReceiverNotificationPlugin extends BaseNotificationPlu
     return NotificationInfo.instance()
                            .to(toList)
                            .with(SocialNotificationUtils.ACTIVITY_ID.getKey(), kudos.getEntityId())
+                           .with("ENTITY_TYPE", kudos.getEntityType())
                            .with("SENDER_ID", senderId)
                            .with("RECEIVER_ID", receiverId)
                            .with("RECEIVER_TYPE", receiverType)

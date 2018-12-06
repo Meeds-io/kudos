@@ -182,7 +182,7 @@ export default {
       if(!this.listDialog || !this.entityId || !this.entityType) {
         return;
       }
-      const $sendKudosLink = $(`#SendKudosButton${this.entityType}${this.entityId}`);
+      const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${this.entityType}${this.entityId}`);
       const kudosList = $sendKudosLink.data("kudosList");
       if(!kudosList || !kudosList.length) {
         return;
@@ -227,7 +227,8 @@ export default {
                   throw new Error("You can't send kudos to yourself !");
                 }
               } else {
-                throw new Error("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
+                console.debug("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
+                throw new Error("The receiver isn't authorized to receive kudos");
               }
             })
             .catch(e => {
@@ -250,9 +251,11 @@ export default {
         // Attach link to activities
         $(window.parentToWatch).bind("DOMSubtreeModified", event => {
           this.addButtonToActivities();
+          this.addButtonToComments();
         });
         this.$nextTick(() => {
           this.addButtonToActivities();
+          this.addButtonToComments();
         });
       });
   },
@@ -275,6 +278,27 @@ export default {
         .catch(e => {
           this.error = e;
         });
+    },
+    addButtonToComments() {
+      if (!this.disabled) {
+        const commentsToAddButtons = $(window.parentToWatch).find('.activityStream .commentItem .statusAction:not(.kudoContainer)');
+        commentsToAddButtons.each((index, element) => {
+          let commentId = $(element).closest('.CommentBlock').data('comment-id');
+          if (commentId && this.entityIds.indexOf(commentId) < 0) {
+            $(element).addClass('kudoContainer');
+            const entityId = commentId;
+            this.entityIds.push(entityId);
+            commentId = commentId.replace('comment', '');
+            this.refreshLink(element, 'COMMENT', commentId)
+              .then(() => {
+                const index = this.entityIds.indexOf(entityId);
+                if (index >= 0) {
+                  this.entityIds.splice(index, 1);
+                }
+              });
+          }
+        });
+      }
     },
     addButtonToActivities() {
       if (!this.disabled) {
@@ -300,20 +324,27 @@ export default {
     refreshLink(element, entityType, entityId) {
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
-          const linkId = `SendKudosButtonACTIVITY${entityId}`;
+          const linkId = `SendKudosButton${entityType}${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          const $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
+          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
           $sendKudosLink.attr('id', linkId);
-          $sendKudosLink.data("kudosList", kudosList);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
             $existingLink.html($sendKudosLink.html());
           } else if(element) {
-            $sendKudosLink.prependTo($(element));
+            if (entityType === 'COMMENT') {
+              $('<li class="separator">-</li>').appendTo($(element));
+              $sendKudosLink.appendTo($(element));
+            } else {
+              $sendKudosLink.prependTo($(element));
+            }
           } else {
             console.warn("Can't refresh entity with type/id", entityType, entityId);
+            return;
           }
+          $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${this.entityType}${this.entityId}`);
+          $sendKudosLink.data("kudosList", kudosList);
         });
     },
     openDialog(event) {
@@ -375,6 +406,20 @@ export default {
           if(!this.dialog) {
             if(this.entityType === 'ACTIVITY') {
               this.refreshActivity(this.entityId);
+            } else if(this.entityType === 'COMMENT') {
+              let activityId = $(`#commentContainercomment${this.entityId}`).closest('.activityStream').attr('id');
+              if (activityId) {
+                const thiss = this;
+                activityId = activityId.replace('activityContainer', '');
+                thiss.refreshActivity(activityId);
+                setTimeout(() => {
+                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last().attr("id");
+                  if(commentToScrollTo) {
+                    commentToScrollTo = commentToScrollTo.replace('commentContainer', '');
+                    UIActivity.focusToComment(commentToScrollTo);
+                  }
+                }, 400);
+              }
             }
           }
         });

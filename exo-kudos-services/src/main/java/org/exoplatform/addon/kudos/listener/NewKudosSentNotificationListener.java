@@ -25,7 +25,8 @@ public class NewKudosSentNotificationListener extends Listener<KudosService, Kud
     Kudos kudos = event.getData();
     try {
       NotificationContext ctx = NotificationContextImpl.cloneInstance();
-      if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY) {
+      if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
+          || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
         ctx.append(KUDOS_ACTIVITY_DETAILS_PARAMETER, kudos);
         ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID))).execute(ctx);
       }
