@@ -32,13 +32,12 @@
           :type="!kudosPeriodType || kudosPeriodType === 'WEEK' ? 'date' : 'month'"
           @input="selectedDateMenu = false" />
       </v-menu>
-    
+
       <v-data-table
         :headers="kudosIdentitiesHeaders"
         :items="kudosIdentitiesList"
         :loading="loading"
         :sortable="true"
-        :pagination.sync="pagination"
         class="elevation-1 mr-3 mb-2"
         hide-actions>
         <template slot="items" slot-scope="props">
@@ -85,7 +84,8 @@ export default {
       selectedStartDate: null,
       selectedEndDate: null,
       pagination: {
-        descending: true
+        descending: true,
+        
       },
       periods: [
         {
