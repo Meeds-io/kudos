@@ -35,8 +35,8 @@
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
-                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
-                    <receiver-link
+                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink absoluteLink">
+                    <identity-link
                       :technical-id="kudos.receiverIdentityId"
                       :id="kudos.receiverId"
                       :type="kudos.receiverType"
@@ -44,7 +44,7 @@
                   </v-card-text>
                   <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
                   <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
-                    <receiver-link
+                    <identity-link
                       :technical-id="kudos.receiverIdentityId"
                       :id="kudos.receiverId"
                       :type="kudos.receiverType"
@@ -82,12 +82,62 @@
         </v-card>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="listDialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="listDialog = false">
+      <v-card class="elevation-12">
+        <div class="popupHeader ClearFix">
+          <a class="uiIconClose pull-right" aria-hidden="true" @click="listDialog = false"></a>
+          <span class="PopupTitle popupTitle">Kudos list</span>
+        </div>
+        <v-card flat>
+          <div v-if="error && !loading" class="alert alert-error v-content">
+            <i class="uiIconError"></i>{{ error }}
+          </div>
+          <v-card-text>
+            <v-container v-if="kudosList && kudosList.length" flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
+              <v-layout
+                row
+                wrap
+                class="kudosIconsContainer">
+                <v-card
+                  v-for="(kudos, index) in kudosList"
+                  :key="index"
+                  :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
+                  flat
+                  class="text-xs-center kudosIconContainerTop">
+                  <v-card-text v-if="kudos.senderFullName" class="kudosIconContainer">
+                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                    <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
+                  </v-card-text>
+                  <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
+                    <identity-link
+                      :technical-id="kudos.senderIdentityId"
+                      :id="kudos.senderId"
+                      :type="kudos.senderType"
+                      :name="kudos.senderFullName" />
+                  </v-card-text>
+                </v-card>
+              </v-layout>
+            </v-container>
+            <div v-else class="alert alert-info">
+              <i class="uiIconInfo"></i>
+              This activity haven't received a kudos yet.
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <button class="btn" @click="listDialog = false">Close</button>
+            <v-spacer />
+          </v-card-actions>
+        </v-card>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import KudosApi from './KudosAPI.vue';
-import ReceiverLink from './ReceiverLink.vue';
+import IdentityLink from './IdentityLink.vue';
 
 import {getReceiver} from '../js/KudosIdentity.js';
 import {getEntityKudos, sendKudos, getKudos} from '../js/Kudos.js';
@@ -96,11 +146,13 @@ import {initSettings} from '../js/KudosSettings.js';
 export default {
   components: {
     KudosApi,
-    ReceiverLink
+    IdentityLink
   },
   data() {
     return {
       dialog: false,
+      listDialog: false,
+      kudosList: false,
       disabled: false,
       remainingKudos: 0,
       remainingDaysToReset: 0,
@@ -126,6 +178,17 @@ export default {
     };
   },
   watch: {
+    listDialog() {
+      if(!this.listDialog || !this.entityId || !this.entityType) {
+        return;
+      }
+      const $sendKudosLink = $(`#SendKudosButton${this.entityType}${this.entityId}`);
+      const kudosList = $sendKudosLink.data("kudosList");
+      if(!kudosList || !kudosList.length) {
+        return;
+      }
+      this.kudosList = kudosList;
+    },
     dialog() {
       if(!this.dialog) {
         return;
@@ -240,7 +303,7 @@ export default {
           const linkId = `SendKudosButtonACTIVITY${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          const $sendKudosLink = $(this.htmlToAppend.replace('entityId', entityId).replace('entityType', entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
+          const $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
           $sendKudosLink.attr('id', linkId);
           $sendKudosLink.data("kudosList", kudosList);
           const $existingLink = $(`#${linkId}`);
@@ -255,7 +318,17 @@ export default {
     },
     openDialog(event) {
       if (!this.disabled) {
+        this.error = null;
         this.dialog = true;
+        this.entityType = event && event.detail && event.detail.type;
+        this.entityId = event && event.detail && event.detail.id;
+      }
+    },
+    openListDialog(event) {
+      if (!this.disabled) {
+        this.error = null;
+        this.kudosList = [];
+        this.listDialog = true;
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
       }
