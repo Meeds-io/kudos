@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.addon.kudos.model.Kudos;
 import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.addon.kudos.service.KudosService;
-import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.log.ExoLogger;
@@ -63,17 +62,15 @@ public class NewKudosSentActivityCommentListener extends Listener<KudosService, 
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
     receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
 
-    String message = StringUtils.isBlank(kudos.getMessage()) ? "."
-                                                             : StringEscapeUtils.escapeHtml(": "
-                                                                 + kudos.getMessage()
-                                                                        .replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
-                                                                                 RESOURCE_BUNDLE_ESCAPE_CHARACTER));
+    String message =
+                   StringUtils.isBlank(kudos.getMessage()) ? "."
+                                                           : ": "
+                                                               + StringEscapeUtils.escapeHtml(kudos.getMessage())
+                                                                                  .replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
+                                                                                           RESOURCE_BUNDLE_ESCAPE_CHARACTER)
+                                                                                  .replace(RESOURCE_BUNDLE_KEYS_CHARACTER,
+                                                                                           RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER);
 
-    try {
-      message = HTMLSanitizer.sanitize(message);
-    } catch (Exception e) {
-      LOG.warn("Error while sanitizing message", message);
-    }
     Map<String, String> templateParams = new LinkedHashMap<String, String>();
     templateParams.put(RESOURCE_BUNDLE_VALUES_PARAM,
                        senderLink + RESOURCE_BUNDLE_VALUES_CHARACTER + receiverLink + RESOURCE_BUNDLE_VALUES_CHARACTER + message);

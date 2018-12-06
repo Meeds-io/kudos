@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -97,7 +98,7 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
     if (StringUtils.isBlank(message)) {
       message = "";
     }
-    templateContext.put("KUDOS_MESSAGE", message);
+    templateContext.put("KUDOS_MESSAGE", StringEscapeUtils.escapeHtml(message));
     String imagePlaceHolder = SocialNotificationUtils.getImagePlaceHolder(language);
     String title = SocialNotificationUtils.processImageTitle(activity.getTitle(), imagePlaceHolder);
     templateContext.put("SUBJECT", title);

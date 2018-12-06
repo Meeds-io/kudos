@@ -55,9 +55,13 @@ public class Utils {
 
   public final static String                 RESOURCE_BUNDLE_KEY_TO_PROCESS          = "RESOURCE_BUNDLE_KEY_TO_PROCESS";
 
+  public final static String                 RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER    = "${-}";
+
   public final static String                 RESOURCE_BUNDLE_ESCAPE_CHARACTER        = "${_}";
 
   public final static String                 RESOURCE_BUNDLE_VALUES_CHARACTER        = "#";
+
+  public final static String                 RESOURCE_BUNDLE_KEYS_CHARACTER          = ",";
 
   public static final ArgumentLiteral<Kudos> KUDOS_ACTIVITY_DETAILS_PARAMETER        =
                                                                               new ArgumentLiteral<>(Kudos.class, "kudos");
