@@ -31,7 +31,7 @@
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                   </v-card-text>
                   <v-card-text v-else class="kudosIconContainer">
-                    <v-icon :title="`${remainingKudos -1} kudos left to send`" class="uiIconKudos uiIconLightGray" size="64">fa-award</v-icon>
+                    <v-icon :title="`${remainingKudos -1} kudos left to send`" class="uiIconKudos uiIconLightGrey" size="64">fa-award</v-icon>
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
@@ -170,10 +170,10 @@ export default {
       htmlToAppend: `<li class="SendKudosButtonTemplate">
           <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">
             <div class="v-btn__content">
-              <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGray"></i>
+              <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
             </div>
           </button>
-          <a rel="tooltip" data-placement="bottom" title="Kudos received by activity" href="javascript:void(0);" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))">kudosCount</a>
+          <a rel="tooltip" data-placement="top" title="Click to display kudos" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}))"> (kudosCount) </a>
         </li>`
     };
   },
@@ -327,7 +327,7 @@ export default {
           const linkId = `SendKudosButton${entityType}${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('uiIconLightGray', hasSentKudos ? 'uiIconBlue' : 'uiIconLightGray'));
+          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', hasSentKudos ? 'primary' : 'grey'));
           $sendKudosLink.attr('id', linkId);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
@@ -343,25 +343,25 @@ export default {
             console.warn("Can't refresh entity with type/id", entityType, entityId);
             return;
           }
-          $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${this.entityType}${this.entityId}`);
+          $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data("kudosList", kudosList);
         });
     },
     openDialog(event) {
       if (!this.disabled) {
         this.error = null;
-        this.dialog = true;
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
+        this.dialog = true;
       }
     },
     openListDialog(event) {
       if (!this.disabled) {
         this.error = null;
         this.kudosList = [];
-        this.listDialog = true;
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
+        this.listDialog = true;
       }
     },
     send() {
