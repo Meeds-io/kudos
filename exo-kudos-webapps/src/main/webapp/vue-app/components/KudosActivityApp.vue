@@ -11,7 +11,7 @@
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
-          <v-card-text>
+          <v-card-text v-if="allKudos && allKudos.length">
             <v-container flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
               <v-layout
                 row
