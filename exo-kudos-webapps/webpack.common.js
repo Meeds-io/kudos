@@ -46,7 +46,7 @@ const config = {
     jquery: '$'
   },
   plugins: [
-    new ExtractTextWebpackPlugin('css/kudos-v1.0.0-M01.css')
+    new ExtractTextWebpackPlugin('css/kudos-v1.0.0.css')
   ]
 };
 
