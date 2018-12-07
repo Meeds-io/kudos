@@ -111,11 +111,15 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
     templateContext.put("SUBJECT", title);
     templateContext.put("PROFILE_URL", LinkProviderUtils.getRedirectUrl("user", senderIdentity.getRemoteId()));
     String activityURL = null;
-    if (activity.isComment()) {
-      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
-    } else {
-      activityURL = LinkProviderUtils.getRedirectUrl("reply_activity_highlight_comment",
+    if (activity.isComment() && StringUtils.isNotBlank(activity.getParentCommentId())) {
+      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment_reply",
+                                                     activity.getParentId() + "-" + activity.getParentCommentId() + "-"
+                                                         + activity.getId());
+    } else if (activity.isComment()) {
+      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment",
                                                      activity.getParentId() + "-" + activity.getId());
+    } else {
+      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
     }
     templateContext.put("VIEW_FULL_DISCUSSION_ACTION_URL", activityURL);
     MessageInfo messageInfo = new MessageInfo();
