@@ -14,7 +14,7 @@ public enum KudosPeriodType {
     YearMonth yearMonth = YearMonth.from(localDateTime);
     switch (this) {
     case WEEK:
-      LocalDateTime firstDayOfThisWeek = localDateTime.with(DayOfWeek.MONDAY);
+      LocalDateTime firstDayOfThisWeek = localDateTime.toLocalDate().with(DayOfWeek.MONDAY).atStartOfDay();
       LocalDateTime firstDayOfNextWeek = firstDayOfThisWeek.plusWeeks(1);
       kudosPeriod.setStartDateInSeconds(timeToSeconds(firstDayOfThisWeek));
       kudosPeriod.setEndDateInSeconds(timeToSeconds(firstDayOfNextWeek));
