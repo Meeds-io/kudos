@@ -19,6 +19,9 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         + " where k.entityType = :entityType" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
     @NamedQuery(name = "Kudos.getAllKudosByEntity", query = "select k from Kudos k" + " where k.entityType = :entityType"
         + " AND k.entityId = :entityId"),
+    @NamedQuery(name = "Kudos.getAllKudosByParentEntity", query = "select k from Kudos k" + " where k.entityType = :entityType"
+        + " AND (k.parentEntityId = :parentEntityId "
+        + " OR k.entityId = :parentEntityId)"),
     @NamedQuery(name = "Kudos.getKudosByPeriodAndSender", query = "select k from Kudos k" + " where k.senderId = :senderId"
         + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
     @NamedQuery(name = "Kudos.countKudosByPeriodAndSender", query = "select count(k) from Kudos k"
@@ -43,6 +46,9 @@ public class KudosEntity implements Serializable {
 
   @Column(name = "IS_RECEIVER_USER", nullable = false)
   public boolean            isReceiverUser;
+
+  @Column(name = "PARENT_ENTITY_ID", nullable = false)
+  public Long               parentEntityId;
 
   @Column(name = "ENTITY_ID", nullable = false)
   public long               entityId;
@@ -118,5 +124,13 @@ public class KudosEntity implements Serializable {
 
   public void setCreatedDate(long createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public Long getParentEntityId() {
+    return parentEntityId;
+  }
+
+  public void setParentEntityId(Long parentEntityId) {
+    this.parentEntityId = parentEntityId;
   }
 }

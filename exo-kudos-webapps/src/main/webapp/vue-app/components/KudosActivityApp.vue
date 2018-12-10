@@ -157,6 +157,7 @@ export default {
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
+      parentEntityId: null,
       entityId: null,
       entityType: null,
       receiverType: null,
@@ -168,7 +169,7 @@ export default {
       kudosMessage: null,
       loading: false,
       htmlToAppend: `<li class="SendKudosButtonTemplate">
-          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();">
+          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
             <div class="v-btn__content">
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
             </div>
@@ -289,7 +290,9 @@ export default {
             const entityId = commentId;
             this.entityIds.push(entityId);
             commentId = commentId.replace('comment', '');
-            this.refreshLink(element, 'COMMENT', commentId)
+            let activityId = $(element).closest('.activityStream').attr('id');
+            activityId = activityId ? activityId.replace('activityContainer', '') : '';
+            this.refreshLink(element, 'COMMENT', commentId, activityId)
               .then(() => {
                 const index = this.entityIds.indexOf(entityId);
                 if (index >= 0) {
@@ -310,7 +313,7 @@ export default {
             const entityId = activityId;
             this.entityIds.push(entityId);
             activityId = activityId ? activityId.replace('activityContainer', '') : null;
-            this.refreshLink(element, 'ACTIVITY', activityId)
+            this.refreshLink(element, 'ACTIVITY', activityId, '')
               .then(() => {
                 const index = this.entityIds.indexOf(entityId);
                 if (index >= 0) {
@@ -321,13 +324,13 @@ export default {
         });
       }
     },
-    refreshLink(element, entityType, entityId) {
+    refreshLink(element, entityType, entityId, parentEntityId) {
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
           const linkId = `SendKudosButton${entityType}${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', hasSentKudos ? 'primary' : 'grey'));
+          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', hasSentKudos ? 'primary' : 'grey'));
           $sendKudosLink.attr('id', linkId);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
@@ -352,6 +355,7 @@ export default {
         this.error = null;
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
+        this.parentEntityId = event && event.detail && event.detail.parentId;
         this.dialog = true;
       }
     },
@@ -370,6 +374,7 @@ export default {
       sendKudos({
         entityType: this.entityType,
         entityId: this.entityId,
+        parentEntityId: this.parentEntityId,
         receiverType: this.receiverType,
         receiverId: this.receiverId,
         message: this.kudosMessage
@@ -392,7 +397,7 @@ export default {
             })
         )
         .then(() => 
-          this.refreshLink(null, this.entityType, this.entityId)
+          this.refreshLink(null, this.entityType, this.entityId, this.parentEntityId)
             .catch(e => {
               console.debug("Error refreshing number of kudos", e);
             })

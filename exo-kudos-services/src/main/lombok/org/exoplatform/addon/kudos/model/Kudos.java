@@ -8,6 +8,8 @@ import lombok.Data;
 public class Kudos implements Comparable<Kudos> {
   private Long          technicalId;
 
+  private String        parentEntityId;
+
   private String        entityId;
 
   private String        entityType;

@@ -126,6 +126,9 @@ public class Utils {
     kudos.setTechnicalId(kudosEntity.getId());
     kudos.setMessage(kudosEntity.getMessage());
     kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
+    if (kudosEntity.getParentEntityId() != null && kudosEntity.getParentEntityId() != 0) {
+      kudos.setParentEntityId(String.valueOf(kudosEntity.getParentEntityId()));
+    }
     kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
     kudos.setTime(timeFromSeconds(kudosEntity.getCreatedDate()));
 
@@ -154,20 +157,13 @@ public class Utils {
     return kudos;
   }
 
-  private static String getIdentityIdByType(Identity receiverIdentity) {
-    if (SpaceIdentityProvider.NAME.equals(receiverIdentity.getProviderId())) {
-      Space space = getSpace(receiverIdentity.getRemoteId());
-      if (space != null) {
-        return space.getId();
-      }
-    }
-    return receiverIdentity.getId();
-  }
-
   public static KudosEntity toNewEntity(Kudos kudos) {
     KudosEntity kudosEntity = new KudosEntity();
     kudosEntity.setMessage(kudos.getMessage());
     kudosEntity.setEntityId(Long.parseLong(kudos.getEntityId()));
+    if (StringUtils.isNoneBlank(kudos.getParentEntityId())) {
+      kudosEntity.setParentEntityId(Long.parseLong(kudos.getParentEntityId()));
+    }
     kudosEntity.setEntityType(KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
     kudosEntity.setSenderId(Long.parseLong(getIdentity(OrganizationIdentityProvider.NAME, kudos.getSenderId()).getId()));
 
@@ -203,6 +199,16 @@ public class Utils {
       kudosPeriodType = globalSettings.getKudosPeriodType();
     }
     return kudosPeriodType.getPeriodOfTime(localDateTime);
+  }
+
+  private static String getIdentityIdByType(Identity receiverIdentity) {
+    if (SpaceIdentityProvider.NAME.equals(receiverIdentity.getProviderId())) {
+      Space space = getSpace(receiverIdentity.getRemoteId());
+      if (space != null) {
+        return space.getId();
+      }
+    }
+    return receiverIdentity.getId();
   }
 
   @SuppressWarnings("deprecation")

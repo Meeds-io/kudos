@@ -27,6 +27,7 @@
       <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
     </modifySql>
   </changeSet>
+
   <changeSet author="kudos" id="1.0.0-1.1">
     <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_01">
       <column name="CREATED_DATE" descending="true"/>
@@ -53,6 +54,21 @@
 
   <changeSet author="kudos" id="1.0.0-3">
     <addUniqueConstraint columnNames="CREATED_DATE" constraintName="UK_ADDONS_KUDOS_01" tableName="ADDONS_KUDOS"/>
+  </changeSet>
+
+  <changeSet author="kudos" id="1.0.0-4">
+    <addColumn tableName="ADDONS_KUDOS">
+      <column name="PARENT_ENTITY_ID" type="BIGINT"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="kudos" id="1.0.0-4.1">
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_05">
+      <column name="CREATED_DATE" descending="true"/>
+      <column name="PARENT_ENTITY_ID" />
+      <column name="ENTITY_ID" />
+      <column name="ENTITY_TYPE" />
+    </createIndex>
   </changeSet>
 
 </databaseChangeLog>
