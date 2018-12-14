@@ -23,6 +23,25 @@
             <field name="contentId">
               <string>exo-kudos/KudosActivity</string>
             </field>
+            <field name="permissions">
+              <collection type="java.util.ArrayList">
+                <value>
+                <string>*:/platform/users</string>
+                </value>
+              </collection>
+            </field>
+            <field name="title">
+              <string>Kudos Activity Portlet</string>
+            </field>
+            <field name="showInfoBar">
+              <boolean>false</boolean>
+            </field>
+            <field name="showApplicationState">
+              <boolean>false</boolean>
+            </field>
+            <field name="showApplicationMode">
+              <boolean>false</boolean>
+            </field>
           </object>
         </object-param>
       </init-params>
