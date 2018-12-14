@@ -1,20 +1,23 @@
-export function getActivityDetails(activityId) {
-  if(activityId) {
-    return fetch(`/portal/rest/v1/social/activities/${activityId}`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(resp => resp && resp.ok && resp.json());
-  } else {
-    return Promise.resolve(null);
-  }
-}
-
 export function getReceiver(entityType, entityId) {
-  if (entityType === 'ACTIVITY' || entityType === 'COMMENT') {
+  if (entityType === 'USER_PROFILE' || entityType === 'USER_TIPTIP') {
+    return getIdentityDetails(entityId, 'user', entityId)
+      .then(identityDetails => {
+        // Change entity id to use long instead of string
+        if(identityDetails) {
+          identityDetails.entityId = identityDetails.identityId;
+        }
+        return identityDetails;
+      });
+  } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP') {
+    return getIdentityDetails(entityId, 'user', entityId)
+      .then(identityDetails => {
+        // Change entity id to use long instead of string
+        if(identityDetails) {
+          identityDetails.entityId = identityDetails.identityId;
+        }
+        return identityDetails;
+      });
+  } else if (entityType === 'ACTIVITY' || entityType === 'COMMENT') {
     let ownerId;
     let ownerIdentityId;
     let ownerType;
@@ -27,49 +30,87 @@ export function getReceiver(entityType, entityId) {
         if (activityDetails && activityDetails.owner && activityDetails.owner.href) {
           isSpace = activityDetails.owner.href.indexOf('/spaces/') >= 0;
           ownerType = isSpace ? 'space' : 'user';
+          let remoteId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
           if (isSpace) {
-            ownerIdentityId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
             ownerId = activityDetails.activityStream && activityDetails.activityStream.id;
           } else {
-            ownerIdentityId = activityDetails.identity.substring(activityDetails.identity.lastIndexOf('/') + 1);
-            ownerId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
+            ownerId = remoteId;
           }
-          return fetch(activityDetails.owner.href, {credentials: 'include'});
+          return getIdentityDetails(ownerId, ownerType, remoteId);
         } else {
           throw new Error("Uknown activity details", activityDetails);
-        }
-      })
-      .then(resp => resp && resp.ok && resp.json())
-      .then(ownerDetails => {
-        if(ownerDetails) {
-          ownerDetails = {
-            id: ownerId,
-            type: ownerType,
-            identityId: ownerIdentityId,
-            fullname: isSpace ? ownerDetails.displayName : ownerDetails.fullname
-          };
-          if (window.kudosSettings.accessPermission && ownerType === 'user') {
-            // check if user is authorized to receive Kudos
-            return fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${ownerId}`, {credentials: 'include'})
-              .then(resp => {
-                if (!resp || !resp.ok) {
-                  ownerDetails.notAuthorized = true;
-                }
-                return ownerDetails;
-              })
-              .catch(e => {
-                return ownerDetails;
-              });
-          } else {
-            return ownerDetails;
-          }
-        } else {
-          throw new Error("Owner details not found", ownerDetails);
         }
       })
       .catch(e => {
         console.debug("Error retrieving activity details with id", entityId, e);
       });
+  } else {
+    console.error("Unkown entity type", entityType, entityId);
+  }
+}
+
+export function getIdentityDetails(urlId, type, remoteId) {
+  const ownerDetails = {
+    type: type,
+    id: remoteId
+  };
+
+  // check if user is authorized to receive Kudos
+  return (
+          window.kudosSettings.accessPermission && ownerType === 'user' ?
+            fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${urlId}`, {credentials: 'include'})
+            : Promise.resolve({ok: true})
+         )
+    .then(resp => {
+      if (!resp || !resp.ok) {
+        ownerDetails.notAuthorized = true;
+        throw new Error();
+      }
+      if(type === 'user' || type === 'organization' || type === 'username') {
+        return fetch(`/portal/rest/v1/social/users/${urlId}`, {credentials: 'include'})
+          .then(resp => resp && resp.ok && resp.json())
+          .then(identityDetails => {
+            if (identityDetails) {
+              ownerDetails.id = identityDetails.username;
+              ownerDetails.identityId = identityDetails.id;
+              ownerDetails.fullname = identityDetails.fullname;
+            } else {
+              ownerDetails.notAuthorized = true;
+            }
+            return ownerDetails;
+          });
+      } else {
+        return fetch(`/portal/rest/v1/social/spaces/${urlId}`, {credentials: 'include'})
+        .then(resp => resp && resp.ok && resp.json())
+        .then(identityDetails => {
+          if (identityDetails) {
+            ownerDetails.identityId = identityDetails.id;
+            ownerDetails.fullname = identityDetails.displayName;
+          } else {
+            ownerDetails.notAuthorized = true;
+          }
+          return ownerDetails;
+        });
+      }
+      return ownerDetails;
+    })
+    .catch(e => {
+      return ownerDetails;
+    });
+}
+
+export function getActivityDetails(activityId) {
+  if(activityId) {
+    return fetch(`/portal/rest/v1/social/activities/${activityId}`, {
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(resp => resp && resp.ok && resp.json());
+  } else {
+    return Promise.resolve(null);
   }
 }
 

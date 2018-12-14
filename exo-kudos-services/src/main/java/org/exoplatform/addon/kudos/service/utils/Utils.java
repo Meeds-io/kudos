@@ -165,14 +165,12 @@ public class Utils {
       kudosEntity.setParentEntityId(Long.parseLong(kudos.getParentEntityId()));
     }
     kudosEntity.setEntityType(KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
-    kudosEntity.setSenderId(Long.parseLong(getIdentity(OrganizationIdentityProvider.NAME, kudos.getSenderId()).getId()));
+    kudosEntity.setSenderId(Long.parseLong(kudos.getSenderIdentityId()));
 
     boolean isReceiverUser = OrganizationIdentityProvider.NAME.equals(kudos.getReceiverType())
         || USER_ACCOUNT_TYPE.equals(kudos.getReceiverType());
     kudosEntity.setReceiverUser(isReceiverUser);
-    kudosEntity.setReceiverId(Long.parseLong(getIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
-                                                                        : SpaceIdentityProvider.NAME,
-                                                         kudos.getReceiverId()).getId()));
+    kudosEntity.setReceiverId(Long.parseLong(kudos.getReceiverIdentityId()));
     kudosEntity.setCreatedDate(timeToSeconds(kudos.getTime()));
     return kudosEntity;
   }
@@ -215,11 +213,6 @@ public class Utils {
   private static Identity getIdentityById(long identityId) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
     return identityManager.getIdentity(String.valueOf(identityId));
-  }
-
-  private static Identity getIdentity(String providerId, String remoteId) {
-    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    return identityManager.getOrCreateIdentity(providerId, remoteId, true);
   }
 
   private static String getAvatar(Identity identity, Space space) {

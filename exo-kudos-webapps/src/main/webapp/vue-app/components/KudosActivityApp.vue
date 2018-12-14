@@ -1,6 +1,6 @@
 <template>
   <v-app v-if="!disabled" id="KudosActivityApp" color="transaprent" flat>
-    <kudos-api />
+    <kudos-api ref="kudosAPI" />
     <v-dialog v-model="dialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="dialog = false">
       <v-card class="elevation-12">
         <div class="popupHeader ClearFix">
@@ -152,6 +152,7 @@ export default {
     return {
       dialog: false,
       listDialog: false,
+      ignoreRefresh: false,
       kudosList: false,
       disabled: false,
       remainingKudos: 0,
@@ -215,6 +216,9 @@ export default {
                     receiverFullName: receiverDetails.fullname,
                     isCurrent: true
                   };
+                  if(receiverDetails.entityId) {
+                    this.entityId = receiverDetails.entityId;
+                  }
                   if(receiverDetails.notAuthorized) {
                     this.error = "Current selected user isn't authorized to receive Kudos.";
                   } else {
@@ -224,6 +228,11 @@ export default {
                   if (this.remainingKudos > 1) {
                     this.allKudos.push({});
                   }
+                  this.$nextTick(() => {
+                    if($(".kudosIconContainerTop.kudosIconContainerCurrent").length) {
+                      $(".kudosIconContainerTop.kudosIconContainerCurrent")[0].scrollIntoView();
+                    }
+                  });
                 } else {
                   throw new Error("You can't send kudos to yourself !");
                 }
@@ -246,6 +255,8 @@ export default {
         if (this.disabled) {
           return;
         }
+        this.$refs.kudosAPI.init();
+
         document.addEventListener('exo-kudos-open-send-modal', this.openDialog);
         document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
 
@@ -325,6 +336,9 @@ export default {
       }
     },
     refreshLink(element, entityType, entityId, parentEntityId) {
+      if(this.ignoreRefresh) {
+        return Promise.resolve(null);
+      }
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
           const linkId = `SendKudosButton${entityType}${entityId}`;
@@ -356,6 +370,7 @@ export default {
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
         this.parentEntityId = event && event.detail && event.detail.parentId;
+        this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
         this.dialog = true;
       }
     },
@@ -389,21 +404,21 @@ export default {
           this.error = String(e);
           throw e;
         })
-        .then(() => this.dialog = false)
-        .then(() =>
-          this.init()
+        .then(() => {
+          return this.init()
             .catch(e => {
               console.debug("Error refreshing allowed number of kudos for current user", e);
-            })
-        )
-        .then(() => 
-          this.refreshLink(null, this.entityType, this.entityId, this.parentEntityId)
+            });
+        })
+        .then(() => {
+          return this.refreshLink(null, this.entityType, this.entityId, this.parentEntityId)
             .catch(e => {
               console.debug("Error refreshing number of kudos", e);
-            })
-        )
+            });
+        })
+        .then(() => this.dialog = false)
         .catch(e => {
-          console.debug("Error saving kudo");
+          console.debug("Error refreshing UI", e);
           this.error = String(e);
         })
         .finally(() => {

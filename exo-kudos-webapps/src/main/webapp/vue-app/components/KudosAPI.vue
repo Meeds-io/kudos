@@ -11,6 +11,9 @@ export default {
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
   },
   methods: {
+    init() {
+      this.initTiptip();
+    },
     getPeriodDates(event) {
       if(event && event.detail && event.detail.date && event.detail.periodType) {
         getPeriodDates(event.detail.date, event.detail.periodType)
@@ -70,6 +73,50 @@ export default {
       } else {
         return getAllKudosByPeriod(detail.startDate, detail.endDate);
       }
+    },
+    initTiptip() {
+      eXo = eXo ? eXo : {};
+      eXo.social = eXo.social ? eXo.social : {};
+      eXo.social.tiptip = eXo.social.tiptip ? eXo.social.tiptip : {};
+      eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];
+      eXo.social.tiptip.extraActions.push({
+        appendContentTo(divUIAction, ownerId, type) {
+          if(!type || type === 'username') {
+            type = 'USER';
+          } else {
+            type = 'SPACE';
+          }
+          divUIAction.append(`<a title="Send Kudos" 
+            class="btn sendKudosTipTipButton"
+            href="javascript:void(0);"
+            onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
+                {'detail' : {'id' : '${ownerId}', 'type': '${type}_TIPTIP', ignoreRefresh: true}}))">
+              <i class="uiIcon fa fa-award uiIconKudosTipTip"></i>
+          </a>`);
+        }
+      });
+      if(!$(".SendKudosButtonBanner").length) {
+        if ($('.spaceMenuNav .spaceMenuNavHeader .spaceMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.spaceGroup) {
+          $('.spaceMenuNav .spaceMenuNavHeader .spaceMenuApps').append(`<li class="SendKudosButtonBanner">
+              <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
+              {'detail' : {'id' : '${eXo.env.portal.spaceGroup}', 'type': 'SPACE_PROFILE', ignoreRefresh: true}}));"
+              class="btn" href="javascript:void(0);">
+                <i class="uiIcon fa fa-award uiIconKudos"></i>
+                <span> Send Kudos</span>
+              </a>
+            </li>`);
+        } else if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
+          $('.profileMenuNav .profileMenuNavHeader .profileMenuApps').append(`<li class="SendKudosButtonBanner">
+              <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
+               {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'SPACE_PROFILE', ignoreRefresh: true}}));"
+               class="btn" href="javascript:void(0);">
+                <i class="uiIcon fa fa-award uiIconKudos"></i>
+                <span> Send Kudos</span>
+              </a>
+            </li>`);
+        }
+      }
+
     }
   }
 };

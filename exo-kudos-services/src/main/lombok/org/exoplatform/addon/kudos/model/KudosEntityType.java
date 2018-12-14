@@ -1,5 +1,5 @@
 package org.exoplatform.addon.kudos.model;
 
 public enum KudosEntityType {
-  ACTIVITY, COMMENT
+  ACTIVITY, COMMENT, USER_PROFILE, USER_TIPTIP, SPACE_PROFILE, SPACE_TIPTIP
 }

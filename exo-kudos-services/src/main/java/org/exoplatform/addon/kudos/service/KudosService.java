@@ -120,8 +120,19 @@ public class KudosService implements Startable {
       throw new IllegalAccessException("User '" + senderId + "' is not authorized to send more kudos");
     }
 
-    checkStatus(OrganizationIdentityProvider.NAME, senderId);
-    checkStatus(kudos.getReceiverType(), kudos.getReceiverId());
+    Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, senderId);
+    if (kudos.getSenderIdentityId() == null) {
+      kudos.setSenderIdentityId(senderIdentity.getId());
+    }
+    Object receiverObject = checkStatusAndGetReceiver(kudos.getReceiverType(), kudos.getReceiverId());
+
+    if (kudos.getReceiverIdentityId() == null) {
+      if (receiverObject instanceof Identity) {
+        kudos.setReceiverIdentityId(((Identity) receiverObject).getId());
+      } else if (receiverObject instanceof Space) {
+        kudos.setReceiverIdentityId(((Space) receiverObject).getId());
+      }
+    }
 
     kudos.setTime(LocalDateTime.now());
     kudos = kudosStorage.createKudos(kudos);
@@ -217,7 +228,7 @@ public class KudosService implements Startable {
     return getPeriodOfTime(getGlobalSettings(), timeFromSeconds(dateInSeconds));
   }
 
-  private void checkStatus(String type, String id) {
+  private Object checkStatusAndGetReceiver(String type, String id) {
     if (USER_ACCOUNT_TYPE.equals(type) || OrganizationIdentityProvider.NAME.equals(type)) {
       Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
       if (identity == null || !identity.isEnable() || identity.isDeleted()) {
@@ -227,11 +238,13 @@ public class KudosService implements Startable {
         throw new IllegalStateException("User '" + id + "' isn't member of authorized group to send/receive kudos: "
             + getAccessPermission());
       }
+      return identity;
     } else {
       Space space = getSpace(id);
       if (space == null) {
         throw new IllegalStateException("Space '" + id + "' wasn't found, thus it can't receive/send kudos");
       }
+      return space;
     }
   }
 
