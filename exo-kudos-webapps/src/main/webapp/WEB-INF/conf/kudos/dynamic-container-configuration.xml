@@ -21,7 +21,7 @@
           <description></description>
           <object type="org.exoplatform.commons.addons.PortletModel">
             <field name="contentId">
-              <string>exo-kudos/KudosActivity</string>
+              <string>exo-kudos/Kudos</string>
             </field>
             <field name="permissions">
               <collection type="java.util.ArrayList">

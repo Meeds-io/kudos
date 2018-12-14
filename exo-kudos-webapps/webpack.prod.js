@@ -19,7 +19,7 @@ const config = merge(webpackCommonConfig, {
     ]
   },
   entry: {
-    kudosActivity: './src/main/webapp/vue-app/kudosActivity.js',
+    kudos: './src/main/webapp/vue-app/kudos.js',
     kudosAdmin: './src/main/webapp/vue-app/kudosAdmin.js'
   },
   output: {

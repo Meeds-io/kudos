@@ -5,12 +5,12 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
    <portlet>
-     <portlet-name>KudosActivity</portlet-name>
+     <portlet-name>Kudos</portlet-name>
      <display-name xml:lang="EN">Kudos Activity Application</display-name>
      <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
      <init-param>
       <name>portlet-view-dispatched-file-path</name>
-      <value>/kudosActivity.jsp</value>
+      <value>/kudos.jsp</value>
      </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>

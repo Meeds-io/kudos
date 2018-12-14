@@ -1,10 +1,10 @@
-import KudosActivityApp from './components/KudosActivityApp.vue';
+import KudosApp from './components/KudosApp.vue';
 import './../css/main.less';
 
 window.parentToWatch = '#UISpaceActivityStreamPortlet, #UIUserActivityStreamPortlet';
 
 Vue.use(Vuetify);
 const vueInstance = new Vue({
-  el: '#KudosActivityApp',
-  render: h => h(KudosActivityApp)
+  el: '#KudosApp',
+  render: h => h(KudosApp)
 });

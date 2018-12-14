@@ -96,16 +96,7 @@ export default {
         }
       });
       if(!$(".SendKudosButtonBanner").length) {
-        if ($('.spaceMenuNav .spaceMenuNavHeader .spaceMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.spaceGroup) {
-          $('.spaceMenuNav .spaceMenuNavHeader .spaceMenuApps').append(`<li class="SendKudosButtonBanner">
-              <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
-              {'detail' : {'id' : '${eXo.env.portal.spaceGroup}', 'type': 'SPACE_PROFILE', ignoreRefresh: true}}));"
-              class="btn" href="javascript:void(0);">
-                <i class="uiIcon fa fa-award uiIconKudos"></i>
-                <span> Send Kudos</span>
-              </a>
-            </li>`);
-        } else if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
+        if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
           $('.profileMenuNav .profileMenuNavHeader .profileMenuApps').append(`<li class="SendKudosButtonBanner">
               <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
                {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'SPACE_PROFILE', ignoreRefresh: true}}));"

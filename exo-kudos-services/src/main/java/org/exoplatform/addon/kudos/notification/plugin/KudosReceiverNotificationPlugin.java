@@ -28,20 +28,20 @@ import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
-public class KudosActivityReceiverNotificationPlugin extends BaseNotificationPlugin {
+public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
 
-  public KudosActivityReceiverNotificationPlugin(InitParams initParams) {
+  public KudosReceiverNotificationPlugin(InitParams initParams) {
     super(initParams);
   }
 
   @Override
   public String getId() {
-    return KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID;
+    return KUDOS_RECEIVER_NOTIFICATION_ID;
   }
 
   @Override
   public boolean isValid(NotificationContext ctx) {
-    Kudos kudos = ctx.value(KUDOS_ACTIVITY_DETAILS_PARAMETER);
+    Kudos kudos = ctx.value(KUDOS_DETAILS_PARAMETER);
     return kudos != null && kudos.getEntityType() != null
         && (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
             || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT);
@@ -49,7 +49,7 @@ public class KudosActivityReceiverNotificationPlugin extends BaseNotificationPlu
 
   @Override
   public NotificationInfo makeNotification(NotificationContext ctx) {
-    Kudos kudos = ctx.value(KUDOS_ACTIVITY_DETAILS_PARAMETER);
+    Kudos kudos = ctx.value(KUDOS_DETAILS_PARAMETER);
 
     String senderId = kudos.getSenderId();
     String receiverId = kudos.getReceiverId();

@@ -16,9 +16,9 @@
  */
 package org.exoplatform.addon.kudos.notification.provider;
 
-import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID;
+import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_RECEIVER_NOTIFICATION_ID;
 
-import org.exoplatform.addon.kudos.notification.builder.KudosActivityTemplateBuilder;
+import org.exoplatform.addon.kudos.notification.builder.KudosTemplateBuilder;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfig;
 import org.exoplatform.commons.api.notification.annotation.TemplateConfigs;
 import org.exoplatform.commons.api.notification.channel.template.TemplateProvider;
@@ -26,12 +26,12 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.container.xml.InitParams;
 
 @TemplateConfigs(templates = {
-    @TemplateConfig(pluginId = KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID, template = "war:/conf/kudos/templates/notification/web/KudosActivityReceiverWebPlugin.gtmpl") })
+    @TemplateConfig(pluginId = KUDOS_RECEIVER_NOTIFICATION_ID, template = "war:/conf/kudos/templates/notification/web/KudosReceiverWebPlugin.gtmpl") })
 public class WebTemplateProvider extends TemplateProvider {
 
   public WebTemplateProvider(InitParams initParams) {
     super(initParams);
-    this.templateBuilders.put(PluginKey.key(KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID), new KudosActivityTemplateBuilder(this, false));
+    this.templateBuilders.put(PluginKey.key(KUDOS_RECEIVER_NOTIFICATION_ID), new KudosTemplateBuilder(this, false));
   }
 
 }

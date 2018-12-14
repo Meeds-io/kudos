@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="!disabled" id="KudosActivityApp" color="transaprent" flat>
+  <v-app v-if="!disabled" id="KudosApp" color="transaprent" flat>
     <kudos-api ref="kudosAPI" />
     <v-dialog v-model="dialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="dialog = false">
       <v-card class="elevation-12">

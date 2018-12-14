@@ -2,9 +2,6 @@ package org.exoplatform.addon.kudos.listener;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,20 +14,25 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.processor.I18NActivityUtils;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
+import org.exoplatform.social.notification.Utils;
 
 /**
- * A listener to add comment on activity
+ * A listener to add comment or activity
  */
-public class NewKudosSentActivityCommentListener extends Listener<KudosService, Kudos> {
-  private static final Log LOG = ExoLogger.getLogger(NewKudosSentActivityCommentListener.class);
+public class NewKudosSentActivityGeneratorListener extends Listener<KudosService, Kudos> {
+  private static final Log LOG = ExoLogger.getLogger(NewKudosSentActivityGeneratorListener.class);
 
   private ActivityManager  activityManager;
 
   private ActivityStorage  activityStorage;
 
-  public NewKudosSentActivityCommentListener(ActivityManager activityManager, ActivityStorage activityStorage) {
+  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
     this.activityStorage = activityStorage;
     this.activityManager = activityManager;
   }
@@ -60,41 +62,43 @@ public class NewKudosSentActivityCommentListener extends Listener<KudosService, 
         if (activity == null) {
           throw new IllegalStateException("Activity with id '" + activityId + "' wasn't found");
         }
-        ExoSocialActivity activityComment = createComment(kudos, parentCommentId);
+        ExoSocialActivity activityComment = createActivity(kudos, parentCommentId);
         activityStorage.saveComment(activity, activityComment);
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
+    } else {
+      ExoSocialActivity activity = createActivity(kudos, null);
+      String providerId = OrganizationIdentityProvider.NAME;
+      if (SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType()) || SpaceIdentityProvider.NAME.equals(kudos.getReceiverType())) {
+        providerId = SpaceIdentityProvider.NAME;
+      }
+
+      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, kudos.getReceiverId(), true);
+      if (owner == null) {
+        LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), kudos.getReceiverId());
+      } else {
+        activityManager.saveActivityNoReturn(owner, activity);
+      }
     }
   }
 
-  private ExoSocialActivity createComment(Kudos kudos, String parentCommentId) {
-    ExoSocialActivityImpl comment = new ExoSocialActivityImpl();
-    comment.setTitle("");
-    comment.setType(KUDOS_ACTIVITY_COMMENT_TYPE);
-    comment.setTitleId(KUDOS_ACTIVITY_COMMENT_TITLE_ID);
-    comment.setUserId(kudos.getSenderIdentityId());
-    comment.setParentCommentId(parentCommentId);
+  private ExoSocialActivity createActivity(Kudos kudos, String parentCommentId) {
+    ExoSocialActivityImpl activity = new ExoSocialActivityImpl();
+    activity.setType(KUDOS_ACTIVITY_COMMENT_TYPE);
+    activity.setTitle("Kudos to " + kudos.getReceiverFullName());
+    activity.setUserId(kudos.getSenderIdentityId());
+    activity.setParentCommentId(parentCommentId);
 
     String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
     senderLink = StringEscapeUtils.unescapeHtml(senderLink);
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
     receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
+    String message = StringUtils.isBlank(kudos.getMessage()) ? "." : ": " + StringEscapeUtils.escapeHtml(kudos.getMessage());
 
-    String message =
-                   StringUtils.isBlank(kudos.getMessage()) ? "."
-                                                           : ": "
-                                                               + StringEscapeUtils.escapeHtml(kudos.getMessage())
-                                                                                  .replace(RESOURCE_BUNDLE_VALUES_CHARACTER,
-                                                                                           RESOURCE_BUNDLE_ESCAPE_CHARACTER)
-                                                                                  .replace(RESOURCE_BUNDLE_KEYS_CHARACTER,
-                                                                                           RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER);
-
-    Map<String, String> templateParams = new LinkedHashMap<String, String>();
-    templateParams.put(RESOURCE_BUNDLE_VALUES_PARAM,
-                       senderLink + RESOURCE_BUNDLE_VALUES_CHARACTER + receiverLink + RESOURCE_BUNDLE_VALUES_CHARACTER + message);
-    comment.setTemplateParams(templateParams);
-    return comment;
+    I18NActivityUtils.addResourceKeyToProcess(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID);
+    I18NActivityUtils.addResourceKey(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID, senderLink, receiverLink, message);
+    return activity;
   }
 
 }

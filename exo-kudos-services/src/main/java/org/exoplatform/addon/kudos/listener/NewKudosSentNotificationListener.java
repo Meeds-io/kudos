@@ -1,7 +1,7 @@
 package org.exoplatform.addon.kudos.listener;
 
-import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_DETAILS_PARAMETER;
-import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID;
+import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_DETAILS_PARAMETER;
+import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_RECEIVER_NOTIFICATION_ID;
 
 import org.exoplatform.addon.kudos.model.Kudos;
 import org.exoplatform.addon.kudos.model.KudosEntityType;
@@ -24,11 +24,11 @@ public class NewKudosSentNotificationListener extends Listener<KudosService, Kud
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
     Kudos kudos = event.getData();
     try {
-      NotificationContext ctx = NotificationContextImpl.cloneInstance();
       if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
           || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
-        ctx.append(KUDOS_ACTIVITY_DETAILS_PARAMETER, kudos);
-        ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID))).execute(ctx);
+        NotificationContext ctx = NotificationContextImpl.cloneInstance();
+        ctx.append(KUDOS_DETAILS_PARAMETER, kudos);
+        ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(KUDOS_RECEIVER_NOTIFICATION_ID))).execute(ctx);
       }
     } catch (Exception e) {
       LOG.warn("Error sending notification for Kudos with id " + kudos.getTechnicalId(), e);

@@ -25,46 +25,45 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.service.rest.Util;
 
 public class Utils {
-  private static final Log                   LOG                                     = ExoLogger.getLogger(Utils.class);
+  private static final Log                   LOG                                  = ExoLogger.getLogger(Utils.class);
 
-  public static final String                 SCOPE_NAME                              = "ADDONS_KUDOS";
+  public static final String                 SCOPE_NAME                           = "ADDONS_KUDOS";
 
-  public static final String                 SETTINGS_KEY_NAME                       = "ADDONS_KUDOS_SETTINGS";
+  public static final String                 SETTINGS_KEY_NAME                    = "ADDONS_KUDOS_SETTINGS";
 
-  public static final Context                KUDOS_CONTEXT                           = Context.GLOBAL;
+  public static final Context                KUDOS_CONTEXT                        = Context.GLOBAL;
 
-  public static final Scope                  KUDOS_SCOPE                             = Scope.APPLICATION.id(SCOPE_NAME);
+  public static final Scope                  KUDOS_SCOPE                          = Scope.APPLICATION.id(SCOPE_NAME);
 
-  public static final String                 SPACE_ACCOUNT_TYPE                      = "space";
+  public static final String                 SPACE_ACCOUNT_TYPE                   = "space";
 
-  public static final String                 USER_ACCOUNT_TYPE                       = "user";
+  public static final String                 USER_ACCOUNT_TYPE                    = "user";
 
-  public static final String                 DEFAULT_ACCESS_PERMISSION               = "defaultAccessPermission";
+  public static final String                 DEFAULT_ACCESS_PERMISSION            = "defaultAccessPermission";
 
-  public static final String                 DEFAULT_KUDOS_PER_PERIOD                = "defaultKudosPerPeriod";
+  public static final String                 DEFAULT_KUDOS_PER_PERIOD             = "defaultKudosPerPeriod";
 
-  public static final String                 KUDOS_ACTIVITY_RECEIVER_NOTIFICATION_ID = "KudosActivityReceiverNotificationPlugin";
+  public static final String                 KUDOS_RECEIVER_NOTIFICATION_ID       = "KudosActivityReceiverNotificationPlugin";
 
-  public static final String                 KUDOS_SENT_EVENT                        = "exo.addons.kudos.sent";
+  public static final String                 KUDOS_SENT_EVENT                     = "exo.addons.kudos.sent";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE             = "exokudos:activity";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE          = "exokudos:activity";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID         = "activity_kudos";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID      = "activity_kudos";
 
-  public final static String                 RESOURCE_BUNDLE_VALUES_PARAM            = "RESOURCE_BUNDLE_VALUES_PARAM";
+  public final static String                 RESOURCE_BUNDLE_VALUES_PARAM         = "RESOURCE_BUNDLE_VALUES_PARAM";
 
-  public final static String                 RESOURCE_BUNDLE_KEY_TO_PROCESS          = "RESOURCE_BUNDLE_KEY_TO_PROCESS";
+  public final static String                 RESOURCE_BUNDLE_KEY_TO_PROCESS       = "RESOURCE_BUNDLE_KEY_TO_PROCESS";
 
-  public final static String                 RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER    = "${-}";
+  public final static String                 RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER = "${-}";
 
-  public final static String                 RESOURCE_BUNDLE_ESCAPE_CHARACTER        = "${_}";
+  public final static String                 RESOURCE_BUNDLE_ESCAPE_CHARACTER     = "${_}";
 
-  public final static String                 RESOURCE_BUNDLE_VALUES_CHARACTER        = "#";
+  public final static String                 RESOURCE_BUNDLE_VALUES_CHARACTER     = "#";
 
-  public final static String                 RESOURCE_BUNDLE_KEYS_CHARACTER          = ",";
+  public final static String                 RESOURCE_BUNDLE_KEYS_CHARACTER       = ",";
 
-  public static final ArgumentLiteral<Kudos> KUDOS_ACTIVITY_DETAILS_PARAMETER        =
-                                                                              new ArgumentLiteral<>(Kudos.class, "kudos");
+  public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER              = new ArgumentLiteral<>(Kudos.class, "kudos");
 
   public static Space getSpace(String id) {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);

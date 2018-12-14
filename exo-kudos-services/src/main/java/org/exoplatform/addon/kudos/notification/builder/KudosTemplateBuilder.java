@@ -33,13 +33,13 @@ import org.exoplatform.social.notification.Utils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 
-public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
+public class KudosTemplateBuilder extends AbstractTemplateBuilder {
 
   private TemplateProvider templateProvider;
 
   private boolean          pushNotification;
 
-  public KudosActivityTemplateBuilder(TemplateProvider templateProvider, boolean pushNotification) {
+  public KudosTemplateBuilder(TemplateProvider templateProvider, boolean pushNotification) {
     this.templateProvider = templateProvider;
     this.pushNotification = pushNotification;
   }
@@ -55,9 +55,6 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
       activity = Utils.getActivityManager().getActivity(activityId);
     } else if (KudosEntityType.COMMENT == KudosEntityType.valueOf(entityType)) {
       activity = Utils.getActivityManager().getActivity("comment" + activityId);
-    }
-    if (activity == null) {
-      return null;
     }
 
     String pluginId = notification.getKey().getId();
@@ -106,31 +103,39 @@ public class KudosActivityTemplateBuilder extends AbstractTemplateBuilder {
       message = "";
     }
     templateContext.put("KUDOS_MESSAGE", StringEscapeUtils.escapeHtml(message));
+    String title = "";
+    String notificationURL = CommonsUtils.getCurrentDomain();
+
     String imagePlaceHolder = SocialNotificationUtils.getImagePlaceHolder(language);
-    String title = SocialNotificationUtils.processImageTitle(activity.getTitle(), imagePlaceHolder);
+    if (activity != null) {
+      title = " : " + SocialNotificationUtils.processImageTitle(activity.getTitle(), imagePlaceHolder);
+      if (activity.isComment() && StringUtils.isNotBlank(activity.getParentCommentId())) {
+        notificationURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment_reply",
+                                                           activity.getParentId() + "-" + activity.getParentCommentId() + "-"
+                                                               + activity.getId());
+      } else if (activity.isComment()) {
+        notificationURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment",
+                                                           activity.getParentId() + "-" + activity.getId());
+      } else {
+        notificationURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
+      }
+    }
+
     templateContext.put("SUBJECT", title);
     templateContext.put("PROFILE_URL", LinkProviderUtils.getRedirectUrl("user", senderIdentity.getRemoteId()));
-    String activityURL = null;
-    if (activity.isComment() && StringUtils.isNotBlank(activity.getParentCommentId())) {
-      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment_reply",
-                                                     activity.getParentId() + "-" + activity.getParentCommentId() + "-"
-                                                         + activity.getId());
-    } else if (activity.isComment()) {
-      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity_highlight_comment",
-                                                     activity.getParentId() + "-" + activity.getId());
-    } else {
-      activityURL = LinkProviderUtils.getRedirectUrl("view_full_activity", activity.getId());
-    }
-    templateContext.put("VIEW_FULL_DISCUSSION_ACTION_URL", activityURL);
+    templateContext.put("VIEW_FULL_DISCUSSION_ACTION_URL", notificationURL);
+
     MessageInfo messageInfo = new MessageInfo();
     if (pushNotification) {
-      messageInfo.subject(activityURL);
+      messageInfo.subject(notificationURL);
     } else {
       messageInfo.subject(TemplateUtils.processSubject(templateContext));
     }
-    String body = SocialNotificationUtils.getBody(ctx, templateContext, activity);
+    // body construction must be made after subject building
+    if (activity != null) {
+      messageInfo.body(SocialNotificationUtils.getBody(ctx, templateContext, activity));
+    }
     ctx.setException(templateContext.getException());
-    messageInfo.body(body);
     return messageInfo.end();
   }
 
