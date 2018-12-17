@@ -440,6 +440,10 @@ export default {
                   }
                 }, 400);
               }
+            } else {
+              if($(".activityStreamStatus .uiIconRefresh").length && $(".activityStreamStatus .uiIconRefresh").is(":visible")) {
+                $(".activityStreamStatus .uiIconRefresh").click();
+              }
             }
           }
         });
