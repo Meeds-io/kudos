@@ -86,13 +86,17 @@ export default {
           } else {
             type = 'SPACE';
           }
-          divUIAction.append(`<a title="Send Kudos" 
-            class="btn sendKudosTipTipButton"
-            href="javascript:void(0);"
-            onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
-                {'detail' : {'id' : '${ownerId}', 'type': '${type}_TIPTIP', ignoreRefresh: true}}))">
-              <i class="uiIcon fa fa-award uiIconKudosTipTip"></i>
-          </a>`);
+          // FIXME disable TIPTIP button to send Kudos to a space because of a limitation
+          // in eXo Platform REST Services that couldn't retrieve Space details by prettyName
+          if(type === 'USER') {
+            divUIAction.append(`<a title="Send Kudos" 
+                class="btn sendKudosTipTipButton"
+                href="javascript:void(0);"
+                onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
+                    {'detail' : {'id' : '${ownerId}', 'type': '${type}_TIPTIP', ignoreRefresh: true}}))">
+                  <i class="uiIcon fa fa-award uiIconKudosTipTip"></i>
+              </a>`);
+          }
         }
       });
       if(!$(".SendKudosButtonBanner").length) {

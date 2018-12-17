@@ -9,7 +9,7 @@ export function getReceiver(entityType, entityId) {
         return identityDetails;
       });
   } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP') {
-    return getIdentityDetails(entityId, 'user', entityId)
+    return getIdentityDetails(entityId, 'space', entityId)
       .then(identityDetails => {
         // Change entity id to use long instead of string
         if(identityDetails) {
