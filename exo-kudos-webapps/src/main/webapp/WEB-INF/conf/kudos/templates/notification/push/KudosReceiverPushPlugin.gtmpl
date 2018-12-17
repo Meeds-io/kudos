@@ -6,5 +6,4 @@
     message = _ctx.appRes("Notification.kudos.received", USER);
   }
 %>
-$message
 $KUDOS_MESSAGE

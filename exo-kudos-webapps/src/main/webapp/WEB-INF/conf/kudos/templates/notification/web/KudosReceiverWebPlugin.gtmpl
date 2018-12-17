@@ -13,6 +13,9 @@
        } else {
          message = _ctx.appRes("Notification.kudos.received", profileUrl);
        }
+       if(org.apache.commons.lang.StringUtils.isNotBlank(ACTIVITY)) {
+         message += " " + _ctx.appRes("Notification.kudos.onActivity");
+       }
       %> 
       <div class="contentSmall" data-link="$VIEW_FULL_DISCUSSION_ACTION_URL">
         <div class="status">

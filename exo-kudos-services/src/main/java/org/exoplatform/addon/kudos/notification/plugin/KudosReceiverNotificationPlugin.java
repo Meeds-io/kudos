@@ -21,7 +21,6 @@ import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 import java.util.List;
 
 import org.exoplatform.addon.kudos.model.Kudos;
-import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
@@ -42,9 +41,7 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
   @Override
   public boolean isValid(NotificationContext ctx) {
     Kudos kudos = ctx.value(KUDOS_DETAILS_PARAMETER);
-    return kudos != null && kudos.getEntityType() != null
-        && (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
-            || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT);
+    return kudos != null && kudos.getEntityType() != null;
   }
 
   @Override

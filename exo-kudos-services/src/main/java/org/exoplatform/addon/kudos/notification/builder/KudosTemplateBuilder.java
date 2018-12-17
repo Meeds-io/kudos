@@ -134,6 +134,9 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     // body construction must be made after subject building
     if (activity != null) {
       messageInfo.body(SocialNotificationUtils.getBody(ctx, templateContext, activity));
+    } else {
+      templateContext.put("ACTIVITY", "");
+      messageInfo.body(TemplateUtils.processGroovy(templateContext));
     }
     ctx.setException(templateContext.getException());
     return messageInfo.end();

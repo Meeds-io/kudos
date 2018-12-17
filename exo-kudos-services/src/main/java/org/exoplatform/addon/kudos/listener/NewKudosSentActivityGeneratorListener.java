@@ -78,7 +78,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
       if (owner == null) {
         LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), kudos.getReceiverId());
       } else {
-        activityManager.saveActivityNoReturn(owner, activity);
+        activityStorage.saveActivity(owner, activity);
       }
     }
   }
