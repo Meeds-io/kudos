@@ -10,26 +10,38 @@ import lombok.Data;
 
 @Data
 public class GlobalSettings {
-  String          accessPermission;
+  private static final String END_PERIOD_DATE_IN_SECONDS_PARAM   = "endPeriodDateInSeconds";
 
-  long            kudosPerPeriod;
+  private static final String START_PERIOD_DATE_IN_SECONDS_PARAM = "startPeriodDateInSeconds";
 
-  KudosPeriodType kudosPeriodType = KudosPeriodType.DEFAULT;
+  private static final String KUDOS_PERIOD_TYPE_PARAM            = "kudosPeriodType";
+
+  private static final String KUDOS_PER_PERIOD_PARAM             = "kudosPerPeriod";
+
+  private static final String ACCESS_PERMISSION_PARAM            = "accessPermission";
+
+  String                      accessPermission;
+
+  long                        kudosPerPeriod;
+
+  KudosPeriodType             kudosPeriodType                    = KudosPeriodType.DEFAULT;
 
   public JSONObject toJSONObject(boolean includeTransient) {
     JSONObject jsonObject = new JSONObject();
     try {
       if (accessPermission != null) {
-        jsonObject.put("accessPermission", accessPermission);
+        jsonObject.put(ACCESS_PERMISSION_PARAM, accessPermission);
       }
-      jsonObject.put("kudosPerPeriod", kudosPerPeriod);
-      jsonObject.put("kudosPeriodType", kudosPeriodType.name());
+      jsonObject.put(KUDOS_PER_PERIOD_PARAM, kudosPerPeriod);
+      jsonObject.put(KUDOS_PERIOD_TYPE_PARAM, kudosPeriodType.name());
       if (includeTransient) {
-        jsonObject.put("startPeriodDateInSeconds", kudosPeriodType.getPeriodOfTime(LocalDateTime.now()).getStartDateInSeconds());
-        jsonObject.put("endPeriodDateInSeconds", kudosPeriodType.getPeriodOfTime(LocalDateTime.now()).getEndDateInSeconds());
+        jsonObject.put(START_PERIOD_DATE_IN_SECONDS_PARAM,
+                       kudosPeriodType.getPeriodOfTime(LocalDateTime.now()).getStartDateInSeconds());
+        jsonObject.put(END_PERIOD_DATE_IN_SECONDS_PARAM,
+                       kudosPeriodType.getPeriodOfTime(LocalDateTime.now()).getEndDateInSeconds());
       }
     } catch (JSONException e) {
-      throw new RuntimeException("Error while converting Object to JSON", e);
+      throw new IllegalStateException("Error while converting Object to JSON", e);
     }
     return jsonObject;
   }
@@ -51,14 +63,15 @@ public class GlobalSettings {
     try {
       JSONObject jsonObject = new JSONObject(jsonString);
       GlobalSettings globalSettings = new GlobalSettings();
-      globalSettings.setAccessPermission(jsonObject.has("accessPermission") ? jsonObject.getString("accessPermission") : null);
-      globalSettings.setKudosPerPeriod(jsonObject.has("kudosPerPeriod") ? jsonObject.getLong("kudosPerPeriod") : 0);
-      globalSettings.setKudosPeriodType(jsonObject.has("kudosPeriodType") ? KudosPeriodType.valueOf(jsonObject.getString("kudosPeriodType")
-                                                                                                              .toUpperCase())
-                                                                          : KudosPeriodType.DEFAULT);
+      globalSettings.setAccessPermission(jsonObject.has(ACCESS_PERMISSION_PARAM) ? jsonObject.getString(ACCESS_PERMISSION_PARAM)
+                                                                                 : null);
+      globalSettings.setKudosPerPeriod(jsonObject.has(KUDOS_PER_PERIOD_PARAM) ? jsonObject.getLong(KUDOS_PER_PERIOD_PARAM) : 0);
+      globalSettings.setKudosPeriodType(jsonObject.has(KUDOS_PERIOD_TYPE_PARAM) ? KudosPeriodType.valueOf(jsonObject.getString(KUDOS_PERIOD_TYPE_PARAM)
+                                                                                                                    .toUpperCase())
+                                                                                : KudosPeriodType.DEFAULT);
       return globalSettings;
     } catch (JSONException e) {
-      throw new RuntimeException("Error while converting JSON String to Object", e);
+      throw new IllegalStateException("Error while converting JSON String to Object", e);
     }
   }
 

@@ -323,7 +323,7 @@ export default {
             $(element).addClass('kudoContainer');
             const entityId = activityId;
             this.entityIds.push(entityId);
-            activityId = activityId ? activityId.replace('activityContainer', '') : null;
+            activityId = activityId.replace('activityContainer', '');
             this.refreshLink(element, 'ACTIVITY', activityId, '')
               .then(() => {
                 const index = this.entityIds.indexOf(entityId);

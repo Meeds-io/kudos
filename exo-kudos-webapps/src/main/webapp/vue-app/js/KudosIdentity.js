@@ -19,7 +19,6 @@ export function getReceiver(entityType, entityId) {
       });
   } else if (entityType === 'ACTIVITY' || entityType === 'COMMENT') {
     let ownerId;
-    let ownerIdentityId;
     let ownerType;
     let isSpace = false;
     if(entityType === 'COMMENT') {
@@ -57,7 +56,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
 
   // check if user is authorized to receive Kudos
   return (
-          window.kudosSettings.accessPermission && ownerType === 'user' ?
+          window.kudosSettings.accessPermission && type === 'user' ?
             fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${urlId}`, {credentials: 'include'})
             : Promise.resolve({ok: true})
          )
@@ -66,7 +65,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
         ownerDetails.notAuthorized = true;
         throw new Error();
       }
-      if(type === 'user' || type === 'organization' || type === 'username') {
+      if(type === 'user') {
         return fetch(`/portal/rest/v1/social/users/${urlId}`, {credentials: 'include'})
           .then(resp => resp && resp.ok && resp.json())
           .then(identityDetails => {
@@ -92,7 +91,6 @@ export function getIdentityDetails(urlId, type, remoteId) {
           return ownerDetails;
         });
       }
-      return ownerDetails;
     })
     .catch(e => {
       return ownerDetails;

@@ -88,6 +88,7 @@ public class KudosService implements Startable {
 
   @Override
   public void stop() {
+    // Nothing to shutdown
   }
 
   /**
@@ -108,16 +109,16 @@ public class KudosService implements Startable {
 
   public void sendKudos(String senderId, Kudos kudos) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
-      throw new IllegalAccessException("User '" + senderId + "' is not authorized to send kudos on behalf of "
+      throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "
           + kudos.getSenderId());
     }
     if (StringUtils.equals(senderId, kudos.getReceiverId())) {
-      throw new IllegalAccessException("User '" + senderId + "' is not authorized to send kudos to himseld!");
+      throw new IllegalAccessException("User with username '" + senderId + "' is not authorized to send kudos to himseld!");
     }
     KudosPeriod currentPeriod = getCurrentKudosPeriod();
 
     if (kudosStorage.countKudosByPeriodAndSender(currentPeriod, senderId) >= getKudosPerPeriod()) {
-      throw new IllegalAccessException("User '" + senderId + "' is not authorized to send more kudos");
+      throw new IllegalAccessException("User having username'" + senderId + "' is not authorized to send more kudos");
     }
 
     Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, senderId);
@@ -191,13 +192,13 @@ public class KudosService implements Startable {
   }
 
   public long getKudosPerPeriod() {
-    GlobalSettings globalSettings = getGlobalSettings();
-    return globalSettings == null ? 0 : globalSettings.getKudosPerPeriod();
+    GlobalSettings storedGlobalSettings = getGlobalSettings();
+    return storedGlobalSettings == null ? 0 : storedGlobalSettings.getKudosPerPeriod();
   }
 
   public String getAccessPermission() {
-    GlobalSettings globalSettings = getGlobalSettings();
-    return globalSettings == null ? null : globalSettings.getAccessPermission();
+    GlobalSettings storedGlobalSettings = getGlobalSettings();
+    return storedGlobalSettings == null ? null : storedGlobalSettings.getAccessPermission();
   }
 
   /**

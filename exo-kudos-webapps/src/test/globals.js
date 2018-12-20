@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import Vue from 'vue';
 
 global.$ = $;
 global.eXo = {

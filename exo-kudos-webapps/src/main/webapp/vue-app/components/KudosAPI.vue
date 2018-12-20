@@ -75,7 +75,7 @@ export default {
       }
     },
     initTiptip() {
-      eXo = eXo ? eXo : {};
+      window.eXo = window.eXo ? window.eXo : {};
       eXo.social = eXo.social ? eXo.social : {};
       eXo.social.tiptip = eXo.social.tiptip ? eXo.social.tiptip : {};
       eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];

@@ -26,7 +26,7 @@ public enum KudosPeriodType {
       kudosPeriod.setEndDateInSeconds(timeToSeconds(nextMonth.atDay(1).atStartOfDay()));
       break;
     case QUARTER:
-      int monthQuarterIndex = (((int) yearMonth.getMonthValue() - 1) / 3) * 3 + 1;
+      int monthQuarterIndex = ((yearMonth.getMonthValue() - 1) / 3) * 3 + 1;
 
       YearMonth startQuarterMonth = YearMonth.of(yearMonth.getYear(), monthQuarterIndex);
       YearMonth endQuarterMonth = startQuarterMonth.plusMonths(3);
@@ -34,7 +34,7 @@ public enum KudosPeriodType {
       kudosPeriod.setEndDateInSeconds(timeToSeconds(endQuarterMonth.atDay(1).atStartOfDay()));
       break;
     case SEMESTER:
-      int monthSemesterIndex = (((int) yearMonth.getMonthValue() - 1) / 6) * 6 + 1;
+      int monthSemesterIndex = ((yearMonth.getMonthValue() - 1) / 6) * 6 + 1;
 
       YearMonth startSemesterMonth = YearMonth.of(yearMonth.getYear(), monthSemesterIndex);
       YearMonth endSemesterMonth = startSemesterMonth.plusMonths(6);

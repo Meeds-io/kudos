@@ -20,6 +20,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
+import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.service.rest.Util;
@@ -51,23 +52,14 @@ public class Utils {
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID      = "activity_kudos";
 
-  public final static String                 RESOURCE_BUNDLE_VALUES_PARAM         = "RESOURCE_BUNDLE_VALUES_PARAM";
-
-  public final static String                 RESOURCE_BUNDLE_KEY_TO_PROCESS       = "RESOURCE_BUNDLE_KEY_TO_PROCESS";
-
-  public final static String                 RESOURCE_BUNDLE_ESCAPE_KEY_CHARACTER = "${-}";
-
-  public final static String                 RESOURCE_BUNDLE_ESCAPE_CHARACTER     = "${_}";
-
-  public final static String                 RESOURCE_BUNDLE_VALUES_CHARACTER     = "#";
-
-  public final static String                 RESOURCE_BUNDLE_KEYS_CHARACTER       = ",";
-
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER              = new ArgumentLiteral<>(Kudos.class, "kudos");
+
+  private Utils() {
+  }
 
   public static Space getSpace(String id) {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
-    if (id.indexOf("/spaces/") >= 0) {
+    if (id.indexOf(SpaceUtils.SPACE_GROUP) >= 0) {
       return spaceService.getSpaceByGroupId(id);
     }
     Space space = spaceService.getSpaceByPrettyName(id);
@@ -208,10 +200,9 @@ public class Utils {
     return receiverIdentity.getId();
   }
 
-  @SuppressWarnings("deprecation")
   private static Identity getIdentityById(long identityId) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    return identityManager.getIdentity(String.valueOf(identityId));
+    return identityManager.getIdentity(String.valueOf(identityId), true);
   }
 
   private static String getAvatar(Identity identity, Space space) {

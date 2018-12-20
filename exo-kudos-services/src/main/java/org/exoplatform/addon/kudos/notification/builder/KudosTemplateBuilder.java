@@ -148,13 +148,12 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
   }
 
   protected ExoSocialActivity getI18N(ExoSocialActivity activity, Locale locale) {
-    I18NActivityProcessor i18NActivityProcessor =
-                                                (I18NActivityProcessor) PortalContainer.getInstance()
-                                                                                       .getComponentInstanceOfType(I18NActivityProcessor.class);
+    I18NActivityProcessor i18NActivityProcessor = PortalContainer.getInstance()
+                                                                 .getComponentInstanceOfType(I18NActivityProcessor.class);
     if (activity.getTitleId() != null) {
       activity = i18NActivityProcessor.process(activity, locale);
     }
     return activity;
   }
 
-};
+}

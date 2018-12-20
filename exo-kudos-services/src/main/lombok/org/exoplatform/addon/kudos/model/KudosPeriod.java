@@ -20,7 +20,7 @@ public class KudosPeriod {
       jsonObject.put("startDateInSeconds", startDateInSeconds);
       jsonObject.put("endDateInSeconds", endDateInSeconds);
     } catch (JSONException e) {
-      throw new RuntimeException("Error while converting Object to JSON", e);
+      throw new IllegalStateException("Error while converting Object to JSON", e);
     }
     return jsonObject;
   }

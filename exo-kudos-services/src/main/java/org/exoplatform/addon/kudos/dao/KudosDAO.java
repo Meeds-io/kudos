@@ -9,19 +9,21 @@ import org.exoplatform.addon.kudos.model.KudosPeriod;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
+  private static final String KUDOS_REMOVAL_IS_DISABLED_MESSAGE = "Kudos removal is disabled";
+
   @Override
   public void deleteAll() {
-    throw new IllegalStateException("Kudos removal is disabled");
+    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
   }
 
   @Override
   public void delete(KudosEntity entity) {
-    throw new IllegalStateException("Kudos removal is disabled");
+    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
   }
 
   @Override
   public void deleteAll(List<KudosEntity> entities) {
-    throw new IllegalStateException("Kudos removal is disabled");
+    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
   }
 
   public List<KudosEntity> getAllKudosByPeriod(KudosPeriod kudosPeriod) {
