@@ -81,7 +81,7 @@ export default {
       eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];
       eXo.social.tiptip.extraActions.push({
         appendContentTo(divUIAction, ownerId, type) {
-          if(!type || type === 'username') {
+          if(!type || type === 'username' || type === 'user' || type === 'organization') {
             type = 'USER';
           } else {
             type = 'SPACE';
@@ -103,7 +103,7 @@ export default {
         if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
           $('.profileMenuNav .profileMenuNavHeader .profileMenuApps').append(`<li class="SendKudosButtonBanner">
               <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
-               {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'SPACE_PROFILE', ignoreRefresh: true}}));"
+               {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'USER_PROFILE', ignoreRefresh: true}}));"
                class="btn" href="javascript:void(0);">
                 <i class="uiIcon fa fa-award uiIconKudos"></i>
                 <span> Send Kudos</span>
