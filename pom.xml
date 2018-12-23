@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.exoplatform.addons.kudos</groupId>
   <artifactId>exo-kudos</artifactId>
-  <version>1.0.x-SNAPSHOT</version>
+  <version>1.1.x-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Add-on:: eXo Kudos - Parent POM</name>
   <description>eXo Kudos Addon</description>
