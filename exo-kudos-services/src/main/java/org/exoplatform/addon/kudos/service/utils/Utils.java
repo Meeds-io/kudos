@@ -26,33 +26,33 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.service.rest.Util;
 
 public class Utils {
-  private static final Log                   LOG                                  = ExoLogger.getLogger(Utils.class);
+  private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
 
-  public static final String                 SCOPE_NAME                           = "ADDONS_KUDOS";
+  public static final String                 SCOPE_NAME                      = "ADDONS_KUDOS";
 
-  public static final String                 SETTINGS_KEY_NAME                    = "ADDONS_KUDOS_SETTINGS";
+  public static final String                 SETTINGS_KEY_NAME               = "ADDONS_KUDOS_SETTINGS";
 
-  public static final Context                KUDOS_CONTEXT                        = Context.GLOBAL;
+  public static final Context                KUDOS_CONTEXT                   = Context.GLOBAL;
 
-  public static final Scope                  KUDOS_SCOPE                          = Scope.APPLICATION.id(SCOPE_NAME);
+  public static final Scope                  KUDOS_SCOPE                     = Scope.APPLICATION.id(SCOPE_NAME);
 
-  public static final String                 SPACE_ACCOUNT_TYPE                   = "space";
+  public static final String                 SPACE_ACCOUNT_TYPE              = "space";
 
-  public static final String                 USER_ACCOUNT_TYPE                    = "user";
+  public static final String                 USER_ACCOUNT_TYPE               = "user";
 
-  public static final String                 DEFAULT_ACCESS_PERMISSION            = "defaultAccessPermission";
+  public static final String                 DEFAULT_ACCESS_PERMISSION       = "defaultAccessPermission";
 
-  public static final String                 DEFAULT_KUDOS_PER_PERIOD             = "defaultKudosPerPeriod";
+  public static final String                 DEFAULT_KUDOS_PER_PERIOD        = "defaultKudosPerPeriod";
 
-  public static final String                 KUDOS_RECEIVER_NOTIFICATION_ID       = "KudosActivityReceiverNotificationPlugin";
+  public static final String                 KUDOS_RECEIVER_NOTIFICATION_ID  = "KudosActivityReceiverNotificationPlugin";
 
-  public static final String                 KUDOS_SENT_EVENT                     = "exo.addons.kudos.sent";
+  public static final String                 KUDOS_SENT_EVENT                = "exo.addons.kudos.sent";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE          = "exokudos:activity";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID      = "activity_kudos";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos";
 
-  public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER              = new ArgumentLiteral<>(Kudos.class, "kudos");
+  public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
 
   private Utils() {
   }
@@ -62,13 +62,16 @@ public class Utils {
     if (id.indexOf(SpaceUtils.SPACE_GROUP) >= 0) {
       return spaceService.getSpaceByGroupId(id);
     }
-    Space space = spaceService.getSpaceByPrettyName(id);
+    Space space = spaceService.getSpaceById(id);
     if (space == null) {
-      space = spaceService.getSpaceByGroupId("/spaces/" + id);
+      space = spaceService.getSpaceByPrettyName(id);
       if (space == null) {
-        space = spaceService.getSpaceByDisplayName(id);
+        space = spaceService.getSpaceByGroupId("/spaces/" + id);
         if (space == null) {
-          space = spaceService.getSpaceByUrl(id);
+          space = spaceService.getSpaceByDisplayName(id);
+          if (space == null) {
+            space = spaceService.getSpaceByUrl(id);
+          }
         }
       }
     }
@@ -123,16 +126,19 @@ public class Utils {
     kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
     kudos.setTime(timeFromSeconds(kudosEntity.getCreatedDate()));
 
-    Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
-    kudos.setReceiverId(receiverIdentity.getRemoteId());
-    kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
-    kudos.setReceiverType(kudosEntity.isReceiverUser() ? USER_ACCOUNT_TYPE : SPACE_ACCOUNT_TYPE);
     if (kudosEntity.isReceiverUser()) {
+      Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
+      kudos.setReceiverId(receiverIdentity.getRemoteId());
+      kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
+      kudos.setReceiverType(USER_ACCOUNT_TYPE);
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
       kudos.setReceiverURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));
     } else {
-      Space space = getSpace(receiverIdentity.getRemoteId());
+      Space space = getSpace(String.valueOf(kudosEntity.getReceiverId()));
+      kudos.setReceiverId(space.getPrettyName());
+      kudos.setReceiverIdentityId(String.valueOf(kudosEntity.getReceiverId()));
+      kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
       kudos.setReceiverFullName(space.getDisplayName());
       kudos.setReceiverURL(Util.getBaseUrl()
           + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));

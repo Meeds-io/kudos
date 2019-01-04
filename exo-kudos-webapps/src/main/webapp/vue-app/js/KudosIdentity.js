@@ -30,11 +30,7 @@ export function getReceiver(entityType, entityId) {
           isSpace = activityDetails.owner.href.indexOf('/spaces/') >= 0;
           ownerType = isSpace ? 'space' : 'user';
           let remoteId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
-          if (isSpace) {
-            ownerId = activityDetails.activityStream && activityDetails.activityStream.id;
-          } else {
-            ownerId = remoteId;
-          }
+          ownerId = remoteId;
           return getIdentityDetails(ownerId, ownerType, remoteId);
         } else {
           throw new Error("Uknown activity details", activityDetails);
