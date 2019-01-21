@@ -60,18 +60,20 @@
               <i class="uiIconInfo"></i>
               No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} {{ remainingDaysToReset === 1 ? 'day' : 'days' }}.
             </div>
-            <v-textarea
-              v-else-if="kudosToSend"
-              id="kudosMessage"
-              v-model="kudosMessage"
-              :disabled="loading"
-              name="kudosMessage"
-              label="Message"
-              placeholder="Enter a message to send with your kudos"
-              class="mt-4 mb-0"
-              rows="3"
-              flat
-              no-resize />
+            <v-form v-else-if="kudosToSend" ref="form">
+              <v-textarea
+                id="kudosMessage"
+                v-model="kudosMessage"
+                :disabled="loading"
+                :rules="kudosMessageRules"
+                name="kudosMessage"
+                label="Message"
+                placeholder="Enter a message to send with your kudos"
+                class="mt-4 mb-0"
+                rows="3"
+                flat
+                no-resize />
+            </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -169,6 +171,11 @@ export default {
       kudosToSend: null,
       kudosMessage: null,
       loading: false,
+      kudosMessageRules: [
+        (v) => !!v || 'Required field',
+        (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || 'A least 10 real characters',
+        (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || 'Min 3 words',
+      ],
       htmlToAppend: `<li class="SendKudosButtonTemplate">
           <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
             <div class="v-btn__content">
@@ -384,8 +391,13 @@ export default {
       }
     },
     send() {
-      this.loading = true;
       this.error = null;
+
+      if(!this.$refs.form.validate()) {
+        return;
+      }
+
+      this.loading = true;
       sendKudos({
         entityType: this.entityType,
         entityId: this.entityId,
@@ -460,7 +472,10 @@ export default {
       $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
       $activityItem.addClass("activity-loadding");
       UIActivityLoader.renderActivity($activityItem);
-    }
+    },
+    escapeCharacters(value) {
+      return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();
+    },
   }
 };
 </script>
