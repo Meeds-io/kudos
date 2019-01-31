@@ -29,7 +29,7 @@
     <page-nodes>
         <node>
             <name>kudosAdministration</name>
-            <label>Kudos administration</label>
+            <label>Kudos</label>
             <page-reference>group::/platform/administrators::kudosAdministration</page-reference>
         </node>
     </page-nodes>
