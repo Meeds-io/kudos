@@ -448,7 +448,9 @@ export default {
                   let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last().attr("id");
                   if(commentToScrollTo) {
                     commentToScrollTo = commentToScrollTo.replace('commentContainer', '');
-                    UIActivity.focusToComment(commentToScrollTo);
+                    window.require(["SHARED/social-ui-activity"], (UIActivity) => {
+                      UIActivity.focusToComment(commentToScrollTo);
+                    });
                   }
                 }, 400);
               }
@@ -471,7 +473,9 @@ export default {
       const $activityItem = $(`#UIActivityLoader${activityId}`);
       $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
       $activityItem.addClass("activity-loadding");
-      UIActivityLoader.renderActivity($activityItem);
+      window.require(["SHARED/social-ui-activities-loader"], (UIActivityLoader) => {
+        UIActivityLoader.renderActivity($activityItem);
+      });
     },
     escapeCharacters(value) {
       return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();
