@@ -87,6 +87,17 @@ public class KudosStorage {
     return kudosList;
   }
 
+  public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
+    boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
+    Identity identity = identityManager.getOrCreateIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
+                                                                           : SpaceIdentityProvider.NAME,
+                                                            receiverId,
+                                                            true);
+    return kudosDAO.countKudosByPeriodAndReceiver(kudosPeriod,
+                                                  Long.parseLong(identity.getId()),
+                                                  isReceiverUser);
+  }
+
   public List<Kudos> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
     List<Kudos> kudosList = new ArrayList<>();
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);

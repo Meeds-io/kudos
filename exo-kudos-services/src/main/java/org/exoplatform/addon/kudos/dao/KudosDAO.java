@@ -33,7 +33,8 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
   }
 
   public List<KudosEntity> getAllKudosByPeriodAndEntityType(KudosPeriod kudosPeriod, int entityType) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriodAndEntityType", KudosEntity.class);
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriodAndEntityType",
+                                                                        KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("entityType", entityType);
     return query.getResultList();
@@ -52,6 +53,15 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     query.setParameter("receiverId", receiverId);
     query.setParameter("isReceiverUser", isReceiverUser);
     return query.getResultList();
+  }
+
+  public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, long receiverId, boolean isReceiverUser) {
+    TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndReceiver", Long.class);
+    setPeriodParameters(query, kudosPeriod);
+    query.setParameter("receiverId", receiverId);
+    query.setParameter("isReceiverUser", isReceiverUser);
+    Long count = query.getSingleResult();
+    return count == null ? 0 : count;
   }
 
   public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {

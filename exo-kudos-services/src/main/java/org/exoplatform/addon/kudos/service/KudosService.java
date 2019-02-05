@@ -167,6 +167,28 @@ public class KudosService implements Startable {
     return kudosBySender;
   }
 
+  public long countKudosByPeriodAndReceiver(long identityId,
+                                            long startDateInSeconds,
+                                            long endDateInSeconds) {
+    KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    if (identity == null) {
+      return 0;
+    }
+    return kudosStorage.countKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId());
+  }
+
+  public List<Kudos> getKudosByPeriodAndReceiver(long identityId,
+                                                 long startDateInSeconds,
+                                                 long endDateInSeconds) {
+    KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    if (identity == null) {
+      return Collections.emptyList();
+    }
+    return kudosStorage.getKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId());
+  }
+
   public List<Kudos> getKudosByReceiverInCurrentPeriod(String receiverType, String receiverId) {
     List<Kudos> kudosList = kudosStorage.getKudosByPeriodAndReceiver(getCurrentKudosPeriod(), receiverType, receiverId);
     if (kudosList != null) {
