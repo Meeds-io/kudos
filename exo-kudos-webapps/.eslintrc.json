@@ -7,6 +7,10 @@
         "eslint:recommended",
         "plugin:vue/recommended"
     ],
+    "plugins": [
+      "standard",
+      "vue"
+    ],
     "globals": {
         "$": true,
         "global": true,
@@ -24,9 +28,7 @@
         "block-scoped-var": ["error"],
         "curly": ["error", "all"],
         "eqeqeq": ["error", "always", { "null": "ignore" }],
-        "indent": ["warn", 2],
         "new-cap": ["off"],
-        "new-parens": ["warn"],
         "no-alert": ["error"],
         "no-await-in-loop": ["error"],
         "no-caller": ["error"],
@@ -37,7 +39,6 @@
         "no-extra-label": ["error"],
         "no-extend-native": ["error"],
         "no-extra-parens": ["off"],
-        "no-floating-decimal": ["warn"],
         "no-implied-eval": ["error"],
         "no-iterator": ["error"],
         "no-labels": ["error"],
@@ -53,7 +54,6 @@
         "no-self-compare": ["error"],
         "no-sequences": ["error"],
         "no-shadow-restricted-names": ["error"],
-        "no-sync": ["error"],
         "no-template-curly-in-string": ["error"],
         "no-throw-literal": ["error"],
         "no-undefined": ["error"],
@@ -71,19 +71,29 @@
         "prefer-template": ["warn"],
         "quotes": ["off"],
         "require-await": ["error"],
-        "semi": ["warn"],
         "valid-jsdoc": ["error"],
         "yoda": ["error", "never", { "exceptRange": true }],
-        "vue/html-indent": ["warn"],
-        "vue/html-self-closing": "off",
-        "vue/max-attributes-per-line": "off"
-    },
-    "overrides": [{
-        "files": [ "src/test/**/*" ],
-        "excludedFiles": "src/main/webapp/js/lib/*",
-        "rules": {
-            "no-empty-function": "off",
-            "no-magic-numbers": "off"
-        }
-    }]
+        "vue/max-attributes-per-line": ["warn", {
+          "singleline": 2,
+          "multiline": {
+            "max": 1,
+            "allowFirstLine": false
+          }
+        }],
+        "vue/singleline-html-element-content-newline": ["off"],
+        "vue/html-self-closing": ["warn", {
+          "html": {
+            "void": "never",
+            "normal": "never",
+            "component": "always"
+          },
+          "svg": "never",
+          "math": "never"
+        }],
+        "vue/html-closing-bracket-newline": ["warn", {
+          "singleline": "never",
+          "multiline": "never"
+        }],
+        "vue/component-name-in-template-casing": ["error", "kebab-case"]
+    }
 }

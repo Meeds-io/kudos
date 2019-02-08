@@ -14,7 +14,11 @@
 
           <v-tabs-items v-model="selectedTab">
             <v-tab-item id="general">
-              <v-progress-circular v-if="loading" indeterminate color="white" class="mr-2"></v-progress-circular>
+              <v-progress-circular
+                v-if="loading"
+                indeterminate
+                color="white"
+                class="mr-2" />
               <v-card v-else flat>
                 <v-card-text>
                   <div class="text-xs-left kudosPeriodConfiguration">
@@ -33,6 +37,8 @@
                       hide-no-data
                       hide-selected
                       small-chips>
+                      <!-- Without slot-scope, the template isn't displayed -->
+                      <!-- eslint-disable-next-line vue/no-unused-vars -->
                       <template slot="selection" slot-scope="data">
                         {{ selectedPeriodType }}
                       </template>
@@ -69,15 +75,26 @@
                         </v-list-tile>
                       </template>
                       <template slot="selection" slot-scope="{ item, selected }">
-                        <v-chip v-if="item.error" :selected="selected" class="autocompleteSelectedItem">
+                        <v-chip
+                          v-if="item.error"
+                          :selected="selected"
+                          class="autocompleteSelectedItem">
                           <del><span>{{ item.name }}</span></del>
                         </v-chip>
-                        <v-chip v-else :selected="selected" class="autocompleteSelectedItem">
+                        <v-chip
+                          v-else
+                          :selected="selected"
+                          class="autocompleteSelectedItem">
                           <span>{{ item.name }}</span>
                         </v-chip>
                       </template>
+                      <!-- Without slot-scope, the template isn't displayed -->
+                      <!-- eslint-disable-next-line vue/no-unused-vars -->
                       <template slot="item" slot-scope="{ item, tile }">
-                        <v-list-tile-avatar v-if="item.avatar" tile size="20">
+                        <v-list-tile-avatar
+                          v-if="item.avatar"
+                          tile
+                          size="20">
                           <img :src="item.avatar">
                         </v-list-tile-avatar>
                         <v-list-tile-title v-text="item.name" />

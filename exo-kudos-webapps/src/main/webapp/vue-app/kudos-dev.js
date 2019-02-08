@@ -9,5 +9,5 @@ window.parentToWatch = '#test';
 Vue.use(Vuetify);
 const vueInstance = new Vue({
   el: '#KudosApp',
-  render: h => h(KudosApp)
+  render: (h) => h(KudosApp),
 });

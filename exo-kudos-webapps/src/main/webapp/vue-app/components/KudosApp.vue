@@ -1,10 +1,23 @@
 <template>
-  <v-app v-if="!disabled" id="KudosApp" color="transaprent" flat>
+  <v-app
+    v-if="!disabled"
+    id="KudosApp"
+    color="transaprent"
+    flat>
     <kudos-api ref="kudosAPI" />
-    <v-dialog v-model="dialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="dialog = false">
+    <v-dialog
+      v-model="dialog"
+      content-class="uiPopup with-overflow"
+      width="500px"
+      max-width="100vw"
+      persistent
+      @keydown.esc="dialog = false">
       <v-card class="elevation-12">
         <div class="popupHeader ClearFix">
-          <a class="uiIconClose pull-right" aria-hidden="true" @click="dialog = false"></a>
+          <a
+            class="uiIconClose pull-right"
+            aria-hidden="true"
+            @click="dialog = false"></a>
           <span class="PopupTitle popupTitle">Send a kudos</span>
         </div>
         <v-card flat>
@@ -12,7 +25,11 @@
             <i class="uiIconError"></i>{{ error }}
           </div>
           <v-card-text v-if="allKudos && allKudos.length">
-            <v-container flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
+            <v-container
+              flat
+              fluid
+              grid-list-lg
+              class="pl-0 pr-0 pb-0 pt-0">
               <v-layout
                 row
                 wrap
@@ -31,22 +48,27 @@
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                   </v-card-text>
                   <v-card-text v-else class="kudosIconContainer">
-                    <v-icon :title="`${remainingKudos -1} kudos left to send`" class="uiIconKudos uiIconLightGrey" size="64">fa-award</v-icon>
+                    <v-icon
+                      :title="`${remainingKudos -1} kudos left to send`"
+                      class="uiIconKudos uiIconLightGrey"
+                      size="64">
+                      fa-award
+                    </v-icon>
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
                   <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink absoluteLink">
                     <identity-link
-                      :technical-id="kudos.receiverIdentityId"
                       :id="kudos.receiverId"
+                      :technical-id="kudos.receiverIdentityId"
                       :type="kudos.receiverType"
                       :name="kudos.receiverFullName" />
                   </v-card-text>
                   <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
                   <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
                     <identity-link
-                      :technical-id="kudos.receiverIdentityId"
                       :id="kudos.receiverId"
+                      :technical-id="kudos.receiverIdentityId"
                       :type="kudos.receiverType"
                       :name="kudos.receiverFullName" />
                   </v-card-text>
@@ -77,18 +99,38 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <button v-if="kudosToSend" :disabled="loading || error" class="btn btn-primary mr-3" @click="send">Send</button>
-            <button :disabled="loading" class="btn" @click="dialog = false">Close</button>
+            <button
+              v-if="kudosToSend"
+              :disabled="loading || error"
+              class="btn btn-primary mr-3"
+              @click="send">
+              Send
+            </button>
+            <button
+              :disabled="loading"
+              class="btn"
+              @click="dialog = false">
+              Close
+            </button>
             <v-spacer />
           </v-card-actions>
         </v-card>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="listDialog" content-class="uiPopup with-overflow" width="500px" max-width="100vw" persistent @keydown.esc="listDialog = false">
+    <v-dialog
+      v-model="listDialog"
+      content-class="uiPopup with-overflow"
+      width="500px"
+      max-width="100vw"
+      persistent
+      @keydown.esc="listDialog = false">
       <v-card class="elevation-12">
         <div class="popupHeader ClearFix">
-          <a class="uiIconClose pull-right" aria-hidden="true" @click="listDialog = false"></a>
+          <a
+            class="uiIconClose pull-right"
+            aria-hidden="true"
+            @click="listDialog = false"></a>
           <span class="PopupTitle popupTitle">Kudos list</span>
         </div>
         <v-card flat>
@@ -96,7 +138,12 @@
             <i class="uiIconError"></i>{{ error }}
           </div>
           <v-card-text>
-            <v-container v-if="kudosList && kudosList.length" flat fluid grid-list-lg class="pl-0 pr-0 pb-0 pt-0">
+            <v-container
+              v-if="kudosList && kudosList.length"
+              flat
+              fluid
+              grid-list-lg
+              class="pl-0 pr-0 pb-0 pt-0">
               <v-layout
                 row
                 wrap
@@ -113,8 +160,8 @@
                   </v-card-text>
                   <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
                     <identity-link
-                      :technical-id="kudos.senderIdentityId"
                       :id="kudos.senderId"
+                      :technical-id="kudos.senderIdentityId"
                       :type="kudos.senderType"
                       :name="kudos.senderFullName" />
                   </v-card-text>

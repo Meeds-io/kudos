@@ -10,6 +10,8 @@
         hide-selected
         small-chips
         class="kudosPeriodTypeInput">
+        <!-- Without slot-scope, the template isn't displayed -->
+        <!-- eslint-disable-next-line vue/no-unused-vars -->
         <template slot="selection" slot-scope="data">
           {{ selectedPeriodType }}
         </template>
@@ -50,11 +52,16 @@
               </v-avatar>
             </td>
             <td class="text-xs-left">
-              <a :href="props.item.url" rel="nofollow" target="_blank">{{ props.item.name }}</a>
+              <a
+                :href="props.item.url"
+                rel="nofollow"
+                target="_blank">
+                {{ props.item.name }}
+              </a>
             </td>
-            <td v-html="props.item.received">
+            <td v-text="props.item.received">
             </td>
-            <td v-html="props.item.sent">
+            <td v-text="props.item.sent">
             </td>
           </tr>
         </template>

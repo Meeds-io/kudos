@@ -1,6 +1,12 @@
 <template>
-  <a v-if="id" :id="componentId" :title="id" :href="url" rel="nofollow" target="_blank">
-    <span v-html="name"></span>
+  <a
+    v-if="id"
+    :id="componentId"
+    :title="id"
+    :href="url"
+    rel="nofollow"
+    target="_blank">
+    <span v-text="name"></span>
   </a>
 </template>
 
