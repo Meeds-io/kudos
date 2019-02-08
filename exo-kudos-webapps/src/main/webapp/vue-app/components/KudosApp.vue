@@ -182,7 +182,7 @@ export default {
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
             </div>
           </button>
-          <a rel="tooltip" data-placement="top" title="Click to display kudos" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
+          <a rel="tooltip" data-placement="top" title="Display kudos list" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
         </li>`
     };
   },
@@ -351,7 +351,7 @@ export default {
           const linkId = `SendKudosButton${entityType}${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', hasSentKudos ? 'primary' : 'grey'));
+          let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', kudosCount ? 'primary' : 'grey'));
           $sendKudosLink.attr('id', linkId);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
