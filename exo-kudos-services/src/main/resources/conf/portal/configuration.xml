@@ -197,4 +197,88 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+    <!-- Gamification zones : reward  zone -->
+  <external-component-plugins>
+    <target-component>org.exoplatform.addons.gamification.service.setting.zone.ZoneRegistry</target-component>
+    <component-plugin>
+      <name>social.zone</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.addons.gamification.service.setting.zone.model.ZoneConfig</type>
+      <init-params>
+        <value-param>
+          <name>zone-name</name>
+          <value>reward</value>
+        </value-param>
+        <value-param>
+          <name>zone-description</name>
+          <value>reward</value>
+        </value-param>
+        <value-param>
+          <name>zone-priority</name>
+          <value>1</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.addons.gamification.service.setting.rule.RuleRegistry</target-component>
+    <component-plugin>
+      <name>rule.SendKudos</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.addons.gamification.service.setting.rule.model.RuleConfig</type>
+      <init-params>
+        <value-param>
+          <name>rule-title</name>
+          <value>sendKudos</value>
+        </value-param>
+        <value-param>
+          <name>rule-description</name>
+          <value>You sent a Kudos</value>
+        </value-param>
+        <value-param>
+          <name>rule-score</name>
+          <value>10</value>
+        </value-param>
+        <value-param>
+          <name>rule-zone</name>
+          <value>reward</value>
+        </value-param>
+        <value-param>
+          <name>rule-enable</name>
+          <value>true</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.addons.gamification.service.setting.rule.RuleRegistry</target-component>
+    <component-plugin>
+      <name>rule.ReceiveKudos</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.addons.gamification.service.setting.rule.model.RuleConfig</type>
+      <init-params>
+        <value-param>
+          <name>rule-title</name>
+          <value>receiveKudos</value>
+        </value-param>
+        <value-param>
+          <name>rule-description</name>
+          <value>Someone sent you a Kudos</value>
+        </value-param>
+        <value-param>
+          <name>rule-score</name>
+          <value>5</value>
+        </value-param>
+        <value-param>
+          <name>rule-zone</name>
+          <value>reward</value>
+        </value-param>
+        <value-param>
+          <name>rule-enable</name>
+          <value>true</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>
