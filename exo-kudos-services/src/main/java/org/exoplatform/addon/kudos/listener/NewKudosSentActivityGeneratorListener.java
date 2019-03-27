@@ -4,9 +4,6 @@ import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_COM
 import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
 import static org.exoplatform.addon.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +12,6 @@ import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.addon.kudos.service.KudosService;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
-import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -38,12 +34,10 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
 
   private ActivityStorage  activityStorage;
   
-  private ListenerService  listenerService;
 
-  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage, ListenerService  listenerService) {
+  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
     this.activityStorage = activityStorage;
     this.activityManager = activityManager;
-    this.listenerService = listenerService;
   }
 
   @Override
@@ -98,26 +92,6 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     activity.setTitle("Kudos to " + kudos.getReceiverFullName());
     activity.setUserId(kudos.getSenderIdentityId());
     activity.setParentCommentId(parentCommentId);
-    try {
-      Map<String, String> gam = new HashMap<>();
-      gam.put("ruleTitle", "sendKudos");
-      gam.put("senderId", kudos.getSenderId());
-      gam.put("receiverId", kudos.getSenderId());
-      gam.put("object", "");
-      listenerService.broadcast("exo.gamification.generic.action", gam, "");
-  } catch (Exception e) {
-    LOG.error("Cannot broadcast gamification event");
-  }
-    try {
-      Map<String, String> gam = new HashMap<>();
-      gam.put("ruleTitle", "receiveKudos");
-      gam.put("senderId", kudos.getReceiverId());
-      gam.put("receiverId", kudos.getReceiverId());
-      gam.put("object", "");
-      listenerService.broadcast("exo.gamification.generic.action", gam, "");
-  } catch (Exception e) {
-    LOG.error("Cannot broadcast gamification event");
-  }
     String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
     senderLink = StringEscapeUtils.unescapeHtml(senderLink);
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";

@@ -155,6 +155,11 @@
       <set-method>addListener</set-method>
       <type>org.exoplatform.addon.kudos.listener.NewKudosSentActivityGeneratorListener</type>
     </component-plugin>
+    <component-plugin>
+      <name>exo.addons.kudos.sent</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.addon.kudos.listener.IntegrationGamificationListener</type>
+    </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>
