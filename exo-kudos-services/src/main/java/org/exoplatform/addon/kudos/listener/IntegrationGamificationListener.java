@@ -26,13 +26,14 @@ public class IntegrationGamificationListener extends Listener<KudosService, Kudo
   @Override
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
     Kudos kudos = event.getData();
+    
  
     try {
       Map<String, String> gam = new HashMap<>();
       gam.put("ruleTitle", "sendKudos");
+      gam.put("object", "/portal/intranet/");
       gam.put("senderId", kudos.getSenderId());
       gam.put("receiverId", kudos.getSenderId());
-      gam.put("object", "");
       listenerService.broadcast("exo.gamification.generic.action", gam, "");
   } catch (Exception e) {
     LOG.error("Cannot broadcast gamification event");
@@ -40,9 +41,9 @@ public class IntegrationGamificationListener extends Listener<KudosService, Kudo
     try {
       Map<String, String> gam = new HashMap<>();
       gam.put("ruleTitle", "receiveKudos");
+      gam.put("object", "/portal/intranet/");
       gam.put("senderId", kudos.getReceiverId());
       gam.put("receiverId", kudos.getReceiverId());
-      gam.put("object", "");
       listenerService.broadcast("exo.gamification.generic.action", gam, "");
   } catch (Exception e) {
     LOG.error("Cannot broadcast gamification event");
