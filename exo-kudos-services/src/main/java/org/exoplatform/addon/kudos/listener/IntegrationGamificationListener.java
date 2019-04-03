@@ -42,7 +42,7 @@ public class IntegrationGamificationListener extends Listener<KudosService, Kudo
       Map<String, String> gam = new HashMap<>();
       gam.put("ruleTitle", "receiveKudos");
       gam.put("object", "/portal/intranet/");
-      gam.put("senderId", kudos.getReceiverId());
+      gam.put("senderId", kudos.getSenderId());
       gam.put("receiverId", kudos.getReceiverId());
       listenerService.broadcast("exo.gamification.generic.action", gam, "");
   } catch (Exception e) {
