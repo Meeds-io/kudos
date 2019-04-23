@@ -1,7 +1,6 @@
 package org.exoplatform.addon.kudos.notification.builder;
 
-import static org.exoplatform.addon.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
-import static org.exoplatform.addon.kudos.service.utils.Utils.getSpace;
+import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
 import java.io.Writer;
 import java.util.Calendar;
@@ -10,7 +9,6 @@ import java.util.Locale;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.addon.kudos.model.KudosEntityType;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.NotificationMessageUtils;
 import org.exoplatform.commons.api.notification.channel.template.AbstractTemplateBuilder;
@@ -34,7 +32,6 @@ import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 
 public class KudosTemplateBuilder extends AbstractTemplateBuilder {
-
   private TemplateProvider templateProvider;
 
   private boolean          pushNotification;
@@ -46,15 +43,14 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
 
   @Override
   protected MessageInfo makeMessage(NotificationContext ctx) {
-
     NotificationInfo notification = ctx.getNotificationInfo();
     String activityId = notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey());
-    String entityType = notification.getValueOwnerParameter("ENTITY_TYPE");
     ExoSocialActivity activity = null;
-    if (entityType == null || KudosEntityType.ACTIVITY == KudosEntityType.valueOf(entityType)) {
-      activity = Utils.getActivityManager().getActivity(activityId);
-    } else if (KudosEntityType.COMMENT == KudosEntityType.valueOf(entityType)) {
-      activity = Utils.getActivityManager().getActivity("comment" + activityId);
+    if (StringUtils.isNotBlank(activityId) && !StringUtils.equals(activityId, "0")) {
+      activity = Utils.getActivityManager().getActivity(ACTIVITY_COMMENT_ID_PREFIX + activityId);
+      if (activity == null) {
+        activity = Utils.getActivityManager().getActivity(activityId);
+      }
     }
 
     String pluginId = notification.getKey().getId();

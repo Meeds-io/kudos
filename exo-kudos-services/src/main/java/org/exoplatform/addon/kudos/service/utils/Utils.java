@@ -48,11 +48,15 @@ public class Utils {
 
   public static final String                 KUDOS_SENT_EVENT                = "exo.addons.kudos.sent";
 
+  public static final String                 KUDOS_ACTIVITY_EVENT            = "exo.addons.kudos.activity";
+
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos";
 
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
+
+  public static final String                 ACTIVITY_COMMENT_ID_PREFIX      = "comment";
 
   private Utils() {
   }
@@ -120,6 +124,7 @@ public class Utils {
     kudos.setTechnicalId(kudosEntity.getId());
     kudos.setMessage(kudosEntity.getMessage());
     kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
+    kudos.setActivityId(kudosEntity.getActivityId());
     if (kudosEntity.getParentEntityId() != null && kudosEntity.getParentEntityId() != 0) {
       kudos.setParentEntityId(String.valueOf(kudosEntity.getParentEntityId()));
     }
@@ -158,6 +163,7 @@ public class Utils {
     KudosEntity kudosEntity = new KudosEntity();
     kudosEntity.setMessage(kudos.getMessage());
     kudosEntity.setEntityId(Long.parseLong(kudos.getEntityId()));
+    kudosEntity.setActivityId(kudos.getActivityId());
     if (StringUtils.isNoneBlank(kudos.getParentEntityId())) {
       kudosEntity.setParentEntityId(Long.parseLong(kudos.getParentEntityId()));
     }

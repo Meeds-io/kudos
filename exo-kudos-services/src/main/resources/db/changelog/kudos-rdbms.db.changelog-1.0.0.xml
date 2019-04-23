@@ -71,4 +71,10 @@
     </createIndex>
   </changeSet>
 
+  <changeSet author="kudos" id="1.0.0-5">
+    <addColumn tableName="ADDONS_KUDOS">
+      <column name="ACTIVITY_ID" type="BIGINT"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

@@ -46,6 +46,25 @@ public class KudosStorage {
     return fromEntity(kudosEntity);
   }
 
+  public void saveKudosActivityId(long kudosId, long activityId) {
+    KudosEntity kudosEntity = kudosDAO.find(kudosId);
+    if (kudosEntity == null) {
+      throw new IllegalStateException("Can't find Kudos with id " + kudosId);
+    } else {
+      kudosEntity.setActivityId(activityId);
+      kudosDAO.update(kudosEntity);
+    }
+  }
+
+  public Kudos getKudosByActivityId(long activityId) {
+    KudosEntity kudosEntity = kudosDAO.findKudosByActivityId(activityId);
+    if (kudosEntity == null) {
+      return null;
+    } else {
+      return fromEntity(kudosEntity);
+    }
+  }
+
   public List<Kudos> getAllKudosByPeriod(KudosPeriod kudosPeriod) {
     List<Kudos> kudosList = new ArrayList<>();
     List<KudosEntity> kudosEntities = kudosDAO.getAllKudosByPeriod(kudosPeriod);

@@ -59,7 +59,8 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
 
     return NotificationInfo.instance()
                            .to(toList)
-                           .with(SocialNotificationUtils.ACTIVITY_ID.getKey(), kudos.getEntityId())
+                           .with(SocialNotificationUtils.ACTIVITY_ID.getKey(), String.valueOf(kudos.getActivityId()))
+                           .with("ENTITY_ID", kudos.getEntityId())
                            .with("ENTITY_TYPE", kudos.getEntityType())
                            .with("SENDER_ID", senderId)
                            .with("RECEIVER_ID", receiverId)

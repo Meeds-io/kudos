@@ -40,6 +40,8 @@ public class Kudos implements Comparable<Kudos> {
 
   private LocalDateTime time;
 
+  private long          activityId;
+
   @Override
   public int compareTo(Kudos o) {
     if (this.getTime() == null) {
