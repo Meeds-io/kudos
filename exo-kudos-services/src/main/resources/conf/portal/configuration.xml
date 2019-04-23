@@ -146,7 +146,7 @@
   <external-component-plugins>
     <target-component>org.exoplatform.services.listener.ListenerService</target-component>
     <component-plugin>
-      <name>exo.addons.kudos.sent</name>
+      <name>exo.addons.kudos.activity</name>
       <set-method>addListener</set-method>
       <type>org.exoplatform.addon.kudos.listener.NewKudosSentNotificationListener</type>
     </component-plugin>
@@ -156,9 +156,9 @@
       <type>org.exoplatform.addon.kudos.listener.NewKudosSentActivityGeneratorListener</type>
     </component-plugin>
     <component-plugin>
-      <name>exo.addons.kudos.sent</name>
+      <name>exo.addons.kudos.activity</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.addon.kudos.listener.IntegrationGamificationListener</type>
+      <type>org.exoplatform.addon.kudos.listener.GamificationIntegrationListener</type>
     </component-plugin>
   </external-component-plugins>
 

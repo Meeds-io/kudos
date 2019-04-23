@@ -1,8 +1,6 @@
 package org.exoplatform.addon.kudos.listener;
 
-import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TITLE_ID;
-import static org.exoplatform.addon.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
-import static org.exoplatform.addon.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
+import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +31,6 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
   private ActivityManager  activityManager;
 
   private ActivityStorage  activityStorage;
-  
 
   public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
     this.activityStorage = activityStorage;
@@ -43,6 +40,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
   @Override
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
     Kudos kudos = event.getData();
+    KudosService kudosService = event.getSource();
     if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
         || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
       String activityId = kudos.getEntityId();
@@ -50,7 +48,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         String parentCommentId = null;
         ExoSocialActivity activity = null;
         if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
-          ExoSocialActivity comment = this.activityManager.getActivity("comment" + activityId);
+          ExoSocialActivity comment = this.activityManager.getActivity(ACTIVITY_COMMENT_ID_PREFIX + activityId);
           if (comment != null) {
             activity = this.activityManager.getParentActivity(comment);
             if (comment.getParentCommentId() != null) {
@@ -67,6 +65,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         }
         ExoSocialActivity activityComment = createActivity(kudos, parentCommentId);
         activityStorage.saveComment(activity, activityComment);
+        kudosService.saveKudosActivity(kudos.getTechnicalId(), getActivityId(activityComment.getId()));
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
@@ -82,6 +81,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), kudos.getReceiverId());
       } else {
         activityStorage.saveActivity(owner, activity);
+        kudosService.saveKudosActivity(kudos.getTechnicalId(), getActivityId(activity.getId()));
       }
     }
   }
@@ -92,6 +92,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     activity.setTitle("Kudos to " + kudos.getReceiverFullName());
     activity.setUserId(kudos.getSenderIdentityId());
     activity.setParentCommentId(parentCommentId);
+
     String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
     senderLink = StringEscapeUtils.unescapeHtml(senderLink);
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
@@ -101,6 +102,11 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     I18NActivityUtils.addResourceKeyToProcess(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID);
     I18NActivityUtils.addResourceKey(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID, senderLink, receiverLink, message);
     return activity;
+  }
+
+  private Long getActivityId(String commentId) {
+    return (commentId == null || commentId.trim().isEmpty()) ? null
+                                                             : Long.valueOf(commentId.replace(ACTIVITY_COMMENT_ID_PREFIX, ""));
   }
 
 }

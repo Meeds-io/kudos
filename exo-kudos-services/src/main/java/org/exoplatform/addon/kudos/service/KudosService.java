@@ -107,6 +107,12 @@ public class KudosService implements Startable {
     return accountSettings;
   }
 
+  public void saveKudosActivity(long kudosId, long activityId) throws Exception {
+    kudosStorage.saveKudosActivityId(kudosId, activityId);
+    Kudos kudos = kudosStorage.getKudoById(kudosId);
+    listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+  }
+
   public void sendKudos(String senderId, Kudos kudos) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "

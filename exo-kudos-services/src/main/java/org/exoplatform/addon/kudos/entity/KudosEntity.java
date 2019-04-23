@@ -59,6 +59,9 @@ public class KudosEntity implements Serializable {
   @Column(name = "ENTITY_TYPE", nullable = false)
   public int                entityType;
 
+  @Column(name = "ACTIVITY_ID", nullable = false)
+  public long               activityId;
+
   @Column(name = "MESSAGE", nullable = true)
   public String             message;
 
@@ -136,4 +139,13 @@ public class KudosEntity implements Serializable {
   public void setParentEntityId(Long parentEntityId) {
     this.parentEntityId = parentEntityId;
   }
+
+  public long getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(long activityId) {
+    this.activityId = activityId;
+  }
+
 }
