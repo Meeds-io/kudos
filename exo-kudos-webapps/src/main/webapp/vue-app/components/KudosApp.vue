@@ -7,6 +7,7 @@
     <kudos-api ref="kudosAPI" />
     <v-dialog
       v-model="dialog"
+      attach="#KudosApp"
       content-class="uiPopup with-overflow"
       width="500px"
       max-width="100vw"
@@ -120,6 +121,7 @@
 
     <v-dialog
       v-model="listDialog"
+      attach="#KudosApp"
       content-class="uiPopup with-overflow"
       width="500px"
       max-width="100vw"
@@ -421,11 +423,14 @@ export default {
     openDialog(event) {
       if (!this.disabled) {
         this.error = null;
-        this.entityType = event && event.detail && event.detail.type;
-        this.entityId = event && event.detail && event.detail.id;
-        this.parentEntityId = event && event.detail && event.detail.parentId;
-        this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-        this.dialog = true;
+        this.dialog = false;
+        this.$nextTick(() => {
+          this.entityType = event && event.detail && event.detail.type;
+          this.entityId = event && event.detail && event.detail.id;
+          this.parentEntityId = event && event.detail && event.detail.parentId;
+          this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
+          this.dialog = true;
+        });
       }
     },
     openListDialog(event) {
