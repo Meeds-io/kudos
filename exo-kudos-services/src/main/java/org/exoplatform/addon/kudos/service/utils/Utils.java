@@ -141,13 +141,15 @@ public class Utils {
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));
     } else {
       Space space = getSpace(String.valueOf(kudosEntity.getReceiverId()));
-      kudos.setReceiverId(space.getPrettyName());
-      kudos.setReceiverIdentityId(String.valueOf(kudosEntity.getReceiverId()));
-      kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
-      kudos.setReceiverFullName(space.getDisplayName());
-      kudos.setReceiverURL(Util.getBaseUrl()
-          + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
-      kudos.setReceiverAvatar(getAvatar(null, space));
+      if (space != null) {
+        kudos.setReceiverId(space.getPrettyName());
+        kudos.setReceiverIdentityId(String.valueOf(kudosEntity.getReceiverId()));
+        kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
+        kudos.setReceiverFullName(space.getDisplayName());
+        kudos.setReceiverURL(Util.getBaseUrl()
+            + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
+        kudos.setReceiverAvatar(getAvatar(null, space));
+      }
     }
 
     Identity senderIdentity = getIdentityById(kudosEntity.getSenderId());
