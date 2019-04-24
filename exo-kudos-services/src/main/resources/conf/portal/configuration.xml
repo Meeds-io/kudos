@@ -269,7 +269,7 @@
         </value-param>
         <value-param>
           <name>rule-description</name>
-          <value>Someone sent you a Kudos</value>
+          <value>You received a Kudos</value>
         </value-param>
         <value-param>
           <name>rule-score</name>
