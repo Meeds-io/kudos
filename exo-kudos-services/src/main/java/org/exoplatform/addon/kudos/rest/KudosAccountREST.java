@@ -25,6 +25,8 @@ import javax.ws.rs.core.Response;
 
 import org.exoplatform.addon.kudos.model.AccountSettings;
 import org.exoplatform.addon.kudos.service.KudosService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
 /**
@@ -34,8 +36,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/kudos/api/account")
 @RolesAllowed("users")
 public class KudosAccountREST implements ResourceContainer {
+  private static final Log LOG = ExoLogger.getLogger(KudosAccountREST.class);
 
-  private KudosService kudosService;
+  private KudosService     kudosService;
 
   public KudosAccountREST(KudosService kudosService) {
     this.kudosService = kudosService;
@@ -51,11 +54,16 @@ public class KudosAccountREST implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   public Response getSettings() {
-    AccountSettings accountDetail = kudosService.getAccountSettings(getCurrentUserId());
-    if (accountDetail == null) {
-      return Response.ok("{}").build();
+    try {
+      AccountSettings accountDetail = kudosService.getAccountSettings(getCurrentUserId());
+      if (accountDetail == null) {
+        return Response.ok("{}").build();
+      }
+      return Response.ok(accountDetail).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos settings", e);
+      return Response.serverError().build();
     }
-    return Response.ok(accountDetail).build();
   }
 
   /**
@@ -69,10 +77,15 @@ public class KudosAccountREST implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   public Response isAuthorized(@QueryParam("username") String username) {
-    if (kudosService.isAuthorized(username)) {
-      return Response.ok().build();
-    } else {
-      return Response.status(403).build();
+    try {
+      if (kudosService.isAuthorized(username)) {
+        return Response.ok().build();
+      } else {
+        return Response.status(403).build();
+      }
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos authorization for user {}", username, e);
+      return Response.serverError().build();
     }
   }
 

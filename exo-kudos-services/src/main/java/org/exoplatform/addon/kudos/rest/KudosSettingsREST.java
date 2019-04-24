@@ -23,6 +23,8 @@ import javax.ws.rs.core.Response;
 
 import org.exoplatform.addon.kudos.model.GlobalSettings;
 import org.exoplatform.addon.kudos.service.KudosService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
 /**
@@ -31,8 +33,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 @Path("/kudos/api/settings")
 @RolesAllowed("users")
 public class KudosSettingsREST implements ResourceContainer {
+  private static final Log LOG = ExoLogger.getLogger(KudosSettingsREST.class);
 
-  private KudosService kudosService;
+  private KudosService     kudosService;
 
   public KudosSettingsREST(KudosService kudosService) {
     this.kudosService = kudosService;
@@ -59,8 +62,13 @@ public class KudosSettingsREST implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
   public Response saveSettings(GlobalSettings settings) {
-    kudosService.saveGlobalSettings(settings);
-    return Response.ok().build();
+    try {
+      kudosService.saveGlobalSettings(settings);
+      return Response.ok().build();
+    } catch (Exception e) {
+      LOG.warn("Error saving kudos settings: {}", settings, e);
+      return Response.serverError().build();
+    }
   }
 
 }

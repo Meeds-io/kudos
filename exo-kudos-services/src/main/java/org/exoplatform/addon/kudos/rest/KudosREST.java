@@ -77,15 +77,14 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
       return Response.status(400).build();
     }
-
-    kudos.setSenderId(getCurrentUserId());
     try {
+      kudos.setSenderId(getCurrentUserId());
       kudosService.sendKudos(getCurrentUserId(), kudos);
+      return Response.ok().build();
     } catch (Exception e) {
-      LOG.warn("Error saving kudos", e);
+      LOG.warn("Error saving kudos: {}", kudos, e);
       return Response.serverError().build();
     }
-    return Response.ok().build();
   }
 
   /**
@@ -102,8 +101,13 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'identity id'");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(identityId);
-    return Response.ok(allKudosBySender).build();
+    try {
+      List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(identityId);
+      return Response.ok(allKudosBySender).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos list of identity {}", identityId, e);
+      return Response.serverError().build();
+    }
   }
 
   /**
@@ -120,8 +124,13 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosByEntity = kudosService.getAllKudosByEntity(entityType, entityId);
-    return Response.ok(allKudosByEntity).build();
+    try {
+      List<Kudos> allKudosByEntity = kudosService.getAllKudosByEntity(entityType, entityId);
+      return Response.ok(allKudosByEntity).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
+      return Response.serverError().build();
+    }
   }
 
   /**
@@ -139,8 +148,13 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'start or end' dates parameter");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriod(startDateInSeconds, endDateInSeconds);
-    return Response.ok(allKudosByPeriod).build();
+    try {
+      List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriod(startDateInSeconds, endDateInSeconds);
+      return Response.ok(allKudosByPeriod).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos list of period: from {} to {}", startDateInSeconds, endDateInSeconds, e);
+      return Response.serverError().build();
+    }
   }
 
   /**
@@ -157,8 +171,13 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
       return Response.status(400).build();
     }
-    List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriodOfDate(dateInSeconds);
-    return Response.ok(allKudosByPeriod).build();
+    try {
+      List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriodOfDate(dateInSeconds);
+      return Response.ok(allKudosByPeriod).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos list of period with date {}", dateInSeconds, e);
+      return Response.serverError().build();
+    }
   }
 
   /**
@@ -181,8 +200,13 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Bad request sent to server with empty 'periodType' parameter");
       return Response.status(400).build();
     }
-    KudosPeriodType kudosPeriodType = KudosPeriodType.valueOf(periodType);
-    KudosPeriod kudosPeriod = kudosPeriodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
-    return Response.ok(kudosPeriod.toString()).build();
+    try {
+      KudosPeriodType kudosPeriodType = KudosPeriodType.valueOf(periodType);
+      KudosPeriod kudosPeriod = kudosPeriodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+      return Response.ok(kudosPeriod.toString()).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting period dates of type {} and date {}", periodType, dateInSeconds, e);
+      return Response.serverError().build();
+    }
   }
 }
