@@ -59,8 +59,8 @@ public class KudosEntity implements Serializable {
   @Column(name = "ENTITY_TYPE", nullable = false)
   public int                entityType;
 
-  @Column(name = "ACTIVITY_ID", nullable = false)
-  public long               activityId;
+  @Column(name = "ACTIVITY_ID")
+  public Long               activityId;
 
   @Column(name = "MESSAGE", nullable = true)
   public String             message;
@@ -141,7 +141,7 @@ public class KudosEntity implements Serializable {
   }
 
   public long getActivityId() {
-    return activityId;
+    return activityId == null ? 0 : activityId;
   }
 
   public void setActivityId(long activityId) {

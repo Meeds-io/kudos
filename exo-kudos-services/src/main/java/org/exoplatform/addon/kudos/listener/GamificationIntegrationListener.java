@@ -63,7 +63,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getSenderId());
         gam.put("receiverId", kudos.getSenderId());
-        listenerService.broadcast("exo.gamification.generic.action", gam, "");
+        listenerService.broadcast("exo.gamification.generic.action", gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
@@ -74,7 +74,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getSenderId());
         gam.put("receiverId", kudos.getReceiverId());
-        listenerService.broadcast("exo.gamification.generic.action", gam, "");
+        listenerService.broadcast("exo.gamification.generic.action", gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
