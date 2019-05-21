@@ -1,0 +1,30 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>kudos</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <!-- War -->
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>/webapps</outputDirectory>
+      <includes>
+        <include>${project.groupId}:kudos-webapps:war</include>
+      </includes>
+      <scope>provided</scope>
+      <outputFileNameMapping>kudos.war</outputFileNameMapping>
+    </dependencySet>
+    <!-- Libraries -->
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>/lib</outputDirectory>
+      <includes>
+        <include>${project.groupId}:kudos-services:jar</include>
+      </includes>
+      <scope>provided</scope>
+      <outputFileNameMapping>kudos-services.jar</outputFileNameMapping>
+    </dependencySet>
+  </dependencySets>
+</assembly>

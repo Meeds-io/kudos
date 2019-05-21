@@ -5,29 +5,29 @@
   <parent>
     <artifactId>addons-parent-pom</artifactId>
     <groupId>org.exoplatform.addons</groupId>
-    <version>9</version>
+    <version>10</version>
     <relativePath/>
   </parent>
   <groupId>org.exoplatform.addons.kudos</groupId>
-  <artifactId>exo-kudos</artifactId>
+  <artifactId>kudos</artifactId>
   <version>1.1.x-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>eXo Add-on:: eXo Kudos - Parent POM</name>
+  <name>eXo Add-on:: Kudos - Parent POM</name>
   <description>eXo Kudos Addon</description>
   <modules>
-    <module>exo-kudos-services</module>
-    <module>exo-kudos-webapps</module>
-    <module>exo-kudos-packaging</module>
+    <module>kudos-services</module>
+    <module>kudos-webapps</module>
+    <module>kudos-packaging</module>
   </modules>
   <scm>
-    <connection>scm:git:git://github.com/exo-addons/kudos.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/exo-addons/kudos.git</developerConnection>
-    <url>https://github.com/exo-addons/kudos</url>
+    <connection>scm:git:git://github.com/exoplatform/kudos.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/exoplatform/kudos.git</developerConnection>
+    <url>https://github.com/exoplatform/kudos</url>
     <tag>HEAD</tag>
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <org.exoplatform.platform.version>5.2.0-M11</org.exoplatform.platform.version>
+    <org.exoplatform.platform.version>5.3.x-SNAPSHOT</org.exoplatform.platform.version>
 
     <org.jackson.version>2.4.0</org.jackson.version>
 
@@ -56,14 +56,14 @@
       <!-- Current project artifacts -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo-kudos-services</artifactId>
+        <artifactId>kudos-services</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>exo-kudos-webapps</artifactId>
+        <artifactId>kudos-webapps</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
         <type>war</type>

@@ -37,6 +37,10 @@ pom.xml.versionsBackup
 .project
 *.log
 
+# vscode project files
+.vscode
+
+
 # OS
 .DS_Store
 
@@ -50,3 +54,4 @@ build
 npm-debug.log
 node_modules
 hotswap-agent.properties
+.factorypath
