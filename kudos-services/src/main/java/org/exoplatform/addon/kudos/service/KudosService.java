@@ -102,7 +102,7 @@ public class KudosService implements Startable {
       accountSettings.setDisabled(true);
       return accountSettings;
     }
-    long sentKudos = countKudosBySenderInCurrentPeriod(getCurrentUserId());
+    long sentKudos = countKudosBySenderInCurrentPeriod(username);
     accountSettings.setRemainingKudos(getKudosPerPeriod() - sentKudos);
     return accountSettings;
   }
@@ -113,7 +113,7 @@ public class KudosService implements Startable {
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
   }
 
-  public void sendKudos(String senderId, Kudos kudos) throws Exception {
+  public Kudos sendKudos(String senderId, Kudos kudos) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "
           + kudos.getSenderId());
@@ -145,6 +145,8 @@ public class KudosService implements Startable {
     kudos = kudosStorage.createKudos(kudos);
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
+
+    return kudos;
   }
 
   public List<Kudos> getAllKudosByPeriod(long startDateInSeconds, long endDateInSeconds) {

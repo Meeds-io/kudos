@@ -7,6 +7,9 @@
   </parent>
   <artifactId>kudos-services</artifactId>
   <name>eXo Add-on:: eXo Kudos - Services</name>
+  <properties>
+    <exo.test.coverage.ratio>0.65</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -72,6 +75,27 @@
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <finalName>kudos-services</finalName>
@@ -106,6 +130,17 @@
             <phase>none</phase>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <exo.properties.url>classpath:/conf/configuration.properties</exo.properties.url>
+            <exo.profiles>hsqldb</exo.profiles>
+            <exo.files.storage.dir>target/files</exo.files.storage.dir>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>
