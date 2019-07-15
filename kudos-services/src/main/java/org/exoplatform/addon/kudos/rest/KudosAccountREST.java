@@ -23,17 +23,18 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.addon.kudos.model.AccountSettings;
 import org.exoplatform.addon.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-/**
- * This class provide a REST endpoint to retrieve detailed information about
- * users and spaces
- */
+import io.swagger.annotations.*;
+
 @Path("/kudos/api/account")
+@Api(value = "/kudos/api/account", description = "Retrieve Kudos settings for users and spaces") // NOSONAR
 @RolesAllowed("users")
 public class KudosAccountREST implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(KudosAccountREST.class);
@@ -44,20 +45,20 @@ public class KudosAccountREST implements ResourceContainer {
     this.kudosService = kudosService;
   }
 
-  /**
-   * Retrieves the user settings for kudos
-   * 
-   * @return
-   */
   @Path("settings")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
+  @ApiOperation(value = "Retrieves user/space settings for kudos", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns account settings object")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getSettings() {
     try {
       AccountSettings accountDetail = kudosService.getAccountSettings(getCurrentUserId());
       if (accountDetail == null) {
-        return Response.ok("{}").build();
+        accountDetail = new AccountSettings();
       }
       return Response.ok(accountDetail).build();
     } catch (Exception e) {
@@ -66,17 +67,20 @@ public class KudosAccountREST implements ResourceContainer {
     }
   }
 
-  /**
-   * Chacks if username is authorized to use Kudos
-   * 
-   * @param username
-   * @return
-   */
   @Path("isAuthorized")
   @GET
-  @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  public Response isAuthorized(@QueryParam("username") String username) {
+  @ApiOperation(value = "Checks if username is authorized to use Kudos", httpMethod = "GET", response = Response.class, notes = "returns empty response")
+  @ApiResponses(value = {
+      @ApiResponse(code = 204, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response isAuthorized(@ApiParam(value = "User login", required = true) @QueryParam("username") String username) {
+    if (StringUtils.isBlank(username)) {
+      LOG.warn("Bad request sent to server with empty 'username'");
+      return Response.status(400).build();
+    }
     try {
       if (kudosService.isAuthorized(username)) {
         return Response.ok().build();

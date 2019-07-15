@@ -34,11 +34,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-/**
- * This class provide a REST endpoint to retrieve detailed information about
- * kudos
- */
+import io.swagger.annotations.*;
+
 @Path("/kudos/api/kudos")
+@Api(value = "/kudos/api/kudos", description = "Manages Kudos") // NOSONAR
 @RolesAllowed("users")
 public class KudosREST implements ResourceContainer {
 
@@ -50,17 +49,17 @@ public class KudosREST implements ResourceContainer {
     this.kudosService = kudosService;
   }
 
-  /**
-   * Save kudos
-   * 
-   * @param kudos
-   * @return
-   */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  @Path("saveKudos")
+  @Path("createKudos")
   @RolesAllowed("users")
-  public Response saveKudos(Kudos kudos) {
+  @ApiOperation(value = "Creates new Kudos", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
+  @ApiResponses(value = {
+      @ApiResponse(code = 204, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response createKudos(@ApiParam(value = "Kudos object to create", required = true) Kudos kudos) {
     if (kudos == null) {
       LOG.warn("Bad request sent to server with empty kudos");
       return Response.status(400).build();
@@ -80,46 +79,49 @@ public class KudosREST implements ResourceContainer {
     try {
       kudos.setSenderId(getCurrentUserId());
       kudosService.sendKudos(getCurrentUserId(), kudos);
-      return Response.ok().build();
+      return Response.noContent().build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);
       return Response.serverError().build();
     }
   }
 
-  /**
-   * Retrieves the user/space kudos
-   * 
-   * @return
-   */
   @Path("getKudos")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  public Response getKudos(@QueryParam("identityId") String identityId) {
-    if (StringUtils.isBlank(identityId)) {
+  @ApiOperation(value = "Get Kudos list by sender login in current period", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getKudos(@ApiParam(value = "kudos sender user login", required = true) @QueryParam("senderId") String senderId) {
+    if (StringUtils.isBlank(senderId)) {
       LOG.warn("Bad request sent to server with empty 'identity id'");
       return Response.status(400).build();
     }
     try {
-      List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(identityId);
+      List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(senderId);
       return Response.ok(allKudosBySender).build();
     } catch (Exception e) {
-      LOG.warn("Error getting kudos list of identity {}", identityId, e);
+      LOG.warn("Error getting kudos list of identity {}", senderId, e);
       return Response.serverError().build();
     }
   }
 
-  /**
-   * Retrieves the user settings for kudos
-   * 
-   * @return
-   */
   @Path("getEntityKudos")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  public Response getEntityKudos(@QueryParam("entityType") String entityType, @QueryParam("entityId") String entityId) {
+  @ApiOperation(value = "Get Kudos list by entity type and id", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getEntityKudos(@ApiParam(value = "kudos entity type (for example activity, comment...)", required = true) @QueryParam("entityType") String entityType,
+                                 @ApiParam(value = "kudos entity id", required = true) @QueryParam("entityId") String entityId) {
     if (StringUtils.isBlank(entityType) || StringUtils.isBlank(entityId)) {
       LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
       return Response.status(400).build();
@@ -133,15 +135,16 @@ public class KudosREST implements ResourceContainer {
     }
   }
 
-  /**
-   * Retrieves all kudos by a designed start and end date
-   * 
-   * @return
-   */
   @Path("getAllKudosByPeriod")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
+  @ApiOperation(value = "Get Kudos list created between start and end dates in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getAllKudosByPeriod(@QueryParam("startDateInSeconds") long startDateInSeconds,
                                       @QueryParam("endDateInSeconds") long endDateInSeconds) {
     if (startDateInSeconds == 0 || endDateInSeconds == 0) {
@@ -157,15 +160,16 @@ public class KudosREST implements ResourceContainer {
     }
   }
 
-  /**
-   * Retrieves all kudos by a period of a designed time
-   * 
-   * @return
-   */
   @Path("getAllKudosByPeriodOfDate")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
+  @ApiOperation(value = "Get Kudos list created in a period contained a selected date in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getAllKudosByPeriodOfDate(@QueryParam("dateInSeconds") long dateInSeconds) {
     if (dateInSeconds == 0) {
       LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
@@ -180,17 +184,16 @@ public class KudosREST implements ResourceContainer {
     }
   }
 
-  /**
-   * Retrieves all kudos by a period of a designed time
-   * 
-   * @param periodType
-   * @param dateInSeconds
-   * @return
-   */
   @Path("getPeriodDates")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
+  @ApiOperation(value = "Get Kudos period of time by computing it using periodType and a selected date", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns KudosPeriod object")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getPeriodDates(@QueryParam("periodType") String periodType, @QueryParam("dateInSeconds") long dateInSeconds) {
     if (dateInSeconds == 0) {
       LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
