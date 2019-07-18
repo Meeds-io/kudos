@@ -6,10 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
-public class GlobalSettings {
+@NoArgsConstructor
+@AllArgsConstructor
+public class GlobalSettings implements Cloneable {
   private static final String END_PERIOD_DATE_IN_SECONDS_PARAM   = "endPeriodDateInSeconds";
 
   private static final String START_PERIOD_DATE_IN_SECONDS_PARAM = "startPeriodDateInSeconds";
@@ -75,4 +77,12 @@ public class GlobalSettings {
     }
   }
 
+  @Override
+  public GlobalSettings clone() { // NOSONAR
+    try {
+      return (GlobalSettings) super.clone();
+    } catch (CloneNotSupportedException e) {
+      return new GlobalSettings(accessPermission, kudosPerPeriod, kudosPeriodType);
+    }
+  }
 }

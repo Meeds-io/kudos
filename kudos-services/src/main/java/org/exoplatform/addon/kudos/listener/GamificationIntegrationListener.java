@@ -1,6 +1,7 @@
 package org.exoplatform.addon.kudos.listener;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.ACTIVITY_COMMENT_ID_PREFIX;
+import static org.exoplatform.addon.kudos.service.utils.Utils.GAMIFICATION_GENERIC_EVENT;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.exoplatform.social.core.service.LinkProvider;
  */
 @Asynchronous
 public class GamificationIntegrationListener extends Listener<KudosService, Kudos> {
+
   private static final Log LOG = ExoLogger.getLogger(GamificationIntegrationListener.class);
 
   private ListenerService  listenerService;
@@ -63,7 +65,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getSenderId());
         gam.put("receiverId", kudos.getSenderId());
-        listenerService.broadcast("exo.gamification.generic.action", gam, String.valueOf(kudos.getTechnicalId()));
+        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
@@ -74,7 +76,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getSenderId());
         gam.put("receiverId", kudos.getReceiverId());
-        listenerService.broadcast("exo.gamification.generic.action", gam, String.valueOf(kudos.getTechnicalId()));
+        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }

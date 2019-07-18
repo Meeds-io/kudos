@@ -50,6 +50,8 @@ public class Utils {
 
   public static final String                 KUDOS_ACTIVITY_EVENT            = "exo.addons.kudos.activity";
 
+  public static final String                 GAMIFICATION_GENERIC_EVENT      = "exo.gamification.generic.action";
+
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos";
@@ -137,7 +139,11 @@ public class Utils {
       kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
       kudos.setReceiverType(USER_ACCOUNT_TYPE);
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
-      kudos.setReceiverURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
+      try {
+        kudos.setReceiverURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
+      } catch (Exception e) {
+        kudos.setReceiverURL(LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
+      }
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));
     } else {
       Space space = getSpace(String.valueOf(kudosEntity.getReceiverId()));
@@ -146,8 +152,13 @@ public class Utils {
         kudos.setReceiverIdentityId(String.valueOf(kudosEntity.getReceiverId()));
         kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
         kudos.setReceiverFullName(space.getDisplayName());
-        kudos.setReceiverURL(Util.getBaseUrl()
-            + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
+        try {
+          kudos.setReceiverURL(Util.getBaseUrl()
+              + LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
+        } catch (Exception e) {
+          kudos.setReceiverURL(LinkProvider.getActivityUriForSpace(space.getPrettyName(),
+                                                                   space.getGroupId().replace("/spaces/", "")));
+        }
         kudos.setReceiverAvatar(getAvatar(null, space));
       }
     }
@@ -156,7 +167,11 @@ public class Utils {
     kudos.setSenderId(senderIdentity.getRemoteId());
     kudos.setSenderIdentityId(getIdentityIdByType(senderIdentity));
     kudos.setSenderFullName(senderIdentity.getProfile().getFullName());
-    kudos.setSenderURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(senderIdentity.getRemoteId()));
+    try {
+      kudos.setSenderURL(Util.getBaseUrl() + LinkProvider.getUserProfileUri(senderIdentity.getRemoteId()));
+    } catch (Exception e) {
+      kudos.setSenderURL(LinkProvider.getUserProfileUri(senderIdentity.getRemoteId()));
+    }
     kudos.setSenderAvatar(getAvatar(senderIdentity, null));
     return kudos;
   }

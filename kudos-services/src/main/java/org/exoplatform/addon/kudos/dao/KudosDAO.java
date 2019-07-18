@@ -7,21 +7,13 @@ import javax.persistence.TypedQuery;
 import org.exoplatform.addon.kudos.entity.KudosEntity;
 import org.exoplatform.addon.kudos.model.KudosPeriod;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
-  private static final Log    LOG                               = ExoLogger.getLogger(KudosDAO.class);
 
   private static final String KUDOS_REMOVAL_IS_DISABLED_MESSAGE = "Kudos removal is disabled";
 
   @Override
   public void deleteAll() {
-    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
-  }
-
-  @Override
-  public void delete(KudosEntity entity) {
     throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
   }
 
@@ -80,20 +72,6 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("senderId", senderId);
     return query.getSingleResult();
-  }
-
-  public KudosEntity findKudosByActivityId(long activityId) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.findKudosByActivityId", KudosEntity.class);
-    query.setParameter("activityId", activityId);
-    List<KudosEntity> result = query.getResultList();
-    if (result == null || result.isEmpty()) {
-      return null;
-    } else {
-      if (result.size() > 1) {
-        LOG.warn("More than one result are returned for Kudos per activity with id {}", activityId);
-      }
-      return result.get(0);
-    }
   }
 
   private void setPeriodParameters(TypedQuery<?> query, KudosPeriod kudosPeriod) {

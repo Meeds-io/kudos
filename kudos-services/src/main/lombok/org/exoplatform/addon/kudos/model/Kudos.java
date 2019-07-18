@@ -1,46 +1,51 @@
 package org.exoplatform.addon.kudos.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode.Exclude;
 
 @Data
-public class Kudos implements Comparable<Kudos> {
-  private Long          technicalId;
+public class Kudos implements Comparable<Kudos>, Serializable {
+  private static final long serialVersionUID = -3058584349224472943L;
 
-  private String        parentEntityId;
+  private Long              technicalId;
 
-  private String        entityId;
+  private String            parentEntityId;
 
-  private String        entityType;
+  private String            entityId;
 
-  private String        senderId;
+  private String            entityType;
 
-  private String        senderIdentityId;
+  private String            senderId;
 
-  private String        senderURL;
+  private String            senderIdentityId;
 
-  private String        senderAvatar;
+  private String            senderURL;
 
-  private String        senderFullName;
+  private String            senderAvatar;
 
-  private String        receiverId;
+  private String            senderFullName;
 
-  private String        receiverIdentityId;
+  private String            receiverId;
 
-  private String        receiverType;
+  private String            receiverIdentityId;
 
-  private String        receiverFullName;
+  private String            receiverType;
 
-  private String        receiverURL;
+  private String            receiverFullName;
 
-  private String        receiverAvatar;
+  private String            receiverURL;
 
-  private String        message;
+  private String            receiverAvatar;
 
-  private LocalDateTime time;
+  private String            message;
 
-  private long          activityId;
+  private LocalDateTime     time;
+
+  @Exclude
+  private long              activityId;
 
   @Override
   public int compareTo(Kudos o) {

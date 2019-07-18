@@ -53,7 +53,7 @@
         <module>iePolyfills</module>
       </depends>
       <depends>
-        <module>kudosVuetify</module>
+        <module>vuetify</module>
       </depends>
       <depends>
         <module>userPopupPlugin</module>
@@ -85,7 +85,7 @@
         <module>iePolyfills</module>
       </depends>
       <depends>
-        <module>kudosVuetify</module>
+        <module>vuetify</module>
       </depends>
       <depends>
         <module>userPopupPlugin</module>
@@ -95,16 +95,5 @@
       </depends>
     </module>
   </portlet>
-
-  <module>
-    <name>kudosVuetify</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/lib/vuetify.min.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-  </module>
 
 </gatein-resources>

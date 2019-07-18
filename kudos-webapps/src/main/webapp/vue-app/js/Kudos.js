@@ -14,7 +14,7 @@ export function getEntityKudos(entityType, entityId) {
 
 export function sendKudos(kudo) {
   if (kudo) {
-    return fetch(`/portal/rest/kudos/api/kudos/saveKudos`, {
+    return fetch(`/portal/rest/kudos/api/kudos/createKudos`, {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -30,7 +30,7 @@ export function sendKudos(kudo) {
 
 export function getKudos(userId) {
   if (userId) {
-    return fetch(`/portal/rest/kudos/api/kudos/getKudos?identityId=${userId}`, {
+    return fetch(`/portal/rest/kudos/api/kudos/getKudos?senderId=${userId}`, {
       credentials: 'include',
       headers: {
         Accept: 'application/json',

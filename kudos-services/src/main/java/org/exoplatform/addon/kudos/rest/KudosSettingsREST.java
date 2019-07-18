@@ -27,10 +27,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-/**
- * This class provide a REST endpoint to manage global settings
- */
+import io.swagger.annotations.*;
+
 @Path("/kudos/api/settings")
+@Api(value = "/kudos/api/settings", description = "Manages Kudos global settings") // NOSONAR
 @RolesAllowed("users")
 public class KudosSettingsREST implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(KudosSettingsREST.class);
@@ -41,30 +41,36 @@ public class KudosSettingsREST implements ResourceContainer {
     this.kudosService = kudosService;
   }
 
-  /**
-   * @return global settings of Kudos application
-   */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
+  @ApiOperation(value = "Get Kudos global settings", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns Kudos global settings object")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response getSettings() {
     return Response.ok(kudosService.getGlobalSettings().toString()).build();
   }
 
-  /**
-   * Save global settings of Kudos application
-   * 
-   * @param settings
-   * @return
-   */
   @Path("save")
   @POST
-  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
+  @ApiOperation(value = "Saves Kudos global settings", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
+  @ApiResponses(value = {
+      @ApiResponse(code = 204, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response saveSettings(GlobalSettings settings) {
+    if (settings == null) {
+      LOG.warn("Bad request sent to server with empty 'settings' parameter");
+      return Response.status(400).build();
+    }
     try {
       kudosService.saveGlobalSettings(settings);
-      return Response.ok().build();
+      return Response.noContent().build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos settings: {}", settings, e);
       return Response.serverError().build();

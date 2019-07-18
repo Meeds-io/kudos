@@ -2,18 +2,19 @@ package org.exoplatform.addon.kudos.service;
 
 import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.exoplatform.addon.kudos.dao.KudosDAO;
 import org.exoplatform.addon.kudos.entity.KudosEntity;
 import org.exoplatform.addon.kudos.model.*;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
 
 /**
  * This is a placeholder class to manage Kudos storage in RDBMS
@@ -25,9 +26,8 @@ public class KudosStorage {
 
   private IdentityManager  identityManager;
 
-  public KudosStorage(KudosDAO kudosDAO, IdentityManager identityManager) {
+  public KudosStorage(KudosDAO kudosDAO) {
     this.kudosDAO = kudosDAO;
-    this.identityManager = identityManager;
   }
 
   public Kudos getKudoById(long id) {
@@ -53,15 +53,6 @@ public class KudosStorage {
     } else {
       kudosEntity.setActivityId(activityId);
       kudosDAO.update(kudosEntity);
-    }
-  }
-
-  public Kudos getKudosByActivityId(long activityId) {
-    KudosEntity kudosEntity = kudosDAO.findKudosByActivityId(activityId);
-    if (kudosEntity == null) {
-      return null;
-    } else {
-      return fromEntity(kudosEntity);
     }
   }
 
@@ -108,38 +99,49 @@ public class KudosStorage {
 
   public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
-    Identity identity = identityManager.getOrCreateIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
-                                                                           : SpaceIdentityProvider.NAME,
-                                                            receiverId,
-                                                            true);
+    Identity identity = getIdentityManager().getOrCreateIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
+                                                                                : SpaceIdentityProvider.NAME,
+                                                                 receiverId,
+                                                                 true);
     return kudosDAO.countKudosByPeriodAndReceiver(kudosPeriod,
                                                   Long.parseLong(identity.getId()),
                                                   isReceiverUser);
   }
 
   public List<Kudos> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
-    List<Kudos> kudosList = new ArrayList<>();
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
-    Identity identity = identityManager.getOrCreateIdentity(isReceiverUser ? OrganizationIdentityProvider.NAME
-                                                                           : SpaceIdentityProvider.NAME,
-                                                            receiverId,
-                                                            true);
+    long identityId = 0;
+    if (isReceiverUser) {
+      Identity identity = getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, receiverId, true);
+      if (identity == null) {
+        return Collections.emptyList();
+      }
+      identityId = Long.parseLong(identity.getId());
+    } else {
+      Space space = getSpace(receiverId);
+      if (space == null) {
+        return Collections.emptyList();
+      }
+      identityId = Long.parseLong(space.getId());
+    }
     List<KudosEntity> kudosEntities = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod,
-                                                                           Long.parseLong(identity.getId()),
+                                                                           identityId,
                                                                            isReceiverUser);
     if (kudosEntities != null) {
+      List<Kudos> kudosList = new ArrayList<>();
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
           kudosList.add(fromEntity(kudosEntity));
         }
       }
+      return kudosList;
     }
-    return kudosList;
+    return Collections.emptyList();
   }
 
   public List<Kudos> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, String senderId) {
     List<Kudos> kudosList = new ArrayList<>();
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
+    Identity identity = getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
     List<KudosEntity> kudosEntities = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, Long.parseLong(identity.getId()));
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
@@ -152,8 +154,14 @@ public class KudosStorage {
   }
 
   public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, String senderId) {
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
+    Identity identity = getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, senderId, true);
     return kudosDAO.countKudosByPeriodAndSender(kudosPeriod, Long.parseLong(identity.getId()));
   }
 
+  private IdentityManager getIdentityManager() {
+    if (identityManager == null) {
+      identityManager = CommonsUtils.getService(IdentityManager.class);
+    }
+    return identityManager;
+  }
 }
