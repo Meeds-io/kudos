@@ -44,6 +44,15 @@
         <as>$</as>
       </depends>
       <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
         <module>fetchPolyfill</module>
       </depends>
       <depends>
@@ -51,9 +60,6 @@
       </depends>
       <depends>
         <module>iePolyfills</module>
-      </depends>
-      <depends>
-        <module>vuetify</module>
       </depends>
       <depends>
         <module>userPopupPlugin</module>
@@ -72,6 +78,15 @@
         <path>/js/kudosAdmin.bundle.js</path>
       </script>
       <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
         <module>jquery</module>
         <as>$</as>
       </depends>
@@ -86,9 +101,6 @@
       </depends>
       <depends>
         <module>vuetify</module>
-      </depends>
-      <depends>
-        <module>userPopupPlugin</module>
       </depends>
       <depends>
         <module>spacePopupPlugin</module>

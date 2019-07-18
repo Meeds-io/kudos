@@ -139,9 +139,14 @@
             <object type="org.exoplatform.social.core.processor.ActivityResourceBundlePlugin">
               <field name="activityKeyTypeMapping">
                 <map type="java.util.HashMap">
+                  <!-- Kept for retro compatibility -->
                   <entry>
                     <key><string>activity_kudos</string></key>
                     <value><string>NewKudosSentActivityComment.activity_kudos</string></value>
+                  </entry>
+                  <entry>
+                    <key><string>activity_kudos_content</string></key>
+                    <value><string>NewKudosSentActivityComment.activity_kudos_content</string></value>
                   </entry>
                 </map>
               </field>

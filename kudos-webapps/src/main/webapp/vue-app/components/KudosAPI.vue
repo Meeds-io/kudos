@@ -79,6 +79,7 @@ export default {
       eXo.social = eXo.social ? eXo.social : {};
       eXo.social.tiptip = eXo.social.tiptip ? eXo.social.tiptip : {};
       eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];
+      const sendKudosLabel = this.$t('exoplatform.kudos.button.sendKudos');
       eXo.social.tiptip.extraActions.push({
         appendContentTo(divUIAction, ownerId, type) {
           if(!type || type === 'username' || type === 'user' || type === 'organization') {
@@ -89,7 +90,7 @@ export default {
           // FIXME disable TIPTIP button to send Kudos to a space because of a limitation
           // in eXo Platform REST Services that couldn't retrieve Space details by prettyName
           if(type === 'USER') {
-            divUIAction.append(`<a title="Send Kudos" 
+            divUIAction.append(`<a title="${sendKudosLabel}" 
                 class="btn sendKudosTipTipButton"
                 href="javascript:void(0);"
                 onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
@@ -106,7 +107,7 @@ export default {
                {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'USER_PROFILE', ignoreRefresh: true}}));"
                class="btn" href="javascript:void(0);">
                 <i class="uiIcon fa fa-award uiIconKudos"></i>
-                <span> Send Kudos</span>
+                <span> ${sendKudosLabel}</span>
               </a>
             </li>`);
         }

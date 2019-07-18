@@ -8,8 +8,8 @@
           </div>
           <v-tabs v-model="selectedTab" grow>
             <v-tabs-slider color="primary" />
-            <v-tab key="general">Settings</v-tab>
-            <v-tab key="kudosList">Kudos list</v-tab>
+            <v-tab key="general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
+            <v-tab key="kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
           </v-tabs>
 
           <v-tabs-items v-model="selectedTab">
@@ -24,23 +24,23 @@
                   <div class="text-xs-left kudosPeriodConfiguration">
                     <v-text-field
                       v-model="kudosPerPeriod"
-                      :rules="mandatoryRule"
-                      label="Number of Kudos"
+                      :label="$t('exoplatform.kudos.label.numberOfKudos')"
                       type="number"
-                      name="kudosPerPeriod" />
-                    <span class="ml-2 mr-2"> kudos per </span>
+                      name="kudosPerPeriod"
+                      required />
+                    <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
                     <v-combobox
                       v-model="kudosPeriodType"
                       :items="periods"
                       :return-object="false"
-                      label="Period type"
+                      :label="$t('exoplatform.kudos.label.periodType')"
                       hide-no-data
                       hide-selected
                       small-chips>
                       <!-- Without slot-scope, the template isn't displayed -->
                       <!-- eslint-disable-next-line vue/no-unused-vars -->
                       <template slot="selection" slot-scope="data">
-                        {{ selectedPeriodType }}
+                        {{ selectedPeriodTypeText }}
                       </template>
                     </v-combobox>
                   </div>
@@ -53,10 +53,10 @@
                       :items="accessPermissionOptions"
                       :loading="isLoadingSuggestions"
                       :search-input.sync="accessPermissionSearchTerm"
+                      :label="$t('exoplatform.kudos.label.kudosAccessPermission')"
+                      :placeholder="$t('exoplatform.kudos.label.kudosAccessPermissionPlaceholder')"
                       attach="#accessPermissionAutoComplete"
-                      label="Kudos access permission (Spaces only)"
                       class="contactAutoComplete"
-                      placeholder="Start typing to Search a space"
                       content-class="contactAutoCompleteContent"
                       max-width="100%"
                       item-text="name"
@@ -70,7 +70,7 @@
                       <template slot="no-data">
                         <v-list-tile>
                           <v-list-tile-title>
-                            Search for a <strong>Space</strong>
+                            {{ $t('exoplatform.kudos.label.kudosAccessPermissionNoData') }}
                           </v-list-tile-title>
                         </v-list-tile>
                       </template>
@@ -105,7 +105,7 @@
                 <v-card-actions>
                   <v-spacer />
                   <button class="btn btn-primary mb-3" @click="saveGlobalSettings">
-                    Save
+                    {{ $t('exoplatform.kudos.button.save') }}
                   </button>
                   <v-spacer />
                 </v-card-actions>
@@ -141,38 +141,41 @@ export default {
       accessPermissionOptions: [],
       accessPermissionSearchTerm: null,
       kudosPeriodType: null,
-      isLoadingSuggestions: false,
-      periods: [
-        {
-          text: 'Week',
-          value: 'WEEK'
-        },
-        {
-          text: 'Month',
-          value: 'MONTH'
-        },
-        {
-          text: 'Quarter',
-          value: 'QUARTER'
-        },
-        {
-          text: 'Semester',
-          value: 'SEMESTER'
-        },
-        {
-          text: 'Year',
-          value: 'YEAR'
-        }
-      ],
-      mandatoryRule: [
-        (v) => !!v || 'Field is required'
-      ]
+      isLoadingSuggestions: false
     };
   },
   computed: {
-    selectedPeriodType() {
-      const selectedPeriodType = this.periods.find(period => period.value === this.kudosPeriodType);
-      return selectedPeriodType ? selectedPeriodType.text : this.kudosPeriodType;
+    periods(){
+      return [
+        {
+          text: this.$t('exoplatform.kudos.label.week'),
+          value: 'WEEK'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.month'),
+          value: 'MONTH'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.quarter'),
+          value: 'QUARTER'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.semester'),
+          value: 'SEMESTER'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.year'),
+          value: 'YEAR'
+        }
+      ]
+    },
+    selectedPeriodTypeText() {
+      let selectedPeriodType = this.periods.find(period => period.value === this.kudosPeriodType);
+      selectedPeriodType = selectedPeriodType ? selectedPeriodType.value : this.kudosPeriodType;
+      if (selectedPeriodType) {
+        return this.$t(`exoplatform.kudos.label.${selectedPeriodType.toLowerCase()}`)
+      }
+      return '';
     }
   },
   watch: {
@@ -239,7 +242,7 @@ export default {
       })
         .then(status => {
           if(!status) {
-            throw new Error("Error sending Kudo, please contact your administrator.");
+            throw new Error(this.$t('exoplatform.kudos.error.errorSavingKudosSettings'));
           }
           return this.init();
         })
