@@ -19,7 +19,7 @@
             class="uiIconClose pull-right"
             aria-hidden="true"
             @click="dialog = false"></a>
-          <span class="PopupTitle popupTitle">Send a kudos</span>
+          <span class="PopupTitle popupTitle">{{ $t('exoplatform.kudos.title.sendAKudos') }}</span>
         </div>
         <v-card flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
@@ -50,7 +50,7 @@
                   </v-card-text>
                   <v-card-text v-else class="kudosIconContainer">
                     <v-icon
-                      :title="`${remainingKudos -1} kudos left to send`"
+                      :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))"
                       class="uiIconKudos uiIconLightGrey"
                       size="64">
                       fa-award
@@ -74,14 +74,14 @@
                       :name="kudos.receiverFullName" />
                   </v-card-text>
                   <v-card-text v-else class="pb-0 pt-0">
-                    <a :title="`${remainingKudos -1} kudos left to send`" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
+                    <a :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
                   </v-card-text>
                 </v-card>
               </v-layout>
             </v-container>
             <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
               <i class="uiIconInfo"></i>
-              No kudos left. You 'll get more kudos to send in {{ remainingDaysToReset }} {{ remainingDaysToReset === 1 ? 'day' : 'days' }}.
+              {{ $t('exoplatform.kudos.info.noKudosLeft', {0: remainingDaysToReset, 1: remainingDaysToReset === 1 ? $t('exoplatform.kudos.label.day') : $t('exoplatform.kudos.label.days') }) }}
             </div>
             <v-form v-else-if="kudosToSend" ref="form">
               <v-textarea
@@ -89,9 +89,9 @@
                 v-model="kudosMessage"
                 :disabled="loading"
                 :rules="kudosMessageRules"
+                :label="$t('exoplatform.kudos.label.kudosMessage')"
+                :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 name="kudosMessage"
-                label="Message"
-                placeholder="Enter a message to send with your kudos"
                 class="mt-4 mb-0"
                 rows="3"
                 flat
@@ -105,13 +105,13 @@
               :disabled="loading || error"
               class="btn btn-primary mr-3"
               @click="send">
-              Send
+              {{ $t('exoplatform.kudos.button.send') }}
             </button>
             <button
               :disabled="loading"
               class="btn"
               @click="dialog = false">
-              Close
+              {{ $t('exoplatform.kudos.button.close') }}
             </button>
             <v-spacer />
           </v-card-actions>
@@ -133,7 +133,7 @@
             class="uiIconClose pull-right"
             aria-hidden="true"
             @click="listDialog = false"></a>
-          <span class="PopupTitle popupTitle">Kudos list</span>
+          <span class="PopupTitle popupTitle">{{ $t('exoplatform.kudos.label.kudosList') }}</span>
         </div>
         <v-card flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
@@ -172,12 +172,12 @@
             </v-container>
             <div v-else class="alert alert-info">
               <i class="uiIconInfo"></i>
-              This activity haven't received a kudos yet.
+              {{ $t('exoplatform.kudos.info.noKudosOnActivity') }}
             </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <button class="btn" @click="listDialog = false">Close</button>
+            <button class="btn" @click="listDialog = false">{{ $t('exoplatform.kudos.button.close') }}</button>
             <v-spacer />
           </v-card-actions>
         </v-card>
@@ -221,17 +221,17 @@ export default {
       kudosMessage: null,
       loading: false,
       kudosMessageRules: [
-        (v) => !!v || 'Required field',
-        (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || 'A least 10 real characters',
-        (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || 'Min 3 words',
+        (v) => !!v || this.$t('exoplatform.kudos.warning.requiredField'),
+        (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
+        (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
       ],
       htmlToAppend: `<li class="SendKudosButtonTemplate">
-          <button rel="tooltip" data-placement="bottom" title="Send Kudos" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
+          <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
             <div class="v-btn__content">
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
             </div>
           </button>
-          <a rel="tooltip" data-placement="top" title="Display kudos list" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
+          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
         </li>`
     };
   },
@@ -276,7 +276,7 @@ export default {
                     this.entityId = receiverDetails.entityId;
                   }
                   if(receiverDetails.notAuthorized) {
-                    this.error = "Current selected user isn't authorized to receive Kudos.";
+                    this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
                   } else {
                     this.kudosToSend = kudosToSend;
                   }
@@ -290,11 +290,11 @@ export default {
                     }
                   });
                 } else {
-                  throw new Error("You can't send kudos to yourself !");
+                  throw new Error(this.$t('exoplatform.kudos.warning.cantSendKudosToYourSelf'));
                 }
               } else {
                 console.debug("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
-                throw new Error("The receiver isn't authorized to receive kudos");
+                throw new Error(this.$t('exoplatform.kudos.error.errorGettingReceiverInformation'));
               }
             })
             .catch(e => {
@@ -460,7 +460,7 @@ export default {
       })
         .then(status => {
           if(!status) {
-            throw new Error("Error sending Kudo, please contact your administrator.");
+            throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
           }
         })
         .catch(e => {

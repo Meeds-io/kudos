@@ -17,6 +17,7 @@
         "eXo": true,
         "Vue": true,
         "Vuetify": true,
+        "exoi18n": true,
         "UIActivityLoader": true,
         "UIActivity": true
     },

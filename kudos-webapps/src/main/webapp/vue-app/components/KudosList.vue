@@ -5,7 +5,7 @@
         v-model="kudosPeriodType"
         :items="periods"
         :return-object="false"
-        label="Period type"
+        :label="$t('exoplatform.kudos.label.periodType')"
         hide-no-data
         hide-selected
         small-chips
@@ -26,12 +26,13 @@
         <v-text-field
           slot="activator"
           v-model="periodDatesDisplay"
-          label="Select the period date"
+          :label="$t('exoplatform.kudos.label.selectPeriodDate')"
           prepend-icon="event" />
         <v-date-picker
           v-model="selectedDate"
           :first-day-of-week="1"
           :type="!kudosPeriodType || kudosPeriodType === 'WEEK' ? 'date' : 'month'"
+          :locale="lang"
           @input="selectedDateMenu = false" />
       </v-menu>
 
@@ -90,33 +91,15 @@ export default {
       kudosIdentitiesList: [],
       selectedStartDate: null,
       selectedEndDate: null,
+      lang: 'en',
       pagination: {
         descending: true,
-        
-      },
-      periods: [
-        {
-          text: 'Week',
-          value: 'WEEK'
-        },
-        {
-          text: 'Month',
-          value: 'MONTH'
-        },
-        {
-          text: 'Quarter',
-          value: 'QUARTER'
-        },
-        {
-          text: 'Semester',
-          value: 'SEMESTER'
-        },
-        {
-          text: 'Year',
-          value: 'YEAR'
-        }
-      ],
-      kudosIdentitiesHeaders: [
+      }
+    };
+  },
+  computed: {
+    kudosIdentitiesHeaders(){
+      return [
         {
           text: '',
           align: 'right',
@@ -125,30 +108,52 @@ export default {
           width: '36px'
         },
         {
-          text: 'Name',
+          text: this.$t('exoplatform.kudos.label.name'),
           align: 'left',
           sortable: false,
           value: 'name'
         },
         {
-          text: 'Received',
+          text: this.$t('exoplatform.kudos.label.received'),
           align: 'center',
           sortable: true,
           value: 'received'
         },
         {
-          text: 'Sent',
+          text: this.$t('exoplatform.kudos.label.sent'),
           align: 'center',
           sortable: true,
           value: 'sent'
         }
-      ]
-    };
-  },
-  computed: {
+      ];
+    },
+    periods(){
+      return [
+        {
+          text: this.$t('exoplatform.kudos.label.week'),
+          value: 'WEEK'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.month'),
+          value: 'MONTH'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.quarter'),
+          value: 'QUARTER'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.semester'),
+          value: 'SEMESTER'
+        },
+        {
+          text: this.$t('exoplatform.kudos.label.year'),
+          value: 'YEAR'
+        }
+      ];
+    },
     periodDatesDisplay() {
       if(this.selectedStartDate && this.selectedEndDate) {
-        return `${this.selectedStartDate} to ${this.selectedEndDate}`;
+        return `${this.selectedStartDate} ${this.$t('exoplatform.kudos.label.to')} ${this.selectedEndDate}`;
       } else if(this.selectedStartDate) {
         return this.selectedStartDate;
       } else {
@@ -178,20 +183,22 @@ export default {
     document.addEventListener('exo-kudos-get-kudos-list-loading', () => this.loading = true);
     document.addEventListener('exo-kudos-get-kudos-list-result', this.loadKudosList);
     document.addEventListener('exo-kudos-get-period-result', this.loadPeriodDates);
+
+    this.lang = eXo && eXo.env && eXo.env.portal && eXo.env.portal.language;
   },
   methods: {
     loadAll() {
       if (!this.selectedDate || !this.kudosPeriodType) {
         return;
       }
-      this.selectedStartDate = this.formatDate(new Date(this.selectedDate));
+      this.selectedStartDate = this.formatDate(new Date(this.selectedDate), this.lang);
       this.selectedEndDate = null;
       document.dispatchEvent(new CustomEvent('exo-kudos-get-period', {'detail' : {'date' : new Date(this.selectedDate), 'periodType': this.kudosPeriodType}}));
     },
     loadPeriodDates(event) {
       if(event && event.detail && event.detail.period) {
-        this.selectedStartDate = this.formatDate(new Date(event.detail.period.startDateInSeconds * 1000));
-        this.selectedEndDate = this.formatDate(new Date(event.detail.period.endDateInSeconds * 1000));
+        this.selectedStartDate = this.formatDate(new Date(event.detail.period.startDateInSeconds * 1000), this.lang);
+        this.selectedEndDate = this.formatDate(new Date(event.detail.period.endDateInSeconds * 1000), this.lang);
         document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail' : {'startDate' : new Date(this.selectedStartDate), 'endDate' : new Date(this.selectedEndDate)}}));
       } else {
         console.debug("Retrieved event detail doesn't have the period as result");
@@ -201,14 +208,14 @@ export default {
       this.error = null;
       this.kudosIdentitiesList = [];
       if(!event || !event.detail) {
-        this.error = 'Empty kudos list is retrieved';
+        this.error = this.$t('exoplatform.kudos.warning.emptyKudosList');
       } else if(event.detail.error) {
         console.debug(event.detail.error);
         this.error = event.detail.error;
       } else if(event.detail.list) {
         this.kudosIdentitiesList = event.detail.list;
       } else {
-        this.error = 'Empty kudos list is retrieved';
+        this.error = this.$t('exoplatform.kudos.warning.emptyKudosList');
       }
       this.loading = false;
     },
@@ -216,9 +223,7 @@ export default {
       if (!date){
         return null;
       }
-      const dateString = date.toString();
-      // Example: 'Feb 01 2018'
-      return dateString.substring(dateString.indexOf(' ') + 1, dateString.indexOf(":") - 3);
+      return date.toLocaleDateString(eXo.env.portal.language);
     }
   }
 };

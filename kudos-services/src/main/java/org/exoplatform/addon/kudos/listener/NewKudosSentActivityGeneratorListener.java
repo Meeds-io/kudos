@@ -100,7 +100,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     String message = StringUtils.isBlank(kudos.getMessage()) ? "." : ": " + StringEscapeUtils.escapeHtml(kudos.getMessage());
 
     I18NActivityUtils.addResourceKeyToProcess(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID);
-    I18NActivityUtils.addResourceKey(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID, senderLink, receiverLink, message);
+    I18NActivityUtils.addResourceKey(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID, senderLink, receiverLink, message, KUDOS_ICON);
     return activity;
   }
 

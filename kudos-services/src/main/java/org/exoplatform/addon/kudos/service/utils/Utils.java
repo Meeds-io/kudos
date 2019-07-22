@@ -28,6 +28,9 @@ import org.exoplatform.social.service.rest.Util;
 public class Utils {
   private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
 
+  public static final String                 KUDOS_ICON                      =
+                                                        "<i class='uiIcon fa fa-award uiIconKudos uiIconBlue'></i>";
+
   public static final String                 SCOPE_NAME                      = "ADDONS_KUDOS";
 
   public static final String                 SETTINGS_KEY_NAME               = "ADDONS_KUDOS_SETTINGS";
@@ -54,7 +57,7 @@ public class Utils {
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos_content";
 
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
 

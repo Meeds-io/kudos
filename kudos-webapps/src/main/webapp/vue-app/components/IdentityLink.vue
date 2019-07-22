@@ -42,15 +42,15 @@ export default {
     return {
       componentId: `ReceiverLink${parseInt(Math.random() * 10000).toString().toString()}`,
       labels: {
-        CancelRequest: "Cancel Request",
-        Confirm: "Confirm",
-        Connect: "Connect",
-        Ignore: "Ignore",
-        RemoveConnection: "Remove Connection",
-        StatusTitle: "Loading...",
-        join: "Join",
-        leave: "Leave",
-        members : "Members"
+        CancelRequest: this.$t('exoplatform.kudos.label.profile.CancelRequest'),
+        Confirm: this.$t('exoplatform.kudos.label.profile.Confirm'),
+        Connect: this.$t('exoplatform.kudos.label.profile.Connect'),
+        Ignore: this.$t('exoplatform.kudos.label.profile.Ignore'),
+        RemoveConnection: this.$t('exoplatform.kudos.label.profile.RemoveConnection'),
+        StatusTitle: this.$t('exoplatform.kudos.label.profile.StatusTitle'),
+        join: this.$t('exoplatform.kudos.label.profile.join'),
+        leave: this.$t('exoplatform.kudos.label.profile.leave'),
+        members: this.$t('exoplatform.kudos.label.profile.members'),
       }
     };
   },
