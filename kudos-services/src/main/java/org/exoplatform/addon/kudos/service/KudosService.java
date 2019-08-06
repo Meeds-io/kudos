@@ -92,7 +92,7 @@ public class KudosService implements Startable {
   }
 
   /**
-   * @param username
+   * @param username username to get its settings
    * @return kudos settings of a user
    */
   public AccountSettings getAccountSettings(String username) {
@@ -234,8 +234,8 @@ public class KudosService implements Startable {
   /**
    * Check if user is authorized to send/receive Kudos
    * 
-   * @param username
-   * @return
+   * @param username username to check
+   * @return true if authorised else return false
    */
   public boolean isAuthorized(String username) {
     if (StringUtils.isBlank(username)) {
