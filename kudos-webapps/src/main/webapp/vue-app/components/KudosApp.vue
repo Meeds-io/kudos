@@ -25,7 +25,7 @@
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
-          <v-card-text v-if="allKudos && allKudos.length">
+          <v-card-text v-if="allKudos && allKudos.length && !error">
             <v-container
               flat
               fluid
