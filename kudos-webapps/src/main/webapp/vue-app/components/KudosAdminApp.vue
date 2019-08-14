@@ -1,5 +1,8 @@
 <template>
-  <v-app id="KudosAdminApp" color="transaprent">
+  <v-app
+    id="KudosAdminApp"
+    color="transaprent"
+    class="VuetifyApp">
     <main>
       <v-layout>
         <v-flex class="white text-xs-center" flat>
