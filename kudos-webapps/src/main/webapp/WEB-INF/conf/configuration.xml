@@ -4,7 +4,6 @@
 
   <import>war:/conf/kudos/bundle-configuration.xml</import>
   <import>war:/conf/kudos/portal-configuration.xml</import>
-  <import>war:/conf/kudos/administration-menu-configuration.xml</import>
   <import>war:/conf/kudos/dynamic-container-configuration.xml</import>
   <import>war:/conf/kudos/notification-configuration.xml</import>
   <import>war:/conf/kudos/gamification-configuration.xml</import>
