@@ -3,6 +3,7 @@
     v-if="!disabled"
     id="KudosApp"
     color="transaprent"
+    class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
     <v-dialog
@@ -73,7 +74,7 @@
                       :type="kudos.receiverType"
                       :name="kudos.receiverFullName" />
                   </v-card-text>
-                  <v-card-text v-else class="pb-0 pt-0">
+                  <v-card-text v-else class="px-0 py-0">
                     <a :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
                   </v-card-text>
                 </v-card>
@@ -225,7 +226,7 @@ export default {
         (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
         (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
       ],
-      htmlToAppend: `<li class="SendKudosButtonTemplate">
+      htmlToAppend: `<li class="SendKudosButtonTemplate VuetifyApp">
           <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
             <div class="v-btn__content">
               <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
