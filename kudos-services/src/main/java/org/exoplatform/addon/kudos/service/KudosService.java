@@ -19,17 +19,20 @@ package org.exoplatform.addon.kudos.service;
 import static org.exoplatform.addon.kudos.service.utils.Utils.*;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.picocontainer.Startable;
 
 import org.exoplatform.addon.kudos.model.*;
+import org.exoplatform.addon.kudos.statistic.ExoKudosStatistic;
+import org.exoplatform.addon.kudos.statistic.ExoKudosStatisticService;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -39,19 +42,20 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 /**
  * A service to manage kudos
  */
-public class KudosService implements Startable {
+public class KudosService implements ExoKudosStatisticService, Startable {
+  private static final Log LOG = ExoLogger.getLogger(KudosService.class);
 
-  private IdentityManager identityManager;
+  private IdentityManager  identityManager;
 
-  private SpaceService    spaceService;
+  private SpaceService     spaceService;
 
-  private ListenerService listenerService;
+  private ListenerService  listenerService;
 
-  private KudosStorage    kudosStorage;
+  private KudosStorage     kudosStorage;
 
-  private SettingService  settingService;
+  private SettingService   settingService;
 
-  private GlobalSettings  globalSettings;
+  private GlobalSettings   globalSettings;
 
   public KudosService(KudosStorage kudosStorage,
                       SettingService settingService,
@@ -113,6 +117,7 @@ public class KudosService implements Startable {
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
   }
 
+  @ExoKudosStatistic(local = true, service = "kudos", operation = "create_kudos")
   public Kudos sendKudos(Kudos kudos, String senderId) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "
@@ -249,6 +254,32 @@ public class KudosService implements Startable {
 
     // Disable kudos for users not member of the permitted space members
     return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
+  }
+
+  @Override
+  public Map<String, Object> getStatisticParameters(String operation, Object result, Object... methodArgs) {
+    if (result == null) {
+      return null;
+    }
+    Map<String, Object> parameters = new HashMap<>();
+
+    Kudos savedKudos = (Kudos) result;
+    parameters.put("kudos_id", savedKudos.getTechnicalId());
+    parameters.put("sender_identity_id", savedKudos.getSenderIdentityId());
+    parameters.put("receiver_identity_id", savedKudos.getReceiverIdentityId());
+    parameters.put("kudos_entity_type", savedKudos.getEntityType());
+    parameters.put("kudos_entity_id", savedKudos.getEntityId());
+
+    String issuer = (String) methodArgs[methodArgs.length - 1];
+    if (StringUtils.isNotBlank(issuer)) {
+      Identity identity = getIdentityByTypeAndId(OrganizationIdentityProvider.NAME, issuer);
+      if (identity == null) {
+        LOG.debug("Can't find identity with remote id: {}" + issuer);
+      } else {
+        parameters.put("user_social_id", identity.getId());
+      }
+    }
+    return parameters;
   }
 
   private KudosPeriod getCurrentKudosPeriod() {

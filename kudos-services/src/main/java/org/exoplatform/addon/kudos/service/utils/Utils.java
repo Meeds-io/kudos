@@ -208,6 +208,11 @@ public class Utils {
     return getPeriodOfTime(globalSettings, LocalDateTime.now());
   }
 
+  public static Identity getIdentityByTypeAndId(String type, String name) {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    return identityManager.getOrCreateIdentity(type, name, true);
+  }
+
   public static KudosPeriod getPeriodOfTime(GlobalSettings globalSettings, LocalDateTime localDateTime) {
     KudosPeriodType kudosPeriodType = null;
     if (globalSettings == null || globalSettings.getKudosPeriodType() == null) {
