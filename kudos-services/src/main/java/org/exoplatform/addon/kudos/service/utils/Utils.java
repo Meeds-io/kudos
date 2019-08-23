@@ -39,7 +39,7 @@ public class Utils {
 
   public static final Scope                  KUDOS_SCOPE                     = Scope.APPLICATION.id(SCOPE_NAME);
 
-  public static final String                 SPACE_ACCOUNT_TYPE              = "space";
+  public static final String                 SPACE_ACCOUNT_TYPE              = SpaceIdentityProvider.NAME;
 
   public static final String                 USER_ACCOUNT_TYPE               = "user";
 
@@ -95,7 +95,7 @@ public class Utils {
   }
 
   public static List<String> getNotificationReceiversUsers(String receiverType, String receiverId, String senderId) {
-    if (SPACE_ACCOUNT_TYPE.equals(receiverType) || SpaceIdentityProvider.NAME.equals(receiverType)) {
+    if (SPACE_ACCOUNT_TYPE.equals(receiverType)) {
       Space space = getSpace(receiverId);
       if (space == null) {
         return Collections.singletonList(receiverId);
@@ -115,13 +115,11 @@ public class Utils {
   }
 
   public static String getReceiverIdentityProviderType(String receiverType) {
-    return SpaceIdentityProvider.NAME.equals(receiverType)
-        || SPACE_ACCOUNT_TYPE.equals(receiverType) ? SpaceIdentityProvider.NAME : OrganizationIdentityProvider.NAME;
+    return SPACE_ACCOUNT_TYPE.equals(receiverType) ? SpaceIdentityProvider.NAME : OrganizationIdentityProvider.NAME;
   }
 
   public static String getReceiverType(String receiverType) {
-    return SpaceIdentityProvider.NAME.equals(receiverType) || SPACE_ACCOUNT_TYPE.equals(receiverType) ? SPACE_ACCOUNT_TYPE
-                                                                                                      : USER_ACCOUNT_TYPE;
+    return SPACE_ACCOUNT_TYPE.equals(receiverType) ? SPACE_ACCOUNT_TYPE : USER_ACCOUNT_TYPE;
   }
 
   public static Kudos fromEntity(KudosEntity kudosEntity) {

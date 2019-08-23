@@ -77,7 +77,7 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
                                                         notification.getValueOwnerParameter("SENDER_ID"),
                                                         true);
     String receiverType = notification.getValueOwnerParameter("RECEIVER_TYPE");
-    if (SPACE_ACCOUNT_TYPE.equals(receiverType) || SpaceIdentityProvider.NAME.equals(receiverType)) {
+    if (SPACE_ACCOUNT_TYPE.equals(receiverType)) {
       String receiverId = notification.getValueOwnerParameter("RECEIVER_ID");
       Space space = getSpace(receiverId);
       if (space != null) {
