@@ -113,7 +113,7 @@ public class KudosService implements Startable {
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
   }
 
-  public Kudos sendKudos(String senderId, Kudos kudos) throws Exception {
+  public Kudos sendKudos(Kudos kudos, String senderId) throws Exception {
     if (!StringUtils.equals(senderId, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "
           + kudos.getSenderId());

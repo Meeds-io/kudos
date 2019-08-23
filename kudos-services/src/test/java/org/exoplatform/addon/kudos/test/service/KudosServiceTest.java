@@ -253,7 +253,7 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos kudos = newKudosDTO();
 
     try {
-      kudosService.sendKudos(RECEIVER_REMOTE_ID, kudos);
+      kudosService.sendKudos(kudos, RECEIVER_REMOTE_ID);
       fail("Sender shouldn't be able to send kudos to himself");
     } catch (Exception e) {
       // Expected
@@ -263,13 +263,13 @@ public class KudosServiceTest extends BaseKudosTest {
     try {
       Kudos fakeKudos = newKudosDTO();
       fakeKudos.setReceiverId(SENDER_REMOTE_ID);
-      kudosService.sendKudos(SENDER_REMOTE_ID, fakeKudos);
+      kudosService.sendKudos(fakeKudos, SENDER_REMOTE_ID);
       fail("Sender should be the same as sender in DTO");
     } catch (Exception e) {
       // Expected
     }
 
-    kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     List<Kudos> list = kudosService.getKudosByReceiverInCurrentPeriod(OrganizationIdentityProvider.NAME, RECEIVER_REMOTE_ID);
@@ -294,7 +294,7 @@ public class KudosServiceTest extends BaseKudosTest {
     kudos.setReceiverId(spaceRemoteId);
     kudos.setReceiverIdentityId(null);
 
-    kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     List<Kudos> list = kudosService.getKudosByReceiverInCurrentPeriod(SpaceIdentityProvider.NAME, spaceRemoteId);
@@ -349,14 +349,14 @@ public class KudosServiceTest extends BaseKudosTest {
       kudosService.saveGlobalSettings(globalSettings);
 
       Kudos kudos = newKudosDTO();
-      kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+      kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
       entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
       Thread.sleep(1000);
 
       try {
-        kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+        kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
         fail("Shouldn't be able to send another Kudos");
       } catch (Exception e) {
         // Expected
@@ -382,7 +382,7 @@ public class KudosServiceTest extends BaseKudosTest {
       kudosService.saveGlobalSettings(globalSettings);
 
       Kudos kudos = newKudosDTO();
-      kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+      kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
       entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
@@ -427,7 +427,7 @@ public class KudosServiceTest extends BaseKudosTest {
     ListenerService listenerService = getService(ListenerService.class);
 
     Kudos kudos = newKudosDTO();
-    kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
@@ -466,7 +466,7 @@ public class KudosServiceTest extends BaseKudosTest {
 
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
-    kudos = kudosService.sendKudos(SENDER_REMOTE_ID, kudos);
+    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     kudos = kudosStorage.getKudoById(kudos.getTechnicalId());
