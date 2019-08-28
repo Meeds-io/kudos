@@ -78,7 +78,7 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       kudos.setSenderId(getCurrentUserId());
-      kudosService.sendKudos(getCurrentUserId(), kudos);
+      kudosService.sendKudos(kudos, getCurrentUserId());
       return Response.noContent().build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);

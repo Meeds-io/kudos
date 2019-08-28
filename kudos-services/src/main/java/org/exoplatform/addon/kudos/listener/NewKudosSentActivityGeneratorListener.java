@@ -72,7 +72,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     } else {
       ExoSocialActivity activity = createActivity(kudos, null);
       String providerId = OrganizationIdentityProvider.NAME;
-      if (SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType()) || SpaceIdentityProvider.NAME.equals(kudos.getReceiverType())) {
+      if (SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType())) {
         providerId = SpaceIdentityProvider.NAME;
       }
 
