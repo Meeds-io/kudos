@@ -5,7 +5,7 @@
     class="VuetifyApp">
     <main>
       <v-layout>
-        <v-flex class="white text-xs-center" flat>
+        <v-flex class="white text-center" flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
@@ -16,7 +16,7 @@
           </v-tabs>
 
           <v-tabs-items v-model="selectedTab">
-            <v-tab-item id="general">
+            <v-tab-item id="general" eager>
               <v-progress-circular
                 v-if="loading"
                 indeterminate
@@ -24,7 +24,7 @@
                 class="mr-2" />
               <v-card v-else flat>
                 <v-card-text>
-                  <div class="text-xs-left kudosPeriodConfiguration">
+                  <div class="text-left kudosPeriodConfiguration">
                     <v-text-field
                       v-model="kudosPerPeriod"
                       :label="$t('exoplatform.kudos.label.numberOfKudos')"
@@ -71,50 +71,54 @@
                       dense
                       flat>
                       <template slot="no-data">
-                        <v-list-tile>
-                          <v-list-tile-title>
+                        <v-list-item>
+                          <v-list-item-title>
                             {{ $t('exoplatform.kudos.label.kudosAccessPermissionNoData') }}
-                          </v-list-tile-title>
-                        </v-list-tile>
+                          </v-list-item-title>
+                        </v-list-item>
                       </template>
                       <template slot="selection" slot-scope="{ item, selected }">
                         <v-chip
                           v-if="item.error"
-                          :selected="selected"
+                          :input-value="selected"
                           class="autocompleteSelectedItem">
                           <del><span>{{ item.name }}</span></del>
                         </v-chip>
                         <v-chip
                           v-else
-                          :selected="selected"
+                          :input-value="selected"
                           class="autocompleteSelectedItem">
                           <span>{{ item.name }}</span>
                         </v-chip>
                       </template>
                       <!-- Without slot-scope, the template isn't displayed -->
                       <!-- eslint-disable-next-line vue/no-unused-vars -->
-                      <template slot="item" slot-scope="{ item, tile }">
-                        <v-list-tile-avatar
+                      <template slot="item" slot-scope="{ item, attrs }">
+                        <v-list-item-avatar
                           v-if="item.avatar"
-                          tile
                           size="20">
                           <img :src="item.avatar">
-                        </v-list-tile-avatar>
-                        <v-list-tile-title v-text="item.name" />
+                        </v-list-item-avatar>
+                        <v-list-item-title v-text="item.name" />
                       </template>
                     </v-autocomplete>
                   </v-flex>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
-                  <button class="btn btn-primary mb-3" @click="saveGlobalSettings">
-                    {{ $t('exoplatform.kudos.button.save') }}
-                  </button>
+                  <div class="ignore-vuetify-classes">
+                    <button class="btn btn-primary ignore-vuetify-classes mb-3" @click="saveGlobalSettings">
+                      {{ $t('exoplatform.kudos.button.save') }}
+                    </button>
+                  </div>
                   <v-spacer />
                 </v-card-actions>
               </v-card>
             </v-tab-item>
-            <v-tab-item id="kudosList" class="text-xs-center">
+            <v-tab-item
+              id="kudosList"
+              class="text-center"
+              eager>
               <kudos-list
                 :default-kudos-period-type="kudosPeriodType" />
             </v-tab-item>

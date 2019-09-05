@@ -20,14 +20,15 @@
         ref="selectedDateMenu"
         v-model="selectedDateMenu"
         transition="scale-transition"
-        lazy
         offset-y
         class="kudosDateSelector">
-        <v-text-field
-          slot="activator"
-          v-model="periodDatesDisplay"
-          :label="$t('exoplatform.kudos.label.selectPeriodDate')"
-          prepend-icon="event" />
+        <template v-slot:activator="{ on }">
+          <v-text-field
+            v-model="periodDatesDisplay"
+            :label="$t('exoplatform.kudos.label.selectPeriodDate')"
+            prepend-icon="event"
+            v-on="on" />
+        </template>
         <v-date-picker
           v-model="selectedDate"
           :first-day-of-week="1"
@@ -39,11 +40,12 @@
       <v-data-table
         :headers="kudosIdentitiesHeaders"
         :items="kudosIdentitiesList"
+        :items-per-page="1000"
         :loading="loading"
         :sortable="true"
         class="elevation-1 mr-3 mb-2"
-        hide-actions>
-        <template slot="items" slot-scope="props">
+        hide-default-footer>
+        <template slot="item" slot-scope="props">
           <tr>
             <td>
               <v-avatar size="36px">
@@ -52,7 +54,7 @@
                   onerror="this.src = '/eXoSkin/skin/images/system/SpaceAvtDefault.png'">
               </v-avatar>
             </td>
-            <td class="text-xs-left">
+            <td class="text-left">
               <a
                 :href="props.item.url"
                 rel="nofollow"
@@ -92,9 +94,6 @@ export default {
       selectedStartDate: null,
       selectedEndDate: null,
       lang: 'en',
-      pagination: {
-        descending: true,
-      }
     };
   },
   computed: {

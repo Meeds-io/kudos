@@ -15,12 +15,12 @@
       persistent
       @keydown.esc="dialog = false">
       <v-card class="elevation-12">
-        <div class="popupHeader ClearFix">
+        <div class="ignore-vuetify-classes popupHeader ClearFix">
           <a
             class="uiIconClose pull-right"
             aria-hidden="true"
             @click="dialog = false"></a>
-          <span class="PopupTitle popupTitle">{{ $t('exoplatform.kudos.title.sendAKudos') }}</span>
+          <span class="ignore-vuetify-classes PopupTitle popupTitle">{{ $t('exoplatform.kudos.title.sendAKudos') }}</span>
         </div>
         <v-card flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
@@ -41,7 +41,7 @@
                   :key="index"
                   :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
                   flat
-                  class="text-xs-center kudosIconContainerTop">
+                  class="text-center kudosIconContainerTop">
                   <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                     <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
@@ -59,7 +59,7 @@
                   </v-card-text>
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
-                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink absoluteLink">
+                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
                     <identity-link
                       :id="kudos.receiverId"
                       :technical-id="kudos.receiverIdentityId"
@@ -67,7 +67,7 @@
                       :name="kudos.receiverFullName" />
                   </v-card-text>
                   <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
-                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
+                  <v-card-text v-else-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
                     <identity-link
                       :id="kudos.receiverId"
                       :technical-id="kudos.receiverIdentityId"
@@ -93,7 +93,7 @@
                 :label="$t('exoplatform.kudos.label.kudosMessage')"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 name="kudosMessage"
-                class="mt-4 mb-0"
+                class="mb-0"
                 rows="3"
                 flat
                 no-resize />
@@ -104,13 +104,13 @@
             <button
               v-if="kudosToSend"
               :disabled="loading || error"
-              class="btn btn-primary mr-3"
+              class="ignore-vuetify-classes btn btn-primary mr-3"
               @click="send">
               {{ $t('exoplatform.kudos.button.send') }}
             </button>
             <button
               :disabled="loading"
-              class="btn"
+              class="ignore-vuetify-classes btn"
               @click="dialog = false">
               {{ $t('exoplatform.kudos.button.close') }}
             </button>
@@ -129,12 +129,12 @@
       persistent
       @keydown.esc="listDialog = false">
       <v-card class="elevation-12">
-        <div class="popupHeader ClearFix">
+        <div class="ignore-vuetify-classes popupHeader ClearFix">
           <a
             class="uiIconClose pull-right"
             aria-hidden="true"
             @click="listDialog = false"></a>
-          <span class="PopupTitle popupTitle">{{ $t('exoplatform.kudos.label.kudosList') }}</span>
+          <span class="ignore-vuetify-classes PopupTitle popupTitle">{{ $t('exoplatform.kudos.label.kudosList') }}</span>
         </div>
         <v-card flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
@@ -156,7 +156,7 @@
                   :key="index"
                   :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
                   flat
-                  class="text-xs-center kudosIconContainerTop">
+                  class="text-center kudosIconContainerTop">
                   <v-card-text v-if="kudos.senderFullName" class="kudosIconContainer">
                     <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
                     <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
@@ -178,7 +178,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <button class="btn" @click="listDialog = false">{{ $t('exoplatform.kudos.button.close') }}</button>
+            <button class="ignore-vuetify-classes btn" @click="listDialog = false">{{ $t('exoplatform.kudos.button.close') }}</button>
             <v-spacer />
           </v-card-actions>
         </v-card>

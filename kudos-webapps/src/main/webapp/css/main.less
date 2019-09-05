@@ -5,7 +5,6 @@
 .kudosIconsContainer {
   max-height: ~"calc(100vh - 365px)";
   overflow: auto;
-  min-height: 130px;
   margin: 0 auto !important;
   justify-content: center;
 }
@@ -47,12 +46,6 @@
   }
   .kudosIconLink {
     padding: 0;
-    
-    &.absoluteLink {
-      position: absolute;
-      z-index: 2;
-      bottom: 0;
-    }
   }
   .kudosIconLinkInvisible {
     position: static;
@@ -101,19 +94,15 @@
     border: 0;
     box-shadow: none;
   }
-  .v-autocomplete__content {
-    position: fixed;
-    z-index: 1100 !important;
-  }
-  .contactAutoComplete {
-    position: relative;
-  }
   .contactAutoCompleteContent {
     top: 55px !important;
     left: 0 !important;
     position: absolute;
     width: 100%;
     z-index: 1050 !important;
+  }
+  .contactAutoComplete {
+    position: relative;
 
     .v-list {
       padding: 0;
