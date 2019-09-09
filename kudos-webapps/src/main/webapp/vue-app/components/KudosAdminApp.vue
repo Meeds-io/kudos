@@ -11,12 +11,15 @@
           </div>
           <v-tabs v-model="selectedTab" grow>
             <v-tabs-slider color="primary" />
-            <v-tab key="general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
-            <v-tab key="kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
+            <v-tab key="general" href="#general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
+            <v-tab key="kudosList" href="#kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
           </v-tabs>
 
           <v-tabs-items v-model="selectedTab">
-            <v-tab-item id="general" eager>
+            <v-tab-item
+              id="general"
+              value="general"
+              eager>
               <v-progress-circular
                 v-if="loading"
                 indeterminate
@@ -117,6 +120,7 @@
             </v-tab-item>
             <v-tab-item
               id="kudosList"
+              value="kudosList"
               class="text-center"
               eager>
               <kudos-list
@@ -142,7 +146,7 @@ export default {
   data: vm => {
     return {
       loading: false,
-      selectedTab: true,
+      selectedTab: 'general',
       error: null,
       accessPermission: null,
       accessPermissionOptions: [],
