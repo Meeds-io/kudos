@@ -28,27 +28,33 @@
               <v-card v-else flat>
                 <v-card-text>
                   <div class="text-left kudosPeriodConfiguration">
-                    <v-text-field
-                      v-model="kudosPerPeriod"
-                      :label="$t('exoplatform.kudos.label.numberOfKudos')"
-                      type="number"
-                      name="kudosPerPeriod"
-                      required />
-                    <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
-                    <v-combobox
-                      v-model="kudosPeriodType"
-                      :items="periods"
-                      :return-object="false"
-                      :label="$t('exoplatform.kudos.label.periodType')"
-                      hide-no-data
-                      hide-selected
-                      small-chips>
-                      <!-- Without slot-scope, the template isn't displayed -->
-                      <!-- eslint-disable-next-line vue/no-unused-vars -->
-                      <template slot="selection" slot-scope="data">
-                        {{ selectedPeriodTypeText }}
-                      </template>
-                    </v-combobox>
+                    <div class="ma-auto">
+                      <v-text-field
+                        v-model="kudosPerPeriod"
+                        :label="$t('exoplatform.kudos.label.numberOfKudos')"
+                        type="number"
+                        name="kudosPerPeriod"
+                        required />
+                    </div>
+                    <div class="ma-auto">
+                      <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
+                    </div>
+                    <div class="ma-auto">
+                      <v-combobox
+                        v-model="kudosPeriodType"
+                        :items="periods"
+                        :return-object="false"
+                        :label="$t('exoplatform.kudos.label.periodType')"
+                        hide-no-data
+                        hide-selected
+                        small-chips>
+                        <!-- Without slot-scope, the template isn't displayed -->
+                        <!-- eslint-disable-next-line vue/no-unused-vars -->
+                        <template slot="selection" slot-scope="data">
+                          {{ selectedPeriodTypeText }}
+                        </template>
+                      </v-combobox>
+                    </div>
                   </div>
                   <v-flex
                     id="accessPermissionAutoComplete"

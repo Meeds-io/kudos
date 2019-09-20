@@ -1,6 +1,9 @@
 <template>
-  <v-card flat>
-    <v-card-text>
+  <v-layout wrap class="mx-4">
+    <v-flex
+      id="selectedDateMenu"
+      class="text-center"
+      xs2>
       <v-combobox
         v-model="kudosPeriodType"
         :items="periods"
@@ -16,27 +19,30 @@
           {{ selectedPeriodType }}
         </template>
       </v-combobox>
+    </v-flex>
+    <v-flex xs10>
+      <v-text-field
+        v-model="periodDatesDisplay"
+        :label="$t('exoplatform.kudos.label.selectPeriodDate')"
+        prepend-icon="event"
+        @click="selectedDateMenu = true" />
       <v-menu
         ref="selectedDateMenu"
         v-model="selectedDateMenu"
+        attach="#selectedDateMenu"
         transition="scale-transition"
         offset-y
+        eager
         class="kudosDateSelector">
-        <template v-slot:activator="{ on }">
-          <v-text-field
-            v-model="periodDatesDisplay"
-            :label="$t('exoplatform.kudos.label.selectPeriodDate')"
-            prepend-icon="event"
-            v-on="on" />
-        </template>
         <v-date-picker
           v-model="selectedDate"
           :first-day-of-week="1"
-          :type="!kudosPeriodType || kudosPeriodType === 'WEEK' ? 'date' : 'month'"
+          :type="!periodType || periodType === 'WEEK' ? 'date' : 'month'"
           :locale="lang"
           @input="selectedDateMenu = false" />
       </v-menu>
-
+    </v-flex>
+    <v-flex xs12>
       <v-data-table
         :headers="kudosIdentitiesHeaders"
         :items="kudosIdentitiesList"
@@ -69,8 +75,8 @@
           </tr>
         </template>
       </v-data-table>
-    </v-card-text>
-  </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -197,7 +203,7 @@ export default {
     loadPeriodDates(event) {
       if(event && event.detail && event.detail.period) {
         this.selectedStartDate = this.formatDate(new Date(event.detail.period.startDateInSeconds * 1000), this.lang);
-        this.selectedEndDate = this.formatDate(new Date(event.detail.period.endDateInSeconds * 1000), this.lang);
+        this.selectedEndDate = this.formatDate(new Date((event.detail.period.endDateInSeconds - 1) * 1000), this.lang);
         document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail' : {'startDate' : new Date(this.selectedStartDate), 'endDate' : new Date(this.selectedEndDate)}}));
       } else {
         console.debug("Retrieved event detail doesn't have the period as result");
