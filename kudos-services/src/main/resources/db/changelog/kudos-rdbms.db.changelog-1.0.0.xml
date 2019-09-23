@@ -77,4 +77,10 @@
     </addColumn>
   </changeSet>
 
+  <changeSet author="kudos" id="1.0.0-6" dbms="mysql">
+    <sql>
+      ALTER TABLE ADDONS_KUDOS MODIFY COLUMN MESSAGE LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
 </databaseChangeLog>
