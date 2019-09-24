@@ -11,12 +11,15 @@
           </div>
           <v-tabs v-model="selectedTab" grow>
             <v-tabs-slider color="primary" />
-            <v-tab key="general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
-            <v-tab key="kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
+            <v-tab key="general" href="#general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
+            <v-tab key="kudosList" href="#kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
           </v-tabs>
 
           <v-tabs-items v-model="selectedTab">
-            <v-tab-item id="general" eager>
+            <v-tab-item
+              id="general"
+              value="general"
+              eager>
               <v-progress-circular
                 v-if="loading"
                 indeterminate
@@ -25,27 +28,33 @@
               <v-card v-else flat>
                 <v-card-text>
                   <div class="text-left kudosPeriodConfiguration">
-                    <v-text-field
-                      v-model="kudosPerPeriod"
-                      :label="$t('exoplatform.kudos.label.numberOfKudos')"
-                      type="number"
-                      name="kudosPerPeriod"
-                      required />
-                    <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
-                    <v-combobox
-                      v-model="kudosPeriodType"
-                      :items="periods"
-                      :return-object="false"
-                      :label="$t('exoplatform.kudos.label.periodType')"
-                      hide-no-data
-                      hide-selected
-                      small-chips>
-                      <!-- Without slot-scope, the template isn't displayed -->
-                      <!-- eslint-disable-next-line vue/no-unused-vars -->
-                      <template slot="selection" slot-scope="data">
-                        {{ selectedPeriodTypeText }}
-                      </template>
-                    </v-combobox>
+                    <div class="ma-auto">
+                      <v-text-field
+                        v-model="kudosPerPeriod"
+                        :label="$t('exoplatform.kudos.label.numberOfKudos')"
+                        type="number"
+                        name="kudosPerPeriod"
+                        required />
+                    </div>
+                    <div class="ma-auto">
+                      <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
+                    </div>
+                    <div class="ma-auto">
+                      <v-combobox
+                        v-model="kudosPeriodType"
+                        :items="periods"
+                        :return-object="false"
+                        :label="$t('exoplatform.kudos.label.periodType')"
+                        hide-no-data
+                        hide-selected
+                        small-chips>
+                        <!-- Without slot-scope, the template isn't displayed -->
+                        <!-- eslint-disable-next-line vue/no-unused-vars -->
+                        <template slot="selection" slot-scope="data">
+                          {{ selectedPeriodTypeText }}
+                        </template>
+                      </v-combobox>
+                    </div>
                   </div>
                   <v-flex
                     id="accessPermissionAutoComplete"
@@ -117,6 +126,7 @@
             </v-tab-item>
             <v-tab-item
               id="kudosList"
+              value="kudosList"
               class="text-center"
               eager>
               <kudos-list
@@ -142,7 +152,7 @@ export default {
   data: vm => {
     return {
       loading: false,
-      selectedTab: true,
+      selectedTab: 'general',
       error: null,
       accessPermission: null,
       accessPermissionOptions: [],
