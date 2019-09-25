@@ -64,7 +64,6 @@
                       v-model="accessPermission"
                       :items="accessPermissionOptions"
                       :loading="isLoadingSuggestions"
-                      :search-input.sync="accessPermissionSearchTerm"
                       :label="$t('exoplatform.kudos.label.kudosAccessPermission')"
                       :placeholder="$t('exoplatform.kudos.label.kudosAccessPermissionPlaceholder')"
                       attach="#accessPermissionAutoComplete"
@@ -78,7 +77,8 @@
                       chips
                       cache-items
                       dense
-                      flat>
+                      flat
+                      @update:search-input="search">
                       <template slot="no-data">
                         <v-list-item>
                           <v-list-item-title>
@@ -102,13 +102,13 @@
                       </template>
                       <!-- Without slot-scope, the template isn't displayed -->
                       <!-- eslint-disable-next-line vue/no-unused-vars -->
-                      <template slot="item" slot-scope="{ item, attrs }">
+                      <template slot="item" slot-scope="{ item }">
                         <v-list-item-avatar
                           v-if="item.avatar"
                           size="20">
                           <img :src="item.avatar">
                         </v-list-item-avatar>
-                        <v-list-item-title v-text="item.name" />
+                        <v-list-item-title v-text="item.name" class="text-left" />
                       </template>
                     </v-autocomplete>
                   </v-flex>
@@ -225,6 +225,9 @@ export default {
     this.init();
   },
   methods: {
+    search(value) {
+      this.accessPermissionSearchTerm = value;
+    },
     init() {
       return initSettings()
         .then(() => {
