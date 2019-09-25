@@ -97,8 +97,8 @@ export default {
       selectedDateMenu: false,
       kudosPeriodType: null,
       kudosIdentitiesList: [],
-      selectedStartDate: null,
-      selectedEndDate: null,
+      selectedStartDateInSeconds: null,
+      selectedEndDateInSeconds: null,
       lang: 'en',
     };
   },
@@ -156,6 +156,12 @@ export default {
         }
       ];
     },
+    selectedStartDate() {
+      return (this.selectedStartDateInSeconds && this.formatDate(new Date(this.selectedStartDateInSeconds * 1000), this.lang)) || 0;
+    },
+    selectedEndDate() {
+      return (this.selectedEndDateInSeconds && this.formatDate(new Date(this.selectedEndDateInSeconds * 1000), this.lang)) || 0;
+    },
     periodDatesDisplay() {
       if(this.selectedStartDate && this.selectedEndDate) {
         return `${this.selectedStartDate} ${this.$t('exoplatform.kudos.label.to')} ${this.selectedEndDate}`;
@@ -196,15 +202,15 @@ export default {
       if (!this.selectedDate || !this.kudosPeriodType) {
         return;
       }
-      this.selectedStartDate = this.formatDate(new Date(this.selectedDate), this.lang);
-      this.selectedEndDate = null;
+      this.selectedStartDateInSeconds = new Date(this.selectedDate).getTime() / 1000;
+      this.selectedEndDateInSeconds = null;
       document.dispatchEvent(new CustomEvent('exo-kudos-get-period', {'detail' : {'date' : new Date(this.selectedDate), 'periodType': this.kudosPeriodType}}));
     },
     loadPeriodDates(event) {
       if(event && event.detail && event.detail.period) {
-        this.selectedStartDate = this.formatDate(new Date(event.detail.period.startDateInSeconds * 1000), this.lang);
-        this.selectedEndDate = this.formatDate(new Date((event.detail.period.endDateInSeconds - 1) * 1000), this.lang);
-        document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail' : {'startDate' : new Date(this.selectedStartDate), 'endDate' : new Date(this.selectedEndDate)}}));
+        this.selectedStartDateInSeconds = event.detail.period.startDateInSeconds;
+        this.selectedEndDateInSeconds = event.detail.period.endDateInSeconds;
+        document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail' : {'startDate' : new Date(this.selectedStartDateInSeconds * 1000), 'endDate' : new Date(this.selectedEndDateInSeconds * 1000)}}));
       } else {
         console.debug("Retrieved event detail doesn't have the period as result");
       }
