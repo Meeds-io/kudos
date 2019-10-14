@@ -4,39 +4,39 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <type>org.exoplatform.addon.kudos.dao.KudosDAO</type>
+    <type>org.exoplatform.kudos.dao.KudosDAO</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addon.kudos.service.KudosStorage</type>
+    <type>org.exoplatform.kudos.service.KudosStorage</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addon.kudos.service.KudosService</type>
+    <type>org.exoplatform.kudos.service.KudosService</type>
     <init-params>
       <value-param>
         <name>defaultAccessPermission</name>
         <description>Default access permissions for Kudos Feature</description>
-        <value>${exo.addon.kudos.defaultAccessPermission:}</value>
+        <value>${exo.kudos.defaultAccessPermission:}</value>
       </value-param>
       <value-param>
         <name>defaultKudosPerPeriod</name>
         <description>Default number of kudos per user per period of time</description>
-        <value>${exo.addon.kudos.defaultKudosPerPeriod:3}</value>
+        <value>${exo.kudos.defaultKudosPerPeriod:3}</value>
       </value-param>
     </init-params>
   </component>
 
   <component>
-    <type>org.exoplatform.addon.kudos.rest.KudosAccountREST</type>
+    <type>org.exoplatform.kudos.rest.KudosAccountREST</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addon.kudos.rest.KudosREST</type>
+    <type>org.exoplatform.kudos.rest.KudosREST</type>
   </component>
 
   <component>
-    <type>org.exoplatform.addon.kudos.rest.KudosSettingsREST</type>
+    <type>org.exoplatform.kudos.rest.KudosSettingsREST</type>
   </component>
 
   <external-component-plugins>

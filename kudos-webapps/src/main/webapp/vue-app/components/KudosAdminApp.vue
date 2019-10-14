@@ -108,7 +108,7 @@
                           size="20">
                           <img :src="item.avatar">
                         </v-list-item-avatar>
-                        <v-list-item-title v-text="item.name" class="text-left" />
+                        <v-list-item-title class="text-left" v-text="item.name" />
                       </template>
                     </v-autocomplete>
                   </v-flex>

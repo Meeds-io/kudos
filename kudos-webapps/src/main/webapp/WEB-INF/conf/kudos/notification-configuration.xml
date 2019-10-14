@@ -37,7 +37,7 @@
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>addPlugin</set-method>
-      <type>org.exoplatform.addon.kudos.notification.plugin.KudosReceiverNotificationPlugin</type>
+      <type>org.exoplatform.kudos.notification.plugin.KudosReceiverNotificationPlugin</type>
       <init-params>
         <object-param>
           <name>template.KudosActivityReceiverNotificationPlugin</name>
@@ -76,7 +76,7 @@
     <component-plugin>
       <name>web.channel.kudos.template</name>
       <set-method>registerTemplateProvider</set-method>
-      <type>org.exoplatform.addon.kudos.notification.provider.WebTemplateProvider</type>
+      <type>org.exoplatform.kudos.notification.provider.WebTemplateProvider</type>
       <init-params>
         <value-param>
           <name>channel-id</name>
@@ -87,7 +87,7 @@
     <component-plugin>
       <name>mail.channel.kudos.template</name>
       <set-method>registerTemplateProvider</set-method>
-      <type>org.exoplatform.addon.kudos.notification.provider.MailTemplateProvider</type>
+      <type>org.exoplatform.kudos.notification.provider.MailTemplateProvider</type>
       <init-params>
         <value-param>
           <name>channel-id</name>
@@ -98,7 +98,7 @@
     <component-plugin>
       <name>push.channel.kudos.template</name>
       <set-method>registerTemplateProvider</set-method>
-      <type>org.exoplatform.addon.kudos.notification.provider.MobilePushTemplateProvider</type>
+      <type>org.exoplatform.kudos.notification.provider.MobilePushTemplateProvider</type>
       <init-params>
         <value-param>
           <name>channel-id</name>
@@ -110,19 +110,19 @@
   <external-component-plugins>
     <target-component>org.exoplatform.services.listener.ListenerService</target-component>
     <component-plugin>
-      <name>exo.addons.kudos.activity</name>
+      <name>exo.kudos.activity</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.addon.kudos.listener.NewKudosSentNotificationListener</type>
+      <type>org.exoplatform.kudos.listener.NewKudosSentNotificationListener</type>
     </component-plugin>
     <component-plugin>
-      <name>exo.addons.kudos.sent</name>
+      <name>exo.kudos.sent</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.addon.kudos.listener.NewKudosSentActivityGeneratorListener</type>
+      <type>org.exoplatform.kudos.listener.NewKudosSentActivityGeneratorListener</type>
     </component-plugin>
     <component-plugin>
-      <name>exo.addons.kudos.activity</name>
+      <name>exo.kudos.activity</name>
       <set-method>addListener</set-method>
-      <type>org.exoplatform.addon.kudos.listener.GamificationIntegrationListener</type>
+      <type>org.exoplatform.kudos.listener.GamificationIntegrationListener</type>
     </component-plugin>
   </external-component-plugins>
 

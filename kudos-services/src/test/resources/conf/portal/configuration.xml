@@ -10,22 +10,22 @@
 
   <component>
     <key>org.exoplatform.social.core.space.spi.SpaceService</key>
-    <type>org.exoplatform.addon.kudos.test.mock.SpaceServiceMock</type>
+    <type>org.exoplatform.kudos.test.mock.SpaceServiceMock</type>
   </component>
 
   <component>
     <key>org.exoplatform.social.core.manager.IdentityManager</key>
-    <type>org.exoplatform.addon.kudos.test.mock.IdentityManagerMock</type>
+    <type>org.exoplatform.kudos.test.mock.IdentityManagerMock</type>
   </component>
 
   <component>
     <key>org.exoplatform.social.core.storage.api.ActivityStorage</key>
-    <type>org.exoplatform.addon.kudos.test.mock.ActivityStorageMock</type>
+    <type>org.exoplatform.kudos.test.mock.ActivityStorageMock</type>
   </component>
 
   <component>
     <key>org.exoplatform.social.core.manager.ActivityManager</key>
-    <type>org.exoplatform.addon.kudos.test.mock.ActivityManagerMock</type>
+    <type>org.exoplatform.kudos.test.mock.ActivityManagerMock</type>
   </component>
 
   <component>
