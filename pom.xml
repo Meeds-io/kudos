@@ -29,8 +29,6 @@
     <!-- 3rd party libraries versions -->
     <org.exoplatform.platform.version>6.0.x-SNAPSHOT</org.exoplatform.platform.version>
 
-    <org.jackson.version>2.4.0</org.jackson.version>
-
     <!-- Used to generate default methods for POJO -->
     <org.lombok.version>1.18.2</org.lombok.version>
     <org.lombok.plugin.version>1.18.0.0</org.lombok.plugin.version>
@@ -76,32 +74,6 @@
         <scope>provided</scope>
       </dependency>
 
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${org.jackson.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${org.bouncycastle.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${org.jackson.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${org.jackson.version}</version>
-        <scope>provided</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
