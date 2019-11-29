@@ -199,14 +199,6 @@ public class ActivityManagerMock implements ActivityManager {
   }
 
   @Override
-  public List<ExoSocialActivity> getActivitiesOfConnections(Identity ownerIdentity,
-                                                            int offset,
-                                                            int length) throws ActivityStorageException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public List<ExoSocialActivity> getActivitiesOfUserSpaces(Identity ownerIdentity) {
     // TODO Auto-generated method stub
     return null;
@@ -255,12 +247,6 @@ public class ActivityManagerMock implements ActivityManager {
   public int getActivitiesCount(Identity owner) throws ActivityStorageException {
     // TODO Auto-generated method stub
     return 0;
-  }
-
-  @Override
-  public void processActivitiy(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
