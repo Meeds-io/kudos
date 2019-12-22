@@ -26,15 +26,15 @@
     <page>
         <name>kudosAdministration</name>
         <title>Kudo administration</title>
-        <access-permissions>manager:/platform/administrators</access-permissions>
-        <edit-permission>manager:/platform/administrators</edit-permission>
+        <access-permissions>manager:/platform/rewarding</access-permissions>
+        <edit-permission>manager:/platform/rewarding</edit-permission>
         <portlet-application>
             <portlet>
                 <application-ref>kudos</application-ref>
                 <portlet-ref>KudosAdmin</portlet-ref>
             </portlet>
             <title>Kudos administration</title>
-            <access-permissions>manager:/platform/administrators</access-permissions>
+            <access-permissions>manager:/platform/rewarding</access-permissions>
             <show-info-bar>false</show-info-bar>
         </portlet-application>
     </page>

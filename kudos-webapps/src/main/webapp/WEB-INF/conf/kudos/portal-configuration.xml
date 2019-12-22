@@ -28,12 +28,12 @@
             <field name="predefinedOwner">
               <collection type="java.util.HashSet">
                 <value>
-                  <string>/platform/administrators</string>
+                  <string>/platform/rewarding</string>
                 </value>
               </collection>
             </field>
             <field name="location">
-              <string>war:/conf/kudos/portal</string>
+              <string>war:/conf/portal</string>
             </field>
           </object>
         </object-param>

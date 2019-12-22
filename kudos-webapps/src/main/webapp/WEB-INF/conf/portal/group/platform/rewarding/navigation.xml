@@ -30,10 +30,11 @@
         <node>
             <name>rewardAdministration</name>
             <label>Reward</label>
+            <page-reference>group::/platform/rewarding::kudosAdministration</page-reference>
             <node>
                 <name>kudosAdministration</name>
                 <label>Kudos</label>
-                <page-reference>group::/platform/administrators::kudosAdministration</page-reference>
+                <page-reference>group::/platform/rewarding::kudosAdministration</page-reference>
             </node>
         </node>
     </page-nodes>
