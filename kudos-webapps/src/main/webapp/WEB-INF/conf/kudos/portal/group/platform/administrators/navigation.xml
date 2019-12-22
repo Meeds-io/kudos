@@ -30,7 +30,6 @@
         <node>
             <name>rewardAdministration</name>
             <label>Reward</label>
-            <page-reference>group::/platform/rewarding::rewardAdministration</page-reference>
             <node>
                 <name>kudosAdministration</name>
                 <label>Kudos</label>
