@@ -27,7 +27,7 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <org.exoplatform.platform.version>6.0.x-SNAPSHOT</org.exoplatform.platform.version>
+    <org.exoplatform.social.version>6.0.x-SNAPSHOT</org.exoplatform.social.version>
 
     <!-- Used to generate default methods for POJO -->
     <org.lombok.version>1.18.2</org.lombok.version>
@@ -44,9 +44,9 @@
     <dependencies>
       <!-- Import versions from platform project -->
       <dependency>
-        <groupId>org.exoplatform.platform</groupId>
-        <artifactId>platform</artifactId>
-        <version>${org.exoplatform.platform.version}</version>
+        <groupId>org.exoplatform.social</groupId>
+        <artifactId>social</artifactId>
+        <version>${org.exoplatform.social.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

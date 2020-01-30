@@ -4,13 +4,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.exoplatform.social.core.ActivityProcessor;
-import org.exoplatform.social.core.activity.filter.ActivityFilter;
-import org.exoplatform.social.core.activity.filter.ActivityUpdateFilter;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.storage.ActivityStorageException;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
-import org.exoplatform.social.core.storage.impl.ActivityBuilderWhere;
 
 public class ActivityStorageMock implements ActivityStorage {
 
@@ -77,21 +74,6 @@ public class ActivityStorageMock implements ActivityStorage {
 
   @Override
   public void deleteComment(String activityId, String commentId) throws ActivityStorageException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public List<ExoSocialActivity> getActivitiesOfIdentities(List<Identity> connectionList,
-                                                           long offset,
-                                                           long limit) throws ActivityStorageException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public List<ExoSocialActivity> getActivitiesOfIdentities(List<Identity> connectionList,
-                                                           TimestampType type,
-                                                           long offset,
-                                                           long limit) throws ActivityStorageException {
     throw new UnsupportedOperationException();
   }
 
@@ -378,15 +360,6 @@ public class ActivityStorageMock implements ActivityStorage {
   }
 
   @Override
-  public List<ExoSocialActivity> getActivitiesOfIdentities(ActivityBuilderWhere where,
-                                                           ActivityFilter filter,
-                                                           long offset,
-                                                           long limit) throws ActivityStorageException {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
   public int getNumberOfSpaceActivities(Identity spaceIdentity) {
     throw new UnsupportedOperationException();
 
@@ -466,42 +439,6 @@ public class ActivityStorageMock implements ActivityStorage {
 
   @Override
   public int getNumberOfNewerOnSpaceActivities(Identity spaceIdentity, Long sinceTime) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfUpdatedOnActivityFeed(Identity owner, ActivityUpdateFilter filter) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfUpdatedOnUserActivities(Identity owner, ActivityUpdateFilter filter) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfUpdatedOnActivitiesOfConnections(Identity owner, ActivityUpdateFilter filter) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfUpdatedOnUserSpacesActivities(Identity owner, ActivityUpdateFilter filter) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfUpdatedOnSpaceActivities(Identity owner, ActivityUpdateFilter filter) {
-    throw new UnsupportedOperationException();
-
-  }
-
-  @Override
-  public int getNumberOfMultiUpdated(Identity owner, Map<String, Long> sinceTimes) {
     throw new UnsupportedOperationException();
 
   }
