@@ -1,12 +1,5 @@
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4" xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
   <portal-skin>
-    <skin-name>Default</skin-name>
-    <skin-module>customModuleVuetify</skin-module>
-    <css-path>/../eXoSkin/skin/css/vuetify/vuetify-all.css</css-path>
-    <css-priority>10</css-priority>
-  </portal-skin>
-
-  <portal-skin>
     <skin-name>Enterprise</skin-name>
     <skin-module>customModuleVuetify</skin-module>
     <css-path>/../EnterpriseSkin/skin/css/vuetify/vuetify-all.css</css-path>
@@ -14,24 +7,10 @@
   </portal-skin>
 
   <portal-skin>
-    <skin-name>Default</skin-name>
-    <skin-module>customModuleKudos</skin-module>
-    <css-path>/css/kudos.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
-
-  <portal-skin>
     <skin-name>Enterprise</skin-name>
     <skin-module>customModuleKudos</skin-module>
     <css-path>/css/kudos.css</css-path>
     <css-priority>11</css-priority>
-  </portal-skin>
-
-  <portal-skin>
-    <skin-name>Default</skin-name>
-    <skin-module>kudos</skin-module>
-    <css-path>/css/platform.css</css-path>
-    <css-priority>100</css-priority>
   </portal-skin>
 
   <portal-skin>
