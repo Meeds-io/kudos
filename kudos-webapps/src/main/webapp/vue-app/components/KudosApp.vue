@@ -8,7 +8,6 @@
     <kudos-api ref="kudosAPI" />
     <v-dialog
       v-model="dialog"
-      attach="#KudosApp"
       content-class="uiPopup with-overflow"
       width="500px"
       max-width="100vw"
@@ -122,7 +121,6 @@
 
     <v-dialog
       v-model="listDialog"
-      attach="#KudosApp"
       content-class="uiPopup with-overflow"
       width="500px"
       max-width="100vw"
