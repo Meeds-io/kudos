@@ -1,11 +1,14 @@
+@import "variables.less";
+@import "mixins.less";
+
 .uiIconKudos.uiIconLightGrey {
   color: #c6c6c6 !important;
 }
 .uiIconKudosCheck.uiIconBlue {
-  color: #578dc9 !important;
+  color: @primaryColor !important;
 }
 .uiIconKudos.uiIconBlue {
-  color: #578dc9 !important;
+  color: @primaryColor !important;
 }
 .uiIconKudosTipTip {
   font-size: 18px !important;

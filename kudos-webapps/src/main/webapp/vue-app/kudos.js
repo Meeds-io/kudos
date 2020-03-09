@@ -1,5 +1,4 @@
 import KudosApp from './components/KudosApp.vue';
-import './../css/main.less';
 
 window.parentToWatch = '#UISpaceActivityStreamPortlet, #UIUserActivityStreamPortlet';
 
