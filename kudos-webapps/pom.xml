@@ -67,7 +67,6 @@
               <compress>false</compress>
               <includes>
                 <include>main.less</include>
-                <include>platform.css</include>
               </includes>
             </configuration>
             <goals>

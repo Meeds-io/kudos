@@ -2,16 +2,9 @@
 
   <portal-skin>
     <skin-name>Enterprise</skin-name>
-    <skin-module>customModuleKudos</skin-module>
-    <css-path>/skin/css/main.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
-
-  <portal-skin>
-    <skin-name>Enterprise</skin-name>
     <skin-module>kudos</skin-module>
-    <css-path>/skin/css/platform.css</css-path>
-    <css-priority>100</css-priority>
+    <css-path>/skin/css/main.css</css-path>
+    <css-priority>120</css-priority>
   </portal-skin>
 
   <portlet>
