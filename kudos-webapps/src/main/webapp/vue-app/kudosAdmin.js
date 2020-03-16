@@ -1,5 +1,4 @@
 import KudosAdminApp from './components/KudosAdminApp.vue';
-import './../css/main.less';
 
 Vue.use(Vuetify);
 
