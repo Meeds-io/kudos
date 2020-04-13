@@ -34,7 +34,7 @@
                 <portlet-ref>KudosAdmin</portlet-ref>
             </portlet>
             <title>Kudos administration</title>
-            <access-permissions>manager:/platform/rewarding</access-permissions>
+            <access-permissions>*:/platform/rewarding</access-permissions>
             <show-info-bar>false</show-info-bar>
         </portlet-application>
     </page>
