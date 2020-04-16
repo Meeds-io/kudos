@@ -19,6 +19,7 @@
         "Vuetify": true,
         "exoi18n": true,
         "UIActivityLoader": true,
+        "extensionRegistry": true,
         "UIActivity": true
     },
     "parserOptions": {
