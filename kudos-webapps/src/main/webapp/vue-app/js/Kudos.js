@@ -86,11 +86,15 @@ export function registerExternalExtensions(title) {
     order: 20,
     enabled: () => true,
     click: (profile) => {
-      document.dispatchEvent(
-        new CustomEvent('exo-kudos-open-send-modal', {detail : {
-          id : profile.username,
-          type: 'USER_PROFILE'
-      }}));
+      const type = profile.prettyName ? 'SPACE_PROFILE' : 'USER_PROFILE';
+      const id = profile.prettyName ? profile.id : profile.username;
+      if (id) {
+        document.dispatchEvent(
+          new CustomEvent('exo-kudos-open-send-modal', {detail : {
+            id : id,
+            type: type,
+        }}));
+      }
     },
   };
   extensionRegistry.registerExtension('profile-extension', 'action', profileExtensionAction);
