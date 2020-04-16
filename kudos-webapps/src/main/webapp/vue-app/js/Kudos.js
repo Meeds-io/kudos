@@ -78,3 +78,22 @@ export function getPeriodDates(date, periodType) {
     },
   }).then((resp) => resp && resp.ok && resp.json());
 }
+
+export function registerExternalExtensions(title) {
+  const profileExtensionAction = {
+    title: title,
+    icon: 'fa fa-award uiIconKudos uiIconLightBlue',
+    order: 20,
+    enabled: () => true,
+    click: (profile) => {
+      document.dispatchEvent(
+        new CustomEvent('exo-kudos-open-send-modal', {detail : {
+          id : profile.username,
+          type: 'USER_PROFILE'
+      }}));
+    },
+  };
+  extensionRegistry.registerExtension('profile-extension', 'action', profileExtensionAction);
+  document.dispatchEvent(new CustomEvent('profile-extension-updated', { detail: profileExtensionAction}));
+}
+

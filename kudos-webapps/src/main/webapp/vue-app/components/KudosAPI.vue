@@ -3,12 +3,13 @@
 </template>
 
 <script>
-import {getAllKudosByPeriod, getAllKudosByPeriodOfDate, getPeriodDates} from '../js/Kudos.js';
+import {getAllKudosByPeriod, getAllKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions} from '../js/Kudos.js';
 
 export default {
   created() {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
+    registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
   },
   methods: {
     init() {
