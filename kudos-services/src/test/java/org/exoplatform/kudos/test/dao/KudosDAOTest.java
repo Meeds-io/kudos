@@ -1,8 +1,8 @@
 package org.exoplatform.kudos.test.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -24,53 +24,25 @@ public class KudosDAOTest extends BaseKudosTest {
     assertNotNull(kudosDAO);
   }
 
-  /**
-   * Check that service is instantiated and functional
-   */
   @Test
-  public void testDeleteAll() {
-    KudosDAO kudosDAO = getService(KudosDAO.class);
-    try {
-      kudosDAO.deleteAll();
-      fail("shouldn't be able to delete all entities");
-    } catch (Exception e) {
-      // Expected
-    }
-  }
-
-  /**
-   * Check that service is instantiated and functional
-   */
-  @Test
-  public void testDeleteAllEntities() {
-    KudosDAO kudosDAO = getService(KudosDAO.class);
-    try {
-      kudosDAO.deleteAll(Collections.emptyList());
-      fail("shouldn't be able to delete all entities");
-    } catch (Exception e) {
-      // Expected
-    }
-  }
-
-  @Test
-  public void testGetAllKudosByEntity() {
+  public void testGetKudosByEntity() {
 
     KudosDAO kudosDAO = getService(KudosDAO.class);
-    List<KudosEntity> list = kudosDAO.getAllKudosByEntity(entityType, entityId);
+    List<KudosEntity> list = kudosDAO.getKudosByEntity(entityType, entityId, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     newKudos();
 
-    list = kudosDAO.getAllKudosByEntity(entityType, entityId);
+    list = kudosDAO.getKudosByEntity(entityType, entityId, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    list = kudosDAO.getAllKudosByEntity(KudosEntityType.COMMENT.ordinal(), entityId);
+    list = kudosDAO.getKudosByEntity(KudosEntityType.COMMENT.ordinal(), entityId, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
-    list = kudosDAO.getAllKudosByEntity(entityType, 20);
+    list = kudosDAO.getKudosByEntity(entityType, 20, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -81,21 +53,21 @@ public class KudosDAOTest extends BaseKudosTest {
     KudosDAO kudosDAO = getService(KudosDAO.class);
     KudosPeriod kudosPeriod = new KudosPeriod(getTime(2019, 1, 1), getCurrentTimeInSeconds());
 
-    List<KudosEntity> list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, true);
+    List<KudosEntity> list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, true, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     newKudos();
 
-    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, true);
+    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, true, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, false);
+    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, receiverId, false, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
-    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, 30, true);
+    list = kudosDAO.getKudosByPeriodAndReceiver(kudosPeriod, 30, true, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -122,43 +94,43 @@ public class KudosDAOTest extends BaseKudosTest {
   }
 
   @Test
-  public void testGetAllKudosByPeriod() {
+  public void testGetKudosByPeriod() {
 
     KudosDAO kudosDAO = getService(KudosDAO.class);
     KudosPeriod kudosPeriod = new KudosPeriod(getTime(2019, 1, 1), getCurrentTimeInSeconds());
 
-    List<KudosEntity> list = kudosDAO.getAllKudosByPeriod(kudosPeriod);
+    List<KudosEntity> list = kudosDAO.getKudosByPeriod(kudosPeriod, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     newKudos();
 
-    list = kudosDAO.getAllKudosByPeriod(kudosPeriod);
+    list = kudosDAO.getKudosByPeriod(kudosPeriod, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    list = kudosDAO.getAllKudosByPeriod(new KudosPeriod(getTime(2019, 1, 1), getTime(2019, 7, 1)));
+    list = kudosDAO.getKudosByPeriod(new KudosPeriod(getTime(2019, 1, 1), getTime(2019, 7, 1)), 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
 
   @Test
-  public void testGetAllKudosByPeriodAndEntityType() {
+  public void testGetKudosByPeriodAndEntityType() {
 
     KudosDAO kudosDAO = getService(KudosDAO.class);
     KudosPeriod kudosPeriod = new KudosPeriod(getTime(2019, 1, 1), getCurrentTimeInSeconds());
 
-    List<KudosEntity> list = kudosDAO.getAllKudosByPeriodAndEntityType(kudosPeriod, entityType);
+    List<KudosEntity> list = kudosDAO.getKudosByPeriodAndEntityType(kudosPeriod, entityType, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     newKudos();
 
-    list = kudosDAO.getAllKudosByPeriodAndEntityType(kudosPeriod, entityType);
+    list = kudosDAO.getKudosByPeriodAndEntityType(kudosPeriod, entityType, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    list = kudosDAO.getAllKudosByPeriodAndEntityType(kudosPeriod, KudosEntityType.COMMENT.ordinal());
+    list = kudosDAO.getKudosByPeriodAndEntityType(kudosPeriod, KudosEntityType.COMMENT.ordinal(), 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -169,17 +141,17 @@ public class KudosDAOTest extends BaseKudosTest {
     KudosDAO kudosDAO = getService(KudosDAO.class);
     KudosPeriod kudosPeriod = new KudosPeriod(getTime(2019, 1, 1), getCurrentTimeInSeconds());
 
-    List<KudosEntity> list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, senderId);
+    List<KudosEntity> list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, senderId, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     newKudos();
 
-    list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, senderId);
+    list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, senderId, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
-    list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, 30);
+    list = kudosDAO.getKudosByPeriodAndSender(kudosPeriod, 30, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }

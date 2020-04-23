@@ -37,7 +37,7 @@ public class IdentityManagerMock implements IdentityManager {
     }
 
     for (int i = 0; i < 100; i++) {
-      Identity identity = new Identity(String.valueOf(i));
+      Identity identity = new Identity(String.valueOf(i + 100));
       identity.setDeleted(false);
       identity.setEnable(true);
       identity.setProviderId(SpaceIdentityProvider.NAME);
@@ -298,11 +298,6 @@ public class IdentityManagerMock implements IdentityManager {
 
   @Override
   public void unregisterProfileListener(ProfileListener listener) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public List<String> sortIdentities(List<String> identityRemoteIds, String sortField) {
     throw new UnsupportedOperationException();
   }
 

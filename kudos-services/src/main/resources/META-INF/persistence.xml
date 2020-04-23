@@ -8,6 +8,7 @@
     <non-jta-data-source>java:/comp/env/exo-jpa_portal</non-jta-data-source>
     <properties>
       <property name="persistenceUnitName" value="exo-pu"></property>
+      <property name="hibernate.enable_lazy_load_no_trans" value="true" />
     </properties>
   </persistence-unit>
 </persistence>

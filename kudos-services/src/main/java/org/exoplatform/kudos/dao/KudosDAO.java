@@ -10,44 +10,39 @@ import org.exoplatform.kudos.model.KudosPeriod;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
 
-  private static final String KUDOS_REMOVAL_IS_DISABLED_MESSAGE = "Kudos removal is disabled";
-
-  @Override
-  public void deleteAll() {
-    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
-  }
-
-  @Override
-  public void deleteAll(List<KudosEntity> entities) {
-    throw new IllegalStateException(KUDOS_REMOVAL_IS_DISABLED_MESSAGE);
-  }
-
-  public List<KudosEntity> getAllKudosByPeriod(KudosPeriod kudosPeriod) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriod", KudosEntity.class);
+  public List<KudosEntity> getKudosByPeriod(KudosPeriod kudosPeriod, int limit) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriod", KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
+    query.setMaxResults(limit);
     return query.getResultList();
   }
 
-  public List<KudosEntity> getAllKudosByPeriodAndEntityType(KudosPeriod kudosPeriod, int entityType) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByPeriodAndEntityType",
+  public List<KudosEntity> getKudosByPeriodAndEntityType(KudosPeriod kudosPeriod, int entityType, int limit) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndEntityType",
                                                                         KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("entityType", entityType);
+    query.setMaxResults(limit);
     return query.getResultList();
   }
 
-  public List<KudosEntity> getAllKudosByEntity(int entityType, long entityId) {
-    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getAllKudosByEntity", KudosEntity.class);
+  public List<KudosEntity> getKudosByEntity(int entityType, long entityId, int limit) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByEntity", KudosEntity.class);
     query.setParameter("entityId", entityId);
     query.setParameter("entityType", entityType);
+    query.setMaxResults(limit);
     return query.getResultList();
   }
 
-  public List<KudosEntity> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, long receiverId, boolean isReceiverUser) {
+  public List<KudosEntity> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod,
+                                                       long receiverId,
+                                                       boolean isReceiverUser,
+                                                       int limit) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndReceiver", KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("receiverId", receiverId);
     query.setParameter("isReceiverUser", isReceiverUser);
+    query.setMaxResults(limit);
     return query.getResultList();
   }
 
@@ -60,10 +55,11 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     return count == null ? 0 : count;
   }
 
-  public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
+  public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId, int limit) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndSender", KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("senderId", senderId);
+    query.setMaxResults(limit);
     return query.getResultList();
   }
 

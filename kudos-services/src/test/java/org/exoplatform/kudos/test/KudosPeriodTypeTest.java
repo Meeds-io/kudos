@@ -3,7 +3,7 @@ package org.exoplatform.kudos.test;
 import static org.junit.Assert.*;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +19,8 @@ public class KudosPeriodTypeTest {
     KudosPeriod periodOfTime = KudosPeriodType.WEEK.getPeriodOfTime(LocalDate.of(2019, 7, 12).atStartOfDay());
     assertNotNull(periodOfTime);
 
-    long startTimeInSeconds = LocalDate.of(2019, 7, 8).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2019, 7, 15).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 7, 8).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2019, 7, 15).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod expectedPeriod = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertEquals(expectedPeriod, periodOfTime);
@@ -33,8 +33,8 @@ public class KudosPeriodTypeTest {
     KudosPeriod periodOfTime = KudosPeriodType.MONTH.getPeriodOfTime(LocalDate.of(2019, 7, 12).atStartOfDay());
     assertNotNull(periodOfTime);
 
-    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2019, 8, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2019, 8, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod expectedPeriod = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertEquals(expectedPeriod, periodOfTime);
@@ -47,8 +47,8 @@ public class KudosPeriodTypeTest {
     KudosPeriod periodOfTime = KudosPeriodType.QUARTER.getPeriodOfTime(LocalDate.of(2019, 7, 12).atStartOfDay());
     assertNotNull(periodOfTime);
 
-    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2019, 10, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2019, 10, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod expectedPeriod = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertEquals(expectedPeriod, periodOfTime);
@@ -61,8 +61,8 @@ public class KudosPeriodTypeTest {
     KudosPeriod periodOfTime = KudosPeriodType.SEMESTER.getPeriodOfTime(LocalDate.of(2019, 7, 12).atStartOfDay());
     assertNotNull(periodOfTime);
 
-    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod expectedPeriod = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertEquals(expectedPeriod, periodOfTime);
@@ -75,8 +75,8 @@ public class KudosPeriodTypeTest {
     KudosPeriod periodOfTime = KudosPeriodType.YEAR.getPeriodOfTime(LocalDate.of(2019, 7, 12).atStartOfDay());
     assertNotNull(periodOfTime);
 
-    long startTimeInSeconds = LocalDate.of(2019, 1, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod expectedPeriod = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertEquals(expectedPeriod, periodOfTime);
@@ -87,8 +87,8 @@ public class KudosPeriodTypeTest {
 
   @Test
   public void testKudosPeriod() throws JSONException {
-    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
-    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    long startTimeInSeconds = LocalDate.of(2019, 7, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+    long endTimeInSeconds = LocalDate.of(2020, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
 
     KudosPeriod periodOfTime = new KudosPeriod(startTimeInSeconds, endTimeInSeconds);
     assertTrue(periodOfTime.toString().contains(String.valueOf(startTimeInSeconds)));

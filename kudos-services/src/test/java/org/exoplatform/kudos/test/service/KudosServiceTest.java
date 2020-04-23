@@ -17,9 +17,11 @@ import org.exoplatform.kudos.service.KudosStorage;
 import org.exoplatform.kudos.service.utils.Utils;
 import org.exoplatform.kudos.test.BaseKudosTest;
 import org.exoplatform.services.listener.*;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 
 public class KudosServiceTest extends BaseKudosTest {
@@ -43,26 +45,26 @@ public class KudosServiceTest extends BaseKudosTest {
   }
 
   @Test
-  public void testGetAllKudosByEntity() {
+  public void testGetKudosByEntity() {
     KudosService kudosService = getService(KudosService.class);
-    List<Kudos> list = kudosService.getAllKudosByEntity(ENTITY_TYPE, ENTITY_ID);
+    List<Kudos> list = kudosService.getKudosByEntity(ENTITY_TYPE, ENTITY_ID, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     KudosEntity kudosEntity = newKudos();
 
-    list = kudosService.getAllKudosByEntity(ENTITY_TYPE, ENTITY_ID);
+    list = kudosService.getKudosByEntity(ENTITY_TYPE, ENTITY_ID, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
     Kudos kudos = list.get(0);
     compareResults(kudosEntity, kudos);
 
-    list = kudosService.getAllKudosByEntity(KudosEntityType.SPACE_TIPTIP.name(), ENTITY_ID);
+    list = kudosService.getKudosByEntity(KudosEntityType.SPACE_TIPTIP.name(), ENTITY_ID, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
-    list = kudosService.getAllKudosByEntity(ENTITY_TYPE, "20");
+    list = kudosService.getKudosByEntity(ENTITY_TYPE, "20", 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -73,24 +75,24 @@ public class KudosServiceTest extends BaseKudosTest {
     long startTime = getTime(2019, 1, 1);
     long endTime = getCurrentTimeInSeconds();
 
-    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(RECEIVER_ID, startTime, endTime);
+    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(RECEIVER_ID, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     KudosEntity kudosEntity = newKudos();
 
-    list = kudosService.getKudosByPeriodAndReceiver(RECEIVER_ID, startTime, endTime);
+    list = kudosService.getKudosByPeriodAndReceiver(RECEIVER_ID, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
     Kudos kudos = list.get(0);
     compareResults(kudosEntity, kudos);
 
-    list = kudosService.getKudosByPeriodAndReceiver(30, startTime, endTime);
+    list = kudosService.getKudosByPeriodAndReceiver(30, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
-    list = kudosService.getKudosByPeriodAndReceiver(30000, startTime, endTime);
+    list = kudosService.getKudosByPeriodAndReceiver(30000, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -118,130 +120,98 @@ public class KudosServiceTest extends BaseKudosTest {
   }
 
   @Test
-  public void testGetAllKudosByPeriod() {
+  public void testGetKudosByPeriodAndSender() {
     KudosService kudosService = getService(KudosService.class);
     long startTime = getTime(2019, 1, 1);
     long endTime = getCurrentTimeInSeconds();
 
-    List<Kudos> list = kudosService.getAllKudosByPeriod(startTime, endTime);
+    List<Kudos> list = kudosService.getKudosByPeriodAndSender(senderId, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     KudosEntity kudosEntity = newKudos();
 
-    list = kudosService.getAllKudosByPeriod(startTime, endTime);
+    list = kudosService.getKudosByPeriodAndSender(senderId, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
     Kudos kudos = list.get(0);
     compareResults(kudosEntity, kudos);
 
-    list = kudosService.getAllKudosByPeriod(getTime(2019, 1, 1), getTime(2019, 7, 1));
+    list = kudosService.getKudosByPeriodAndSender(30, startTime, endTime, 10);
+    assertNotNull(list);
+    assertEquals(0, list.size());
+
+    list = kudosService.getKudosByPeriodAndSender(30000, startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
 
   @Test
-  public void testGetAllKudosByEntityTypeInCurrentPeriod() {
+  public void testCountKudosByPeriodAndSender() {
+
     KudosService kudosService = getService(KudosService.class);
+    long startTime = getTime(2019, 1, 1);
+    long endTime = getCurrentTimeInSeconds();
 
-    List<Kudos> list = kudosService.getAllKudosByEntityTypeInCurrentPeriod(ENTITY_TYPE);
-    assertNotNull(list);
-    assertEquals(0, list.size());
-
-    KudosEntity kudosEntity = newKudos();
-
-    list = kudosService.getAllKudosByEntityTypeInCurrentPeriod(ENTITY_TYPE);
-    assertNotNull(list);
-    assertEquals(1, list.size());
-
-    Kudos kudos = list.get(0);
-    compareResults(kudosEntity, kudos);
-
-    list = kudosService.getAllKudosByEntityTypeInCurrentPeriod(KudosEntityType.SPACE_TIPTIP.name());
-    assertNotNull(list);
-    assertEquals(0, list.size());
-  }
-
-  @Test
-  public void testGetAllKudosByPeriodOfDate() {
-    KudosService kudosService = getService(KudosService.class);
-    long startTime = getCurrentTimeInSeconds();
-
-    List<Kudos> list = kudosService.getAllKudosByPeriodOfDate(startTime);
-    assertNotNull(list);
-    assertEquals(0, list.size());
-
-    KudosEntity kudosEntity = newKudos();
-
-    list = kudosService.getAllKudosByPeriodOfDate(startTime);
-    assertNotNull(list);
-    assertEquals(1, list.size());
-
-    Kudos kudos = list.get(0);
-    compareResults(kudosEntity, kudos);
-
-    list = kudosService.getAllKudosByPeriodOfDate(getTime(2019, 6, 1));
-    assertNotNull(list);
-    assertEquals(0, list.size());
-  }
-
-  @Test
-  public void testCountKudosBySenderInCurrentPeriod() {
-    KudosService kudosService = getService(KudosService.class);
-
-    long count = kudosService.countKudosBySenderInCurrentPeriod(SENDER_REMOTE_ID);
+    long count = kudosService.countKudosByPeriodAndSender(senderId, startTime, endTime);
     assertEquals(0, count);
 
     newKudos();
 
-    count = kudosService.countKudosBySenderInCurrentPeriod(SENDER_REMOTE_ID);
+    count = kudosService.countKudosByPeriodAndSender(senderId, startTime, endTime);
     assertEquals(1, count);
 
-    count = kudosService.countKudosBySenderInCurrentPeriod("root30");
+    count = kudosService.countKudosByPeriodAndSender(30, startTime, endTime);
+    assertEquals(0, count);
+
+    count = kudosService.countKudosByPeriodAndSender(30000, startTime, endTime);
     assertEquals(0, count);
   }
 
   @Test
-  public void testGetKudosByReceiverInCurrentPeriod() {
+  public void testGetKudosByPeriod() {
     KudosService kudosService = getService(KudosService.class);
+    long startTime = getTime(2019, 1, 1);
+    long endTime = getCurrentTimeInSeconds();
 
-    List<Kudos> list = kudosService.getKudosByReceiverInCurrentPeriod(OrganizationIdentityProvider.NAME, RECEIVER_REMOTE_ID);
+    List<Kudos> list = kudosService.getKudosByPeriod(startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     KudosEntity kudosEntity = newKudos();
 
-    list = kudosService.getKudosByReceiverInCurrentPeriod(OrganizationIdentityProvider.NAME, RECEIVER_REMOTE_ID);
+    list = kudosService.getKudosByPeriod(startTime, endTime, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
     Kudos kudos = list.get(0);
     compareResults(kudosEntity, kudos);
 
-    list = kudosService.getKudosByReceiverInCurrentPeriod(SpaceIdentityProvider.NAME, RECEIVER_REMOTE_ID);
+    list = kudosService.getKudosByPeriod(getTime(2019, 1, 1), getTime(2019, 7, 1), 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
 
   @Test
-  public void testGetAllKudosBySenderInCurrentPeriod() {
+  public void testGetKudosByPeriodOfDate() {
     KudosService kudosService = getService(KudosService.class);
+    long startTime = getCurrentTimeInSeconds();
 
-    List<Kudos> list = kudosService.getAllKudosBySenderInCurrentPeriod(SENDER_REMOTE_ID);
+    List<Kudos> list = kudosService.getKudosByPeriodOfDate(startTime, 10);
     assertNotNull(list);
     assertEquals(0, list.size());
 
     KudosEntity kudosEntity = newKudos();
 
-    list = kudosService.getAllKudosBySenderInCurrentPeriod(SENDER_REMOTE_ID);
+    list = kudosService.getKudosByPeriodOfDate(startTime, 10);
     assertNotNull(list);
     assertEquals(1, list.size());
 
     Kudos kudos = list.get(0);
     compareResults(kudosEntity, kudos);
 
-    list = kudosService.getAllKudosBySenderInCurrentPeriod("root25");
+    list = kudosService.getKudosByPeriodOfDate(getTime(2019, 6, 1), 10);
     assertNotNull(list);
     assertEquals(0, list.size());
   }
@@ -253,26 +223,32 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos kudos = newKudosDTO();
 
     try {
-      kudosService.sendKudos(kudos, RECEIVER_REMOTE_ID);
+      kudosService.createKudos(kudos, RECEIVER_REMOTE_ID);
       fail("Sender shouldn't be able to send kudos to himself");
     } catch (Exception e) {
       // Expected
     }
 
-    // Smae receiver and sender
+    // Same receiver and sender
     try {
       Kudos fakeKudos = newKudosDTO();
       fakeKudos.setReceiverId(SENDER_REMOTE_ID);
-      kudosService.sendKudos(fakeKudos, SENDER_REMOTE_ID);
-      fail("Sender should be the same as sender in DTO");
+      kudosService.createKudos(fakeKudos, SENDER_REMOTE_ID);
+      fail("Sender shouldn't be the same as sender in DTO");
     } catch (Exception e) {
       // Expected
     }
 
-    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
-    List<Kudos> list = kudosService.getKudosByReceiverInCurrentPeriod(OrganizationIdentityProvider.NAME, RECEIVER_REMOTE_ID);
+    KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
+    IdentityManager identityManager = getService(IdentityManager.class);
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER_REMOTE_ID);
+    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(identity.getId()),
+                                                                currentKudosPeriod.getStartDateInSeconds(),
+                                                                currentKudosPeriod.getEndDateInSeconds(),
+                                                                10);
     assertNotNull(list);
     assertEquals(1, list.size());
     Kudos retrievedKudos = list.get(0);
@@ -288,22 +264,61 @@ public class KudosServiceTest extends BaseKudosTest {
   public void testSendKudosToSpace() throws Exception {
     KudosService kudosService = getService(KudosService.class);
 
+    String spaceRemoteId = "space3";
+
     Kudos kudos = newKudosDTO();
     kudos.setReceiverType(SpaceIdentityProvider.NAME);
-    String spaceRemoteId = "space3";
     kudos.setReceiverId(spaceRemoteId);
     kudos.setReceiverIdentityId(null);
 
-    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+    restartTransaction();
+
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
-    List<Kudos> list = kudosService.getKudosByReceiverInCurrentPeriod(SpaceIdentityProvider.NAME, spaceRemoteId);
+    KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
+    IdentityManager identityManager = getService(IdentityManager.class);
+    Identity identity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, spaceRemoteId);
+    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(identity.getId()),
+                                                                currentKudosPeriod.getStartDateInSeconds(),
+                                                                currentKudosPeriod.getEndDateInSeconds(),
+                                                                10);
     assertNotNull(list);
     assertEquals(1, list.size());
     Kudos retrievedKudos = list.get(0);
     assertEquals(kudos, retrievedKudos);
     assertEquals(0, kudos.compareTo(retrievedKudos));
     assertEquals(kudos.hashCode(), retrievedKudos.hashCode());
+  }
+
+  @Test
+  public void testGetKudosByPeriodType() {
+    KudosService kudosService = getService(KudosService.class);
+    long startTime = getCurrentTimeInSeconds();
+
+    try {
+      kudosService.getKudosByPeriod(startTime, null, 10);
+      fail("Shouldn't be able to get kudos list by null period type");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    List<Kudos> list = kudosService.getKudosByPeriod(startTime, KudosPeriodType.WEEK, 10);
+    assertNotNull(list);
+    assertEquals(0, list.size());
+
+    KudosEntity kudosEntity = newKudos();
+
+    list = kudosService.getKudosByPeriod(startTime, KudosPeriodType.WEEK, 10);
+    assertNotNull(list);
+    assertEquals(1, list.size());
+
+    Kudos kudos = list.get(0);
+    compareResults(kudosEntity, kudos);
+
+    list = kudosService.getKudosByPeriod(getTime(2019, 6, 1), KudosPeriodType.WEEK, 10);
+    assertNotNull(list);
+    assertEquals(0, list.size());
   }
 
   @Test
@@ -349,14 +364,14 @@ public class KudosServiceTest extends BaseKudosTest {
       kudosService.saveGlobalSettings(globalSettings);
 
       Kudos kudos = newKudosDTO();
-      kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+      kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
       entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
       Thread.sleep(1000);
 
       try {
-        kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+        kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
         fail("Shouldn't be able to send another Kudos");
       } catch (Exception e) {
         // Expected
@@ -382,7 +397,7 @@ public class KudosServiceTest extends BaseKudosTest {
       kudosService.saveGlobalSettings(globalSettings);
 
       Kudos kudos = newKudosDTO();
-      kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+      kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
       entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
@@ -427,7 +442,7 @@ public class KudosServiceTest extends BaseKudosTest {
     ListenerService listenerService = getService(ListenerService.class);
 
     Kudos kudos = newKudosDTO();
-    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
@@ -438,7 +453,7 @@ public class KudosServiceTest extends BaseKudosTest {
       }
     });
 
-    kudosService.saveKudosActivity(kudos.getTechnicalId(), kudos.getActivityId());
+    kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), kudos.getActivityId());
     assertTrue(listenerInvoked.get());
   }
 
@@ -466,7 +481,7 @@ public class KudosServiceTest extends BaseKudosTest {
 
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
-    kudos = kudosService.sendKudos(kudos, SENDER_REMOTE_ID);
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     entitiesToClean.add(kudos);
 
     kudos = kudosStorage.getKudoById(kudos.getTechnicalId());
