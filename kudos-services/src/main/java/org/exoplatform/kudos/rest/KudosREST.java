@@ -33,6 +33,8 @@ import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.manager.IdentityManager;
 
 import io.swagger.annotations.*;
 
@@ -45,13 +47,226 @@ public class KudosREST implements ResourceContainer {
 
   private KudosService     kudosService;
 
-  public KudosREST(KudosService kudosService) {
+  private IdentityManager  identityManager;
+
+  public KudosREST(IdentityManager identityManager, KudosService kudosService) {
+    this.identityManager = identityManager;
     this.kudosService = kudosService;
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  @ApiOperation(value = "Get Kudos list created in a period contained a selected date in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getAllKudosByPeriodOfDate(@ApiParam(value = "Timestamp in seconds of date in the middle of selected period. If not defined, current time will be used.", required = false) @QueryParam("dateInSeconds") long dateInSeconds,
+                                            @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
+    if (dateInSeconds == 0) {
+      dateInSeconds = System.currentTimeMillis() / 1000;
+    }
+    try {
+      List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriodOfDate(dateInSeconds, getLimit(limit));
+      return Response.ok(allKudosByPeriod).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos list of period with date {}", dateInSeconds, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("byEntity")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get Kudos list by entity type and id", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getEntityKudos(@ApiParam(value = "kudos entity type (for example activity, comment...)", required = true) @QueryParam("entityType") String entityType,
+                                 @ApiParam(value = "kudos entity id", required = true) @QueryParam("entityId") String entityId,
+                                 @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
+    if (StringUtils.isBlank(entityType) || StringUtils.isBlank(entityId)) {
+      LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
+      return Response.status(400).build();
+    }
+    try {
+      List<Kudos> allKudosByEntity = kudosService.getKudosByEntity(entityType, entityId, getLimit(limit));
+      return Response.ok(allKudosByEntity).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("byDates")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("administrators")
+  @ApiOperation(value = "Get Kudos list created between start and end dates in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 403, message = "Unauthorized operation"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getAllKudosByDates(@QueryParam("startDateInSeconds") long startDateInSeconds,
+                                     @QueryParam("endDateInSeconds") long endDateInSeconds,
+                                     @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
+    if (startDateInSeconds == 0 || endDateInSeconds == 0) {
+      LOG.warn("Bad request sent to server with empty 'start or end' dates parameter");
+      return Response.status(400).build();
+    }
+    try {
+      List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriod(startDateInSeconds, endDateInSeconds, getLimit(limit));
+      return Response.ok(allKudosByPeriod).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos list of period: from {} to {}", startDateInSeconds, endDateInSeconds, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("{identityId}/received")
+  @RolesAllowed("users")
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Retrieve the list of received Kudos by a user or space in a selected period", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  public Response getReceivedKudosByPeriod(@ApiParam(value = "User or space identity technical id", required = true) @PathParam("identityId") long identityId,
+                                           @ApiParam(value = "Date in the middle of a period defined using a timestamp in seconds", required = true) @QueryParam("dateInSeconds") long dateInSeconds,
+                                           @ApiParam(value = "Period type, can be: WEEK, MONTH, QUARTER, SEMESTER and YEAR. Default is the same as configured period", required = true) @QueryParam("periodType") String periodType,
+                                           @ApiParam(value = "Limit of kudos to retrieve, if equal to 0, no kudos will be retrieved", required = true) @QueryParam("limit") int limit,
+                                           @ApiParam(value = "Whether return size of received kudos, default = false", required = false) @QueryParam("returnSize") boolean returnSize) {
+    if (identityId <= 0) {
+      return Response.status(400).entity("identityId is mandatory").build();
+    }
+    if (dateInSeconds < 0) {
+      return Response.status(400).entity("dateInSeconds parameter should be a positive number").build();
+    }
+    if (limit < 0) {
+      return Response.status(400).entity("limit parameter should be a positive number").build();
+    }
+    if (!returnSize && limit == 0) {
+      return Response.status(400)
+                     .entity("you should whether use 'limit' to get a list of kudos or 'returnSize' to return the size")
+                     .build();
+    }
+
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    if (identity == null) {
+      return Response.status(400).entity("Can't find identity with id " + identityId).build();
+    }
+
+    if (dateInSeconds == 0) {
+      dateInSeconds = System.currentTimeMillis() / 1000;
+    }
+
+    KudosPeriodType kudosPeriodType = null;
+    if (StringUtils.isBlank(periodType)) {
+      kudosPeriodType = kudosService.getDefaultKudosPeriodType();
+    } else {
+      try {
+        kudosPeriodType = KudosPeriodType.valueOf(periodType.toUpperCase());
+      } catch (Exception e) {
+        return Response.status(400).entity("periodType  '" + periodType + "' is not valid").build();
+      }
+    }
+
+    KudosPeriod period = kudosPeriodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+    KudosList kudosList = new KudosList();
+    if (returnSize) {
+      long size = kudosService.countKudosByPeriodAndReceiver(identityId,
+                                                             period.getStartDateInSeconds(),
+                                                             period.getEndDateInSeconds());
+      kudosList.setSize(size);
+      if (size == 0) {
+        return Response.ok(kudosList).build();
+      }
+    }
+    List<Kudos> kudos = kudosService.getKudosByPeriodAndReceiver(identityId,
+                                                                 period.getStartDateInSeconds(),
+                                                                 period.getEndDateInSeconds(),
+                                                                 getLimit(limit));
+    kudosList.setKudos(kudos);
+    return Response.ok(kudosList).build();
+  }
+
+  @Path("{identityId}/sent")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Retrieve the list of sent Kudos for a user in a selected period", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getSentKudosByPeriod(@ApiParam(value = "User or space identity technical id", required = true) @PathParam("identityId") long identityId,
+                                       @ApiParam(value = "Date in the middle of a period defined using a timestamp in seconds", required = false) @QueryParam("dateInSeconds") long dateInSeconds,
+                                       @ApiParam(value = "Period type, can be: WEEK, MONTH, QUARTER, SEMESTER and YEAR. Default is the same as configured period", required = false) @QueryParam("periodType") String periodType,
+                                       @ApiParam(value = "Limit of kudos to retrieve, if equal to 0, no kudos will be retrieved", required = false) @QueryParam("limit") int limit,
+                                       @ApiParam(value = "Whether return size of sent kudos, default = false", required = false) @QueryParam("returnSize") boolean returnSize) {
+    if (identityId <= 0) {
+      return Response.status(400).entity("identityId is mandatory").build();
+    }
+    if (dateInSeconds < 0) {
+      return Response.status(400).entity("dateInSeconds parameter should be a positive number").build();
+    }
+    if (limit < 0) {
+      return Response.status(400).entity("limit parameter should be a positive number").build();
+    }
+    if (!returnSize && limit == 0) {
+      return Response.status(400)
+                     .entity("you should whether use 'limit' to get a list of kudos or 'returnSize' to return the size")
+                     .build();
+    }
+
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    if (identity == null) {
+      return Response.status(400).entity("Can't find identity with id " + identityId).build();
+    }
+
+    if (dateInSeconds == 0) {
+      dateInSeconds = System.currentTimeMillis() / 1000;
+    }
+
+    KudosPeriodType kudosPeriodType = null;
+    if (StringUtils.isBlank(periodType)) {
+      kudosPeriodType = kudosService.getDefaultKudosPeriodType();
+    } else {
+      try {
+        kudosPeriodType = KudosPeriodType.valueOf(periodType.toUpperCase());
+      } catch (Exception e) {
+        return Response.status(400).entity("periodType  '" + periodType + "' is not valid").build();
+      }
+    }
+
+    KudosPeriod period = kudosPeriodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+    KudosList kudosList = new KudosList();
+    if (returnSize) {
+      long size = kudosService.countKudosByPeriodAndSender(identityId,
+                                                           period.getStartDateInSeconds(),
+                                                           period.getEndDateInSeconds());
+      kudosList.setSize(size);
+      if (size == 0) {
+        return Response.ok(kudosList).build();
+      }
+    }
+    List<Kudos> kudos = kudosService.getKudosByPeriodAndSender(identityId,
+                                                               period.getStartDateInSeconds(),
+                                                               period.getEndDateInSeconds(),
+                                                               getLimit(limit));
+    kudosList.setKudos(kudos);
+    return Response.ok(kudosList).build();
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  @Path("createKudos")
   @RolesAllowed("users")
   @ApiOperation(value = "Creates new Kudos", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
   @ApiResponses(value = {
@@ -78,108 +293,10 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       kudos.setSenderId(getCurrentUserId());
-      kudosService.sendKudos(kudos, getCurrentUserId());
+      kudosService.createKudos(kudos, getCurrentUserId());
       return Response.noContent().build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @Path("getKudos")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @ApiOperation(value = "Get Kudos list by sender login in current period", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getKudos(@ApiParam(value = "kudos sender user login", required = true) @QueryParam("senderId") String senderId) {
-    if (StringUtils.isBlank(senderId)) {
-      LOG.warn("Bad request sent to server with empty 'identity id'");
-      return Response.status(400).build();
-    }
-    try {
-      List<Kudos> allKudosBySender = kudosService.getAllKudosBySenderInCurrentPeriod(senderId);
-      return Response.ok(allKudosBySender).build();
-    } catch (Exception e) {
-      LOG.warn("Error getting kudos list of identity {}", senderId, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @Path("getEntityKudos")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @ApiOperation(value = "Get Kudos list by entity type and id", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getEntityKudos(@ApiParam(value = "kudos entity type (for example activity, comment...)", required = true) @QueryParam("entityType") String entityType,
-                                 @ApiParam(value = "kudos entity id", required = true) @QueryParam("entityId") String entityId) {
-    if (StringUtils.isBlank(entityType) || StringUtils.isBlank(entityId)) {
-      LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
-      return Response.status(400).build();
-    }
-    try {
-      List<Kudos> allKudosByEntity = kudosService.getAllKudosByEntity(entityType, entityId);
-      return Response.ok(allKudosByEntity).build();
-    } catch (Exception e) {
-      LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @Path("getAllKudosByPeriod")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
-  @ApiOperation(value = "Get Kudos list created between start and end dates in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getAllKudosByPeriod(@QueryParam("startDateInSeconds") long startDateInSeconds,
-                                      @QueryParam("endDateInSeconds") long endDateInSeconds) {
-    if (startDateInSeconds == 0 || endDateInSeconds == 0) {
-      LOG.warn("Bad request sent to server with empty 'start or end' dates parameter");
-      return Response.status(400).build();
-    }
-    try {
-      List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriod(startDateInSeconds, endDateInSeconds);
-      return Response.ok(allKudosByPeriod).build();
-    } catch (Exception e) {
-      LOG.warn("Error getting kudos list of period: from {} to {}", startDateInSeconds, endDateInSeconds, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @Path("getAllKudosByPeriodOfDate")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
-  @ApiOperation(value = "Get Kudos list created in a period contained a selected date in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getAllKudosByPeriodOfDate(@QueryParam("dateInSeconds") long dateInSeconds) {
-    if (dateInSeconds == 0) {
-      LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
-      return Response.status(400).build();
-    }
-    try {
-      List<Kudos> allKudosByPeriod = kudosService.getAllKudosByPeriodOfDate(dateInSeconds);
-      return Response.ok(allKudosByPeriod).build();
-    } catch (Exception e) {
-      LOG.warn("Error getting kudos list of period with date {}", dateInSeconds, e);
       return Response.serverError().build();
     }
   }
@@ -188,7 +305,7 @@ public class KudosREST implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Get Kudos period of time by computing it using periodType and a selected date", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns KudosPeriod object")
+  @ApiOperation(value = "Get Kudos period of time by computing it using period type and a selected date", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns Kudos period object")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request fulfilled"),
       @ApiResponse(code = 400, message = "Invalid query input"),
@@ -211,5 +328,12 @@ public class KudosREST implements ResourceContainer {
       LOG.warn("Error getting period dates of type {} and date {}", periodType, dateInSeconds, e);
       return Response.serverError().build();
     }
+  }
+
+  private int getLimit(int limit) {
+    if (limit <= 0) {
+      limit = 1000;
+    }
+    return limit;
   }
 }

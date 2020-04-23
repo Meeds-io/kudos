@@ -4,13 +4,13 @@ import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.*;
 
-import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.*;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
@@ -40,21 +40,22 @@ public abstract class BaseKudosTest {
 
   @BeforeClass
   public static void beforeTest() {
-    container = PortalContainer.getInstance();
+    RootContainer rootContainer = RootContainer.getInstance();
+    container = rootContainer.getPortalContainer("portal");
     assertNotNull("Container shouldn't be null", container);
     assertTrue("Container should have been started", container.isStarted());
   }
 
   @Before
   public void beforeMethodTest() {
-    RequestLifeCycle.begin(container);
+    begin();
   }
 
   @After
   public void afterMethodTest() {
     KudosDAO kudosDAO = getService(KudosDAO.class);
 
-    RequestLifeCycle.end();
+    end();
     RequestLifeCycle.begin(container);
 
     if (!entitiesToClean.isEmpty()) {
@@ -78,7 +79,7 @@ public abstract class BaseKudosTest {
                  0,
                  kudosCount);
 
-    RequestLifeCycle.end();
+    end();
   }
 
   protected <T> T getService(Class<T> componentType) {
@@ -134,9 +135,28 @@ public abstract class BaseKudosTest {
     return kudosEntity;
   }
 
+  protected void restartTransaction() {
+    int i = 0;
+    // Close transactions until no encapsulated transaction
+    boolean success = true;
+    do {
+      try {
+        end();
+        i++;
+      } catch (IllegalStateException e) {
+        success = false;
+      }
+    } while (success);
+
+    // Restart transactions with the same number of encapsulations
+    for (int j = 0; j < i; j++) {
+      begin();
+    }
+  }
+
   protected void compareResults(KudosEntity kudosEntity, Kudos kudos) {
     assertEquals(kudosEntity.getActivityId(), kudos.getActivityId());
-    assertEquals(kudosEntity.getCreatedDate(), kudos.getTime().atZone(ZoneOffset.systemDefault()).toEpochSecond());
+    assertEquals(kudosEntity.getCreatedDate(), kudos.getTime().atZone(ZoneId.systemDefault()).toEpochSecond());
     assertEquals(String.valueOf(kudosEntity.getEntityId()), kudos.getEntityId());
     assertEquals(kudosEntity.getEntityType(), KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
     assertEquals(kudosEntity.getId(), kudos.getTechnicalId());
@@ -147,11 +167,20 @@ public abstract class BaseKudosTest {
   }
 
   protected long getTime(int year, int month, int day) {
-    return LocalDate.of(year, month, day).atStartOfDay(ZoneOffset.systemDefault()).toEpochSecond();
+    return LocalDate.of(year, month, day).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
   }
 
   protected long getCurrentTimeInSeconds() {
     return System.currentTimeMillis() / 1000 + 10;
+  }
+
+  protected void begin() {
+    ExoContainerContext.setCurrentContainer(container);
+    RequestLifeCycle.begin(container);
+  }
+
+  protected void end() {
+    RequestLifeCycle.end();
   }
 
 }

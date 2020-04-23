@@ -201,7 +201,7 @@ public class Utils {
   }
 
   public static long timeToSeconds(LocalDateTime time) {
-    return time.atZone(ZoneOffset.systemDefault()).toEpochSecond();
+    return time.atZone(ZoneId.systemDefault()).toEpochSecond();
   }
 
   public static KudosPeriod getCurrentPeriod(GlobalSettings globalSettings) {
@@ -210,10 +210,15 @@ public class Utils {
 
   public static Identity getIdentityByTypeAndId(String type, String name) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    return identityManager.getOrCreateIdentity(type, name, true);
+    return identityManager.getOrCreateIdentity(type, name);
   }
 
   public static KudosPeriod getPeriodOfTime(GlobalSettings globalSettings, LocalDateTime localDateTime) {
+    KudosPeriodType kudosPeriodType = getPeriodType(globalSettings);
+    return kudosPeriodType.getPeriodOfTime(localDateTime);
+  }
+
+  public static KudosPeriodType getPeriodType(GlobalSettings globalSettings) {
     KudosPeriodType kudosPeriodType = null;
     if (globalSettings == null || globalSettings.getKudosPeriodType() == null) {
       LOG.warn("Provided globalSettings doesn't have a parametred kudos period type, using MONTH period type: " + globalSettings,
@@ -222,7 +227,7 @@ public class Utils {
     } else {
       kudosPeriodType = globalSettings.getKudosPeriodType();
     }
-    return kudosPeriodType.getPeriodOfTime(localDateTime);
+    return kudosPeriodType;
   }
 
   private static String getIdentityIdByType(Identity receiverIdentity) {

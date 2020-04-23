@@ -82,7 +82,7 @@ public class KudosAccountREST implements ResourceContainer {
       return Response.status(400).build();
     }
     try {
-      if (kudosService.isAuthorized(username)) {
+      if (kudosService.isAuthorizedOnKudosModule(username)) {
         return Response.ok().build();
       } else {
         return Response.status(403).build();

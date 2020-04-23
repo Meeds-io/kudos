@@ -62,8 +62,8 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     Calendar cal = Calendar.getInstance();
     cal.setTimeInMillis(notification.getLastModifiedDate());
     templateContext.put("READ",
-                        Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"
-                                                                                                                              : "unread");
+                        Boolean.parseBoolean(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"
+                                                                                                                                   : "unread");
     templateContext.put("NOTIFICATION_ID", notification.getId());
     templateContext.put("LAST_UPDATED_TIME",
                         TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(),
@@ -73,8 +73,7 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
 
     Identity senderIdentity = Utils.getIdentityManager()
                                    .getOrCreateIdentity(OrganizationIdentityProvider.NAME,
-                                                        notification.getValueOwnerParameter("SENDER_ID"),
-                                                        true);
+                                                        notification.getValueOwnerParameter("SENDER_ID"));
     String receiverType = notification.getValueOwnerParameter("RECEIVER_TYPE");
     if (SPACE_ACCOUNT_TYPE.equals(receiverType)) {
       String receiverId = notification.getValueOwnerParameter("RECEIVER_ID");

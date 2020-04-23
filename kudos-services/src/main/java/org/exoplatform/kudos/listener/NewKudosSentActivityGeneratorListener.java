@@ -65,7 +65,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         }
         ExoSocialActivity activityComment = createActivity(kudos, parentCommentId);
         activityStorage.saveComment(activity, activityComment);
-        kudosService.saveKudosActivity(kudos.getTechnicalId(), getActivityId(activityComment.getId()));
+        kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), getActivityId(activityComment.getId()));
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
@@ -76,12 +76,12 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         providerId = SpaceIdentityProvider.NAME;
       }
 
-      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, kudos.getReceiverId(), true);
+      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, kudos.getReceiverId());
       if (owner == null) {
         LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), kudos.getReceiverId());
       } else {
         activityStorage.saveActivity(owner, activity);
-        kudosService.saveKudosActivity(kudos.getTechnicalId(), getActivityId(activity.getId()));
+        kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), getActivityId(activity.getId()));
       }
     }
   }

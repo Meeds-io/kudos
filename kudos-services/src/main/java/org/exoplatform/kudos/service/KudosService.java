@@ -31,8 +31,7 @@ import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.statistic.ExoKudosStatistic;
 import org.exoplatform.kudos.statistic.ExoKudosStatisticService;
 import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -43,19 +42,18 @@ import org.exoplatform.social.core.space.spi.SpaceService;
  * A service to manage kudos
  */
 public class KudosService implements ExoKudosStatisticService, Startable {
-  private static final Log LOG = ExoLogger.getLogger(KudosService.class);
 
-  private IdentityManager  identityManager;
+  private IdentityManager identityManager;
 
-  private SpaceService     spaceService;
+  private SpaceService    spaceService;
 
-  private ListenerService  listenerService;
+  private ListenerService listenerService;
 
-  private KudosStorage     kudosStorage;
+  private KudosStorage    kudosStorage;
 
-  private SettingService   settingService;
+  private SettingService  settingService;
 
-  private GlobalSettings   globalSettings;
+  private GlobalSettings  globalSettings;
 
   public KudosService(KudosStorage kudosStorage,
                       SettingService settingService,
@@ -96,43 +94,69 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   }
 
   /**
+   * @return {@link GlobalSettings} of Kudos module
+   */
+  public GlobalSettings getGlobalSettings() {
+    if (this.globalSettings == null) {
+      this.globalSettings = loadGlobalSettings();
+    }
+    return this.globalSettings;
+  }
+
+  /**
+   * Stores new parameters of Kudos module
+   * 
+   * @param settings {@link GlobalSettings}
+   */
+  public void saveGlobalSettings(GlobalSettings settings) {
+    settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toStringToPersist()));
+    this.globalSettings = null;
+  }
+
+  /**
    * @param username username to get its settings
    * @return kudos settings of a user
    */
   public AccountSettings getAccountSettings(String username) {
     AccountSettings accountSettings = new AccountSettings();
 
-    if (!isAuthorized(username)) {
+    if (!isAuthorizedOnKudosModule(username)) {
       accountSettings.setDisabled(true);
       return accountSettings;
     }
-    long sentKudos = countKudosBySenderInCurrentPeriod(username);
-    accountSettings.setRemainingKudos(getKudosPerPeriod() - sentKudos);
+
+    Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, username);
+    long senderIdentityId = Long.parseLong(senderIdentity.getId());
+    long sentKudos = kudosStorage.countKudosByPeriodAndSender(getCurrentKudosPeriod(), senderIdentityId);
+    accountSettings.setRemainingKudos(getAllowedKudosPerPeriod() - sentKudos);
     return accountSettings;
   }
 
-  public void saveKudosActivity(long kudosId, long activityId) throws Exception {
-    kudosStorage.saveKudosActivityId(kudosId, activityId);
-    Kudos kudos = kudosStorage.getKudoById(kudosId);
-    listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
-  }
-
+  /**
+   * Create a new Kudos sent by current user
+   * 
+   * @param kudos {@link Kudos} to create
+   * @param currentUser username of current user
+   * @return created {@link Kudos}
+   * @throws Exception when receiver or sender aren't allowed.
+   */
   @ExoKudosStatistic(local = true, service = "kudos", operation = "create_kudos")
-  public Kudos sendKudos(Kudos kudos, String senderId) throws Exception {
-    if (!StringUtils.equals(senderId, kudos.getSenderId())) {
-      throw new IllegalAccessException("User with id '" + senderId + "' is not authorized to send kudos on behalf of "
+  public Kudos createKudos(Kudos kudos, String currentUser) throws Exception {
+    if (!StringUtils.equals(currentUser, kudos.getSenderId())) {
+      throw new IllegalAccessException("User with id '" + currentUser + "' is not authorized to send kudos on behalf of "
           + kudos.getSenderId());
     }
-    if (StringUtils.equals(senderId, kudos.getReceiverId())) {
-      throw new IllegalAccessException("User with username '" + senderId + "' is not authorized to send kudos to himseld!");
+    if (StringUtils.equals(currentUser, kudos.getReceiverId())) {
+      throw new IllegalAccessException("User with username '" + currentUser + "' is not authorized to send kudos to himseld!");
     }
     KudosPeriod currentPeriod = getCurrentKudosPeriod();
 
-    if (kudosStorage.countKudosByPeriodAndSender(currentPeriod, senderId) >= getKudosPerPeriod()) {
-      throw new IllegalAccessException("User having username'" + senderId + "' is not authorized to send more kudos");
+    Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, currentUser);
+    long senderIdentityId = Long.parseLong(senderIdentity.getId());
+    if (kudosStorage.countKudosByPeriodAndSender(currentPeriod, senderIdentityId) >= getAllowedKudosPerPeriod()) {
+      throw new IllegalAccessException("User having username'" + currentUser + "' is not authorized to send more kudos");
     }
 
-    Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, senderId);
     if (kudos.getSenderIdentityId() == null) {
       kudos.setSenderIdentityId(senderIdentity.getId());
     }
@@ -154,32 +178,117 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     return kudos;
   }
 
-  public List<Kudos> getAllKudosByPeriod(long startDateInSeconds, long endDateInSeconds) {
+  /**
+   * Stores generated activity for created {@link Kudos}
+   * 
+   * @param kudosId {@link Kudos} technical identifier
+   * @param activityId {@link ExoSocialActivity} technical identifier
+   * @throws Exception when an error happens when broadcasting event or saving
+   *           activityId of Kudos
+   */
+  public void updateKudosGeneratedActivityId(long kudosId, long activityId) throws Exception {
+    kudosStorage.saveKudosActivityId(kudosId, activityId);
+    Kudos kudos = kudosStorage.getKudoById(kudosId);
+    listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+  }
+
+  /**
+   * Retrieves the list of kudos sent in a period of time.
+   * 
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosByPeriod(long startDateInSeconds, long endDateInSeconds, int limit) {
     KudosPeriod period = new KudosPeriod(startDateInSeconds, endDateInSeconds);
-    return kudosStorage.getAllKudosByPeriod(period);
+    return kudosStorage.getKudosByPeriod(period, limit);
   }
 
-  public List<Kudos> getAllKudosByPeriodOfDate(long dateInSeconds) {
-    KudosPeriod period = getKudosPeriodOfTime(dateInSeconds);
-    return kudosStorage.getAllKudosByPeriod(period);
-  }
-
-  public List<Kudos> getAllKudosByEntity(String entityType, String entityId) {
-    return kudosStorage.getAllKudosByEntity(entityType, entityId);
-  }
-
-  public List<Kudos> getAllKudosByEntityTypeInCurrentPeriod(String entityType) {
-    return kudosStorage.getAllKudosByPeriodAndEntityType(getCurrentKudosPeriod(), entityType);
-  }
-
-  public List<Kudos> getAllKudosBySenderInCurrentPeriod(String identityId) {
-    List<Kudos> kudosBySender = kudosStorage.getKudosByPeriodAndSender(getCurrentKudosPeriod(), identityId);
-    if (kudosBySender != null) {
-      Collections.sort(kudosBySender);
+  /**
+   * Retrieves the list of kudos sent in a period of time.
+   * 
+   * @param dateInSeconds timestamp in seconds
+   * @param periodType {@link KudosPeriodType} used to compute real start and
+   *          end dates of period
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosByPeriod(long dateInSeconds, KudosPeriodType periodType, int limit) {
+    if (periodType == null) {
+      throw new IllegalArgumentException("'periodType' is mandatory");
     }
-    return kudosBySender;
+    KudosPeriod period = periodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+    return kudosStorage.getKudosByPeriod(period, limit);
   }
 
+  /**
+   * Retrieves the list of kudos sent in a period of time. Configured Period
+   * Type is retrieved from {@link GlobalSettings}
+   * 
+   * @param dateInSeconds timestamp in seconds to compute real start and end
+   *          dates of period
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosByPeriodOfDate(long dateInSeconds, int limit) {
+    KudosPeriod period = getKudosPeriodOfTime(dateInSeconds);
+    return kudosStorage.getKudosByPeriod(period, limit);
+  }
+
+  /**
+   * Retrieves a list of kudos sent using a dedicated entity (activity, comment,
+   * profile header, tiptip...)
+   * 
+   * @param entityType entity type of type {@link KudosEntityType}
+   * @param entityId entity technical id
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosByEntity(String entityType, String entityId, int limit) {
+    return kudosStorage.getKudosByEntity(entityType, entityId, limit);
+  }
+
+  /**
+   * Count kudos received by an identity in a period of time
+   * 
+   * @param senderIdentityId {@link Identity} technical id
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @return 0 id identity not found, else kudos count
+   */
+  public long countKudosByPeriodAndSender(long senderIdentityId,
+                                          long startDateInSeconds,
+                                          long endDateInSeconds) {
+    KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    return kudosStorage.countKudosByPeriodAndSender(kudosPeriod, senderIdentityId);
+  }
+
+  /**
+   * Retrieves Kudos list by sender identity Id
+   * 
+   * @param senderIdentityId {@link Identity} technical id of sender
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosByPeriodAndSender(long senderIdentityId,
+                                               long startDateInSeconds,
+                                               long endDateInSeconds,
+                                               int limit) {
+    KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    return kudosStorage.getKudosByPeriodAndSender(kudosPeriod, senderIdentityId, limit);
+  }
+
+  /**
+   * Count kudos received by an identity in a period of time
+   * 
+   * @param identityId {@link Identity} technical id
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @return 0 id identity not found, else kudos count
+   */
   public long countKudosByPeriodAndReceiver(long identityId,
                                             long startDateInSeconds,
                                             long endDateInSeconds) {
@@ -191,49 +300,26 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     return kudosStorage.countKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId());
   }
 
+  /**
+   * Retrieves kudos received by an identity in a period of time
+   * 
+   * @param identityId {@link Identity} technical id
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @param limit limit of results size to retrieve
+   * @return {@link List} of {@link Kudos}. An empty list will be returned if
+   *         the identity is not found.
+   */
   public List<Kudos> getKudosByPeriodAndReceiver(long identityId,
                                                  long startDateInSeconds,
-                                                 long endDateInSeconds) {
+                                                 long endDateInSeconds,
+                                                 int limit) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
     Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
     if (identity == null) {
       return Collections.emptyList();
     }
-    return kudosStorage.getKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId());
-  }
-
-  public List<Kudos> getKudosByReceiverInCurrentPeriod(String receiverType, String receiverId) {
-    List<Kudos> kudosList = kudosStorage.getKudosByPeriodAndReceiver(getCurrentKudosPeriod(), receiverType, receiverId);
-    if (kudosList != null) {
-      Collections.sort(kudosList);
-    }
-    return kudosList;
-  }
-
-  public long countKudosBySenderInCurrentPeriod(String senderId) {
-    return kudosStorage.countKudosByPeriodAndSender(getCurrentKudosPeriod(), senderId);
-  }
-
-  public void saveGlobalSettings(GlobalSettings settings) {
-    settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toStringToPersist()));
-    this.globalSettings = null;
-  }
-
-  public GlobalSettings getGlobalSettings() {
-    if (this.globalSettings == null) {
-      this.globalSettings = loadGlobalSettings();
-    }
-    return this.globalSettings;
-  }
-
-  public long getKudosPerPeriod() {
-    GlobalSettings storedGlobalSettings = getGlobalSettings();
-    return storedGlobalSettings == null ? 0 : storedGlobalSettings.getKudosPerPeriod();
-  }
-
-  public String getAccessPermission() {
-    GlobalSettings storedGlobalSettings = getGlobalSettings();
-    return storedGlobalSettings == null ? null : storedGlobalSettings.getAccessPermission();
+    return kudosStorage.getKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId(), limit);
   }
 
   /**
@@ -242,7 +328,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    * @param username username to check
    * @return true if authorised else return false
    */
-  public boolean isAuthorized(String username) {
+  public boolean isAuthorizedOnKudosModule(String username) {
     if (StringUtils.isBlank(username)) {
       return false;
     }
@@ -273,41 +359,58 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     String issuer = (String) methodArgs[methodArgs.length - 1];
     if (StringUtils.isNotBlank(issuer)) {
       Identity identity = getIdentityByTypeAndId(OrganizationIdentityProvider.NAME, issuer);
-      if (identity == null) {
-        LOG.debug("Can't find identity with remote id: {}" + issuer);
-      } else {
+      if (identity != null) {
         parameters.put("user_social_id", identity.getId());
       }
     }
     return parameters;
   }
 
-  private KudosPeriod getCurrentKudosPeriod() {
+  public KudosPeriodType getDefaultKudosPeriodType() {
+    return getPeriodType(getGlobalSettings());
+  }
+
+  public KudosPeriod getCurrentKudosPeriod() {
     return getCurrentPeriod(getGlobalSettings());
   }
 
-  private KudosPeriod getKudosPeriodOfTime(long dateInSeconds) {
+  public KudosPeriod getKudosPeriodOfTime(long dateInSeconds) {
     return getPeriodOfTime(getGlobalSettings(), timeFromSeconds(dateInSeconds));
+  }
+
+  public KudosPeriod getKudosPeriodOfTime(KudosPeriodType periodType, long dateInSeconds) {
+    return periodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
   }
 
   private Object checkStatusAndGetReceiver(String type, String id) {
     if (USER_ACCOUNT_TYPE.equals(type) || OrganizationIdentityProvider.NAME.equals(type)) {
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id, true);
+      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, id);
       if (identity == null || !identity.isEnable() || identity.isDeleted()) {
-        throw new IllegalStateException("User '" + id + "' doesn't have a valid and enabled social identity");
+        throw new IllegalStateException("User with identity id '" + id + "' doesn't have a valid and enabled social identity");
       }
-      if (!isAuthorized(id)) {
-        throw new IllegalStateException("User '" + id + "' isn't member of authorized group to send/receive kudos: "
+      if (!isAuthorizedOnKudosModule(id)) {
+        throw new IllegalStateException("User with identity id '" + id
+            + "' isn't member of authorized group to send/receive kudos: "
             + getAccessPermission());
       }
       return identity;
     } else {
       Space space = getSpace(id);
       if (space == null) {
-        throw new IllegalStateException("Space '" + id + "' wasn't found, thus it can't receive/send kudos");
+        throw new IllegalStateException("Space with id '" + id + "' wasn't found, thus it can't receive/send kudos");
       }
       return space;
     }
+  }
+
+  private long getAllowedKudosPerPeriod() {
+    GlobalSettings storedGlobalSettings = getGlobalSettings();
+    return storedGlobalSettings == null ? 0 : storedGlobalSettings.getKudosPerPeriod();
+  }
+
+  private String getAccessPermission() {
+    GlobalSettings storedGlobalSettings = getGlobalSettings();
+    return storedGlobalSettings == null ? null : storedGlobalSettings.getAccessPermission();
   }
 
   private GlobalSettings loadGlobalSettings() {

@@ -13,23 +13,29 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @DynamicUpdate
 @Table(name = "ADDONS_KUDOS")
 @NamedQueries({
-    @NamedQuery(name = "Kudos.getAllKudosByPeriod", query = "select k from Kudos k" + " where k.createdDate > :startDate"
-        + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.getAllKudosByPeriodAndEntityType", query = "select k from Kudos k"
-        + " where k.entityType = :entityType" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.getAllKudosByEntity", query = "select k from Kudos k" + " where k.entityType = :entityType"
-        + " AND k.entityId = :entityId"),
-    @NamedQuery(name = "Kudos.getAllKudosByParentEntity", query = "select k from Kudos k" + " where k.entityType = :entityType"
+    @NamedQuery(name = "Kudos.getKudosByPeriod", query = "select k from Kudos k" + " WHERE k.createdDate > :startDate"
+        + " AND k.createdDate < :endDate"
+        + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(name = "Kudos.getKudosByPeriodAndEntityType", query = "select k from Kudos k"
+        + " where k.entityType = :entityType" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"
+        + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(name = "Kudos.getKudosByEntity", query = "select k from Kudos k" + " WHERE k.entityType = :entityType"
+        + " AND k.entityId = :entityId"
+        + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(name = "Kudos.getKudosByParentEntity", query = "select k from Kudos k" + " WHERE k.entityType = :entityType"
         + " AND (k.parentEntityId = :parentEntityId "
-        + " OR k.entityId = :parentEntityId)"),
-    @NamedQuery(name = "Kudos.getKudosByPeriodAndSender", query = "select k from Kudos k" + " where k.senderId = :senderId"
-        + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
+        + " OR k.entityId = :parentEntityId)"
+        + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(name = "Kudos.getKudosByPeriodAndSender", query = "select k from Kudos k" + " WHERE k.senderId = :senderId"
+        + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"
+        + " ORDER BY k.createdDate DESC"),
     @NamedQuery(name = "Kudos.countKudosByPeriodAndSender", query = "select count(k) from Kudos k"
-        + " where k.senderId = :senderId" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
-    @NamedQuery(name = "Kudos.getKudosByPeriodAndReceiver", query = "select k from Kudos k" + " where k.receiverId = :receiverId"
-        + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
+        + " WHERE k.senderId = :senderId" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
+    @NamedQuery(name = "Kudos.getKudosByPeriodAndReceiver", query = "select k from Kudos k" + " WHERE k.receiverId = :receiverId"
+        + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"
+        + " ORDER BY k.createdDate DESC"),
     @NamedQuery(name = "Kudos.countKudosByPeriodAndReceiver", query = "select count(k) from Kudos k"
-        + " where k.receiverId = :receiverId"
+        + " WHERE k.receiverId = :receiverId"
         + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate") })
 public class KudosEntity implements Serializable {
 
