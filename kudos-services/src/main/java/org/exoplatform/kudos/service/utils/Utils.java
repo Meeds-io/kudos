@@ -132,7 +132,7 @@ public class Utils {
       kudos.setParentEntityId(String.valueOf(kudosEntity.getParentEntityId()));
     }
     kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
-    kudos.setTime(timeFromSeconds(kudosEntity.getCreatedDate()));
+    kudos.setTimeInSeconds(kudosEntity.getCreatedDate());
 
     if (kudosEntity.isReceiverUser()) {
       Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
@@ -192,7 +192,7 @@ public class Utils {
         || USER_ACCOUNT_TYPE.equals(kudos.getReceiverType());
     kudosEntity.setReceiverUser(isReceiverUser);
     kudosEntity.setReceiverId(Long.parseLong(kudos.getReceiverIdentityId()));
-    kudosEntity.setCreatedDate(timeToSeconds(kudos.getTime()));
+    kudosEntity.setCreatedDate(kudos.getTimeInSeconds());
     return kudosEntity;
   }
 

@@ -1,9 +1,5 @@
-<template>
-  <span></span>
-</template>
-
 <script>
-import {getAllKudosByPeriod, getAllKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions} from '../js/Kudos.js';
+import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions} from '../../js/Kudos.js';
 
 export default {
   created() {
@@ -70,9 +66,9 @@ export default {
     },
     getKudosByDate(detail) {
       if(detail.date) {
-        return getAllKudosByPeriodOfDate(detail.date);
+        return getKudosByPeriodOfDate(detail.date);
       } else {
-        return getAllKudosByPeriod(detail.startDate, detail.endDate);
+        return getKudosByPeriod(detail.startDate, detail.endDate);
       }
     },
     initTiptip() {

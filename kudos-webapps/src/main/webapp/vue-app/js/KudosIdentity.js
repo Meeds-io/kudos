@@ -27,7 +27,7 @@ export function getReceiver(entityType, entityId) {
         if (activityDetails && activityDetails.owner && activityDetails.owner.href) {
           isSpace = activityDetails.owner.href.indexOf('/spaces/') >= 0;
           ownerType = isSpace ? 'space' : 'user';
-          let remoteId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
+          const remoteId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
           ownerId = remoteId;
           return getIdentityDetails(ownerId, ownerType, remoteId);
         } else {

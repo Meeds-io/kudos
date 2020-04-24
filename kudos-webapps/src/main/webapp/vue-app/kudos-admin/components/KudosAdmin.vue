@@ -140,15 +140,10 @@
 </template>
 
 <script>
-import KudosList from './KudosList.vue';
-
-import {initSettings, saveSettings} from '../js/KudosSettings.js';
-import {searchSpaces} from '../js/KudosIdentity.js';
+import {initSettings, saveSettings} from '../../js/KudosSettings.js';
+import {searchSpaces} from '../../js/KudosIdentity.js';
 
 export default {
-  components: {
-    KudosList
-  },
   data: vm => {
     return {
       loading: false,
@@ -247,6 +242,7 @@ export default {
                 }
               });
           }
+          document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
         })
         .catch(e => {
           this.error = e;

@@ -10,7 +10,7 @@
      <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
      <init-param>
       <name>portlet-view-dispatched-file-path</name>
-      <value>/kudos.jsp</value>
+      <value>/WEB-INF/pages/kudos.html</value>
      </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>
@@ -25,12 +25,32 @@
    </portlet>
 
    <portlet>
+     <portlet-name>KudosOverview</portlet-name>
+     <display-name xml:lang="EN">Kudos Overview Application</display-name>
+     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+     <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/WEB-INF/pages/kudosOverview.html</value>
+     </init-param>
+     <expiration-cache>-1</expiration-cache>
+     <cache-scope>PUBLIC</cache-scope>
+     <supports>
+       <mime-type>text/html</mime-type>
+     </supports>
+     <supported-locale>en</supported-locale>
+     <portlet-info>
+       <title>Kudos Overview Application</title>
+       <keywords>Kudos Overview Application</keywords>
+     </portlet-info>
+   </portlet>
+
+   <portlet>
      <portlet-name>KudosAdmin</portlet-name>
      <display-name xml:lang="EN">Kudos Application Administration</display-name>
      <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
      <init-param>
       <name>portlet-view-dispatched-file-path</name>
-      <value>/kudosAdmin.html</value>
+      <value>/WEB-INF/pages/kudosAdmin.html</value>
      </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>
