@@ -62,8 +62,8 @@ public class KudosREST implements ResourceContainer {
       @ApiResponse(code = 200, message = "Request fulfilled"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getAllKudosByPeriodOfDate(@ApiParam(value = "Timestamp in seconds of date in the middle of selected period. If not defined, current time will be used.", required = false) @QueryParam("dateInSeconds") long dateInSeconds,
-                                            @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
+  public Response getKudosByPeriodOfDate(@ApiParam(value = "Timestamp in seconds of date in the middle of selected period. If not defined, current time will be used.", required = false) @QueryParam("dateInSeconds") long dateInSeconds,
+                                         @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
     if (dateInSeconds == 0) {
       dateInSeconds = System.currentTimeMillis() / 1000;
     }
@@ -112,9 +112,9 @@ public class KudosREST implements ResourceContainer {
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 403, message = "Unauthorized operation"),
       @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getAllKudosByDates(@QueryParam("startDateInSeconds") long startDateInSeconds,
-                                     @QueryParam("endDateInSeconds") long endDateInSeconds,
-                                     @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
+  public Response getKudosByDates(@QueryParam("startDateInSeconds") long startDateInSeconds,
+                                  @QueryParam("endDateInSeconds") long endDateInSeconds,
+                                  @ApiParam(value = "Limit of results to return", required = false) @QueryParam("limit") int limit) {
     if (startDateInSeconds == 0 || endDateInSeconds == 0) {
       LOG.warn("Bad request sent to server with empty 'start or end' dates parameter");
       return Response.status(400).build();
@@ -185,7 +185,7 @@ public class KudosREST implements ResourceContainer {
                                                              period.getStartDateInSeconds(),
                                                              period.getEndDateInSeconds());
       kudosList.setSize(size);
-      if (size == 0) {
+      if (size == 0 || limit == 0) {
         return Response.ok(kudosList).build();
       }
     }
@@ -253,10 +253,11 @@ public class KudosREST implements ResourceContainer {
                                                            period.getStartDateInSeconds(),
                                                            period.getEndDateInSeconds());
       kudosList.setSize(size);
-      if (size == 0) {
+      if (size == 0 || limit == 0) {
         return Response.ok(kudosList).build();
       }
     }
+
     List<Kudos> kudos = kudosService.getKudosByPeriodAndSender(identityId,
                                                                period.getStartDateInSeconds(),
                                                                period.getEndDateInSeconds(),
@@ -301,7 +302,7 @@ public class KudosREST implements ResourceContainer {
     }
   }
 
-  @Path("getPeriodDates")
+  @Path("period")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
@@ -311,7 +312,8 @@ public class KudosREST implements ResourceContainer {
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 403, message = "Unauthorized operation"),
       @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getPeriodDates(@QueryParam("periodType") String periodType, @QueryParam("dateInSeconds") long dateInSeconds) {
+  public Response getPeriodDates(@ApiParam(value = "Period type, can be: WEEK, MONTH, QUARTER, SEMESTER and YEAR. Default is the same as configured period", required = false) @QueryParam("periodType") String periodType,
+                                 @ApiParam(value = "Date in the middle of a period defined using a timestamp in seconds", required = false) @QueryParam("dateInSeconds") long dateInSeconds) {
     if (dateInSeconds == 0) {
       LOG.warn("Bad request sent to server with empty 'dateInSeconds' parameter");
       return Response.status(400).build();

@@ -253,7 +253,8 @@ public class KudosServiceTest extends BaseKudosTest {
     assertEquals(1, list.size());
     Kudos retrievedKudos = list.get(0);
     assertEquals(kudos, retrievedKudos);
-    assertEquals(0, kudos.compareTo(retrievedKudos));
+    assertEquals(kudos.getTechnicalId(), retrievedKudos.getTechnicalId());
+    assertEquals(kudos.getTimeInSeconds(), retrievedKudos.getTimeInSeconds());
     assertEquals(kudos.hashCode(), retrievedKudos.hashCode());
     assertNotNull(kudos.toString());
     assertTrue(kudos.toString().contains(SENDER_REMOTE_ID));
@@ -287,7 +288,8 @@ public class KudosServiceTest extends BaseKudosTest {
     assertEquals(1, list.size());
     Kudos retrievedKudos = list.get(0);
     assertEquals(kudos, retrievedKudos);
-    assertEquals(0, kudos.compareTo(retrievedKudos));
+    assertEquals(kudos.getTechnicalId(), retrievedKudos.getTechnicalId());
+    assertEquals(kudos.getTimeInSeconds(), retrievedKudos.getTimeInSeconds());
     assertEquals(kudos.hashCode(), retrievedKudos.hashCode());
   }
 

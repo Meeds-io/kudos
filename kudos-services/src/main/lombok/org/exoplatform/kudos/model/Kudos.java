@@ -1,13 +1,12 @@
 package org.exoplatform.kudos.model;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode.Exclude;
 
 @Data
-public class Kudos implements Comparable<Kudos>, Serializable {
+public class Kudos implements Serializable {
   private static final long serialVersionUID = -3058584349224472943L;
 
   private Long              technicalId;
@@ -42,19 +41,9 @@ public class Kudos implements Comparable<Kudos>, Serializable {
 
   private String            message;
 
-  private LocalDateTime     time;
+  private long              timeInSeconds;
 
   @Exclude
   private long              activityId;
 
-  @Override
-  public int compareTo(Kudos o) {
-    if (this.getTime() == null) {
-      return -1;
-    }
-    if (o.getTime() == null) {
-      return 1;
-    }
-    return this.getTime().compareTo(o.getTime());
-  }
 }

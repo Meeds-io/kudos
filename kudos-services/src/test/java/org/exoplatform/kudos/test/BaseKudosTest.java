@@ -156,7 +156,7 @@ public abstract class BaseKudosTest {
 
   protected void compareResults(KudosEntity kudosEntity, Kudos kudos) {
     assertEquals(kudosEntity.getActivityId(), kudos.getActivityId());
-    assertEquals(kudosEntity.getCreatedDate(), kudos.getTime().atZone(ZoneId.systemDefault()).toEpochSecond());
+    assertEquals(kudosEntity.getCreatedDate(), kudos.getTimeInSeconds());
     assertEquals(String.valueOf(kudosEntity.getEntityId()), kudos.getEntityId());
     assertEquals(kudosEntity.getEntityType(), KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
     assertEquals(kudosEntity.getId(), kudos.getTechnicalId());

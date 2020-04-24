@@ -170,7 +170,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
       }
     }
 
-    kudos.setTime(LocalDateTime.now());
+    kudos.setTimeInSeconds(timeToSeconds(LocalDateTime.now()));
     kudos = kudosStorage.createKudos(kudos);
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);

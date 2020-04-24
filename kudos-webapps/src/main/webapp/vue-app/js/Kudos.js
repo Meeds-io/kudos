@@ -1,20 +1,6 @@
-export function getEntityKudos(entityType, entityId) {
-  if (entityType && entityId) {
-    return fetch(`/portal/rest/kudos/api/kudos/getEntityKudos?entityId=${entityId}&entityType=${entityType}`, {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }).then((resp) => resp && resp.ok && resp.json());
-  } else {
-    return Promise.resolve([]);
-  }
-}
-
-export function sendKudos(kudo) {
+export function sendKudos(kudo, limit) {
   if (kudo) {
-    return fetch(`/portal/rest/kudos/api/kudos/createKudos`, {
+    return fetch(`/portal/rest/kudos/api/kudos?limit=${limit || 0}`, {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -28,25 +14,8 @@ export function sendKudos(kudo) {
   }
 }
 
-export function getKudos(userId) {
-  if (userId) {
-    return fetch(`/portal/rest/kudos/api/kudos/getKudos?senderId=${userId}`, {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }).then((resp) => resp && resp.ok && resp.json());
-  } else {
-    return Promise.resolve(null);
-  }
-}
-
-export function getAllKudosByPeriod(startDate, endDate) {
-  // convert from milliseconds to seconds
-  startDate = parseInt(startDate.getTime() / 1000);
-  endDate = parseInt(endDate.getTime() / 1000);
-  return fetch(`/portal/rest/kudos/api/kudos/getAllKudosByPeriod?startDateInSeconds=${startDate}&endDateInSeconds=${endDate}`, {
+export function getKudosSent(senderIdentityId, limit, returnSize, periodType, dateInSeconds) {
+  return fetch(`/portal/rest/kudos/api/kudos/${senderIdentityId}/sent?limit=${limit || 0}&returnSize=${returnSize || true}&periodType=${periodType || ''}&dateInSeconds=${dateInSeconds || '0'}`, {
     credentials: 'include',
     headers: {
       Accept: 'application/json',
@@ -55,10 +24,47 @@ export function getAllKudosByPeriod(startDate, endDate) {
   }).then((resp) => resp && resp.ok && resp.json());
 }
 
-export function getAllKudosByPeriodOfDate(date) {
+export function getKudosReceived(receiverIdentityId, limit, returnSize, periodType, dateInSeconds) {
+  return fetch(`/portal/rest/kudos/api/kudos/${receiverIdentityId}/received?limit=${limit || 0}&returnSize=${returnSize || true}&periodType=${periodType || ''}&dateInSeconds=${dateInSeconds || '0'}`, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  }).then((resp) => resp && resp.ok && resp.json());
+}
+
+export function getEntityKudos(entityType, entityId, limit) {
+  if (entityType && entityId) {
+    return fetch(`/portal/rest/kudos/api/kudos/byEntity?entityId=${entityId}&entityType=${entityType}&limit=${limit || 0}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then((resp) => resp && resp.ok && resp.json());
+  } else {
+    return Promise.resolve([]);
+  }
+}
+
+export function getKudosByPeriodOfDate(date, limit) {
   // convert from milliseconds to seconds
   date = parseInt(date.getTime() / 1000);
-  return fetch(`/portal/rest/kudos/api/kudos/getAllKudosByPeriodOfDate?dateInSeconds=${date}`, {
+  return fetch(`/portal/rest/kudos/api/kudos?dateInSeconds=${date}&limit=${limit || 0}`, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  }).then((resp) => resp && resp.ok && resp.json());
+}
+
+export function getKudosByPeriod(startDate, endDate, limit) {
+  // convert from milliseconds to seconds
+  startDate = parseInt(startDate.getTime() / 1000);
+  endDate = parseInt(endDate.getTime() / 1000);
+  return fetch(`/portal/rest/kudos/api/kudos/byDates?startDateInSeconds=${startDate}&endDateInSeconds=${endDate}&limit=${limit || 0}`, {
     credentials: 'include',
     headers: {
       Accept: 'application/json',
@@ -70,7 +76,7 @@ export function getAllKudosByPeriodOfDate(date) {
 export function getPeriodDates(date, periodType) {
   // convert from milliseconds to seconds
   date = parseInt(date.getTime() / 1000);
-  return fetch(`/portal/rest/kudos/api/kudos/getPeriodDates?dateInSeconds=${date}&periodType=${periodType}`, {
+  return fetch(`/portal/rest/kudos/api/kudos/period?dateInSeconds=${date}&periodType=${periodType}`, {
     credentials: 'include',
     headers: {
       Accept: 'application/json',

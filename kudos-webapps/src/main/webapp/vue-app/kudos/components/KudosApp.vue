@@ -59,7 +59,7 @@
                   <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
                   <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
                   <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
-                    <identity-link
+                    <kudos-identity-link
                       :id="kudos.receiverId"
                       :technical-id="kudos.receiverIdentityId"
                       :type="kudos.receiverType"
@@ -67,7 +67,7 @@
                   </v-card-text>
                   <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
                   <v-card-text v-else-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
-                    <identity-link
+                    <kudos-identity-link
                       :id="kudos.receiverId"
                       :technical-id="kudos.receiverIdentityId"
                       :type="kudos.receiverType"
@@ -160,7 +160,7 @@
                     <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
                   </v-card-text>
                   <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
-                    <identity-link
+                    <kudos-identity-link
                       :id="kudos.senderId"
                       :technical-id="kudos.senderIdentityId"
                       :type="kudos.senderType"
@@ -186,18 +186,11 @@
 </template>
 
 <script>
-import KudosApi from './KudosAPI.vue';
-import IdentityLink from './IdentityLink.vue';
-
-import {getReceiver} from '../js/KudosIdentity.js';
-import {getEntityKudos, sendKudos, getKudos} from '../js/Kudos.js';
-import {initSettings} from '../js/KudosSettings.js';
+import {getReceiver} from '../../js/KudosIdentity.js';
+import {getEntityKudos, sendKudos, getKudosSent} from '../../js/Kudos.js';
+import {initSettings} from '../../js/KudosSettings.js';
 
 export default {
-  components: {
-    KudosApi,
-    IdentityLink
-  },
   data() {
     return {
       dialog: false,
@@ -336,10 +329,12 @@ export default {
         .then(() => {
           const remainingDaysToReset = Number(this.getRemainingDays());
           this.remainingDaysToReset = remainingDaysToReset ? remainingDaysToReset : 0;
+
           // Get Kudos in an async way
-          getKudos(eXo.env.portal.userName)
+          const limit = Math.max(20, window.kudosSettings.kudosPerPeriod);
+          getKudosSent(eXo.env.portal.userIdentityId, limit)
             .then(allKudos => {
-              this.allKudosSent = allKudos ? allKudos : [];
+              this.allKudosSent = allKudos && allKudos.kudos || [];
             });
         })
         .catch(e => {
@@ -412,7 +407,6 @@ export default {
               $sendKudosLink.prependTo($(element));
             }
           } else {
-            console.warn("Can't refresh entity with type/id", entityType, entityId);
             return;
           }
           $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);

@@ -10,7 +10,7 @@
     "watch": "webpack --config webpack.watch.js --progress --colors --watch -d",
     "test": "jest",
     "format": "prettier --config ./.prettierrc --write ./src/main/webapp/vue-app/**.js ./src/main/webapp/vue-app/js/**.js",
-    "lint": "eslint --fix ./src/main/webapp/vue-app/components/*.vue",
+    "lint": "eslint --fix ./src/main/webapp/vue-app/**/*.js ./src/main/webapp/vue-app/**/**/*.js ./src/main/webapp/vue-app/**/**/*.vue ./src/main/webapp/vue-app/**/**/**/*.vue",
     "test-coverage": "jest --coverage",
     "build": "webpack --config webpack.prod.js --mode production"
   },
