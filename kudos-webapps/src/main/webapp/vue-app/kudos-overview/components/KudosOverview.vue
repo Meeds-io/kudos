@@ -8,7 +8,7 @@
       flat
       class="border-box-sizing py-3">
       <div class="text-header-title text-sub-title text-no-wrap">
-        {{ $t('exoplatform.kudos.button.rewardsKudos') }}
+        {{ $t('exoplatform.kudos.button.rewardedKudos') }}
       </div>
       <v-spacer />
       <select
