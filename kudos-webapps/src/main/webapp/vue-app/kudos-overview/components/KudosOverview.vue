@@ -7,7 +7,9 @@
       height="48"
       flat
       class="border-box-sizing py-3">
-      <div class="text-header-title text-sub-title text-no-wrap">
+      <div
+        :class="skeleton && 'skeleton-text skeleton-text-width skeleton-background skeleton-text-height-thick skeleton-border-radius'"
+        class="text-header-title text-sub-title text-no-wrap">
         {{ $t('exoplatform.kudos.button.rewardedKudos') }}
       </div>
       <v-spacer />
@@ -29,6 +31,7 @@
         <kudos-overview-card
           :clickable="owner && receivedKudosCount > 0"
           :skeleton="skeleton"
+          :class="skeleton && 'skeleton-background skeleton-text skeleton-border-radius skeleton-text-height-block mx-10 my-4'"
           class="kudosReceivedOverviewPeriod"
           @open-drawer="openDrawer('received')">
           <template slot="count">
@@ -44,6 +47,7 @@
         <kudos-overview-card
           :clickable="owner && sentKudosCount > 0"
           :skeleton="skeleton"
+          :class="skeleton && 'skeleton-background skeleton-text skeleton-border-radius skeleton-text-height-block mx-10 my-4'"
           class="kudosSentOverviewPeriod"
           @open-drawer="openDrawer('sent')">
           <template slot="count">
