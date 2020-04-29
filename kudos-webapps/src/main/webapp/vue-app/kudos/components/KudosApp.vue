@@ -377,11 +377,16 @@ export default {
     },
     addButtonToActivities() {
       if (!this.disabled) {
-        const activitiesToAddButtons = $(window.parentToWatch).find('.activityStream:not(.kudoContainer)');
+        const activitiesToAddButtons = $(window.parentToWatch).find('.activityStream:not(.kudoActivityContainer)');
         activitiesToAddButtons.each((index, element) => {
+          if($(element).attr("id") === "welcomeActivity") {
+              return false;
+          } else {
           let activityId = $(element).closest('.activityStream').attr('id');
           if (activityId && this.entityIds.indexOf(activityId) < 0) {
-            $(element).addClass('kudoContainer');
+            $(element).addClass('kudoActivityContainer');
+            $(element).find('.statusAction.pull-right:not(.kudoContainer)').addClass('kudoContainer');
+            $(element).find('.actionBarMobile:not(.kudoContainer)').addClass('kudoContainer');
             const entityId = activityId;
             this.entityIds.push(entityId);
             activityId = activityId.replace('activityContainer', '');
@@ -393,7 +398,9 @@ export default {
                 }
               });
           }
+          }
         });
+
       }
     },
 
