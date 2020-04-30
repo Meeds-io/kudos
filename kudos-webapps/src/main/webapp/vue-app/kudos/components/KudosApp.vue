@@ -220,11 +220,22 @@ export default {
       htmlToAppend: `<li class="SendKudosButtonTemplate VuetifyApp">
           <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
             <div class="v-btn__content">
-              <i aria-hidden="true" class="fa fa-award uiIconKudos uiIconLightGrey"></i>
+              <i aria-hidden="true" class="fa fa-award uiKudosAction uiIconKudos uiIconLightGrey"></i>
+              <span class="kudosLabelMobile">Kudos</span>
             </div>
           </button>
-          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
-        </li>`
+          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="kudosActivityNumber grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> kudosCount </a>
+        </li>`,
+      htmlToAppendToComment: `<li class="separator">-</li>
+      <li class="SendKudosButtonTemplate VuetifyApp">
+          <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
+            <div class="v-btn__content">
+              <span class="kudosLabel lightGrey">Kudos</span>
+            </div>
+          </button>
+          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="lightGrey" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
+        </li>`,
+      htmlToAppendToActivity: ` <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="KudosNumber" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();">kudosCount Kudos</a>`
     };
   },
   watch: {
@@ -366,11 +377,16 @@ export default {
     },
     addButtonToActivities() {
       if (!this.disabled) {
-        const activitiesToAddButtons = $(window.parentToWatch).find('.activityStream .statusAction.pull-right:not(.kudoContainer)');
+        const activitiesToAddButtons = $(window.parentToWatch).find('.activityStream:not(.kudoActivityContainer)');
         activitiesToAddButtons.each((index, element) => {
+          if($(element).attr("id") === "welcomeActivity") {
+              return false;
+          } else {
           let activityId = $(element).closest('.activityStream').attr('id');
           if (activityId && this.entityIds.indexOf(activityId) < 0) {
-            $(element).addClass('kudoContainer');
+            $(element).addClass('kudoActivityContainer');
+            $(element).find('.statusAction.pull-right:not(.kudoContainer)').addClass('kudoContainer');
+            $(element).find('.actionBarMobile:not(.kudoContainer)').addClass('kudoContainer');
             const entityId = activityId;
             this.entityIds.push(entityId);
             activityId = activityId.replace('activityContainer', '');
@@ -382,9 +398,13 @@ export default {
                 }
               });
           }
+          }
         });
+
       }
     },
+
+
     refreshLink(element, entityType, entityId, parentEntityId) {
       if(this.ignoreRefresh) {
         return Promise.resolve(null);
@@ -395,16 +415,19 @@ export default {
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
           let $sendKudosLink = $(this.htmlToAppend.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('LightGrey', hasSentKudos ? 'Blue' : 'LightGrey').replace('grey', kudosCount ? 'primary' : 'grey'));
+          const $sendKudosLinkComment = $(this.htmlToAppendToComment.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('lightGrey', hasSentKudos ? 'hasKudos' : 'lightGrey').replace('lightGrey', kudosCount ? 'hasKudos' : 'lightGrey'));
+          const $sentKudosNumber = $(this.htmlToAppendToActivity.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace('kudosCount', kudosCount));
           $sendKudosLink.attr('id', linkId);
+          $sendKudosLinkComment.attr('id', linkId);
           const $existingLink = $(`#${linkId}`);
           if ($existingLink.length) {
             $existingLink.html($sendKudosLink.html());
           } else if(element) {
             if (entityType === 'COMMENT') {
-              $('<li class="separator">-</li>').appendTo($(element));
-              $sendKudosLink.appendTo($(element));
+             $(element).find('.dateTime').before($sendKudosLinkComment);
             } else {
-              $sendKudosLink.prependTo($(element));
+              $sendKudosLink.appendTo($(element).find('.statusAction.pull-right'));
+              $(element).find('.CommentsNumber').after($sentKudosNumber);
             }
           } else {
             return;
