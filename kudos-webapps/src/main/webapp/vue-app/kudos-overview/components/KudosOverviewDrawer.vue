@@ -22,7 +22,7 @@
         :disabled="loading"
         class="loadMoreButton ma-auto btn"
         block
-        @click="loadNextPage">
+        @click="loadMore">
         {{ $t('exoplatform.kudos.button.showMore') }}
       </v-btn>
       <v-spacer />
