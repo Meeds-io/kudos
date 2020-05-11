@@ -90,7 +90,7 @@ export function registerExternalExtensions(title) {
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
     order: 20,
-    enabled: () => true,
+    enabled: (profile) => profile.enabled && !profile.deleted,
     click: (profile) => {
       const type = profile.prettyName ? 'SPACE_PROFILE' : 'USER_PROFILE';
       const id = profile.prettyName ? profile.id : profile.username;
