@@ -249,6 +249,10 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     return kudosStorage.getKudosByEntity(entityType, entityId, limit);
   }
 
+  public long countKudosByEntity(String entityType, String entityId) {
+    return kudosStorage.countKudosByEntity(entityType, entityId);
+  }
+
   /**
    * Count kudos received by an identity in a period of time
    * 

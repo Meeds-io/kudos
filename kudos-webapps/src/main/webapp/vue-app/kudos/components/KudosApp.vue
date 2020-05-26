@@ -217,15 +217,7 @@ export default {
         (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
         (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
       ],
-      htmlToAppend: `<li class="SendKudosButtonTemplate VuetifyApp">
-          <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
-            <div class="v-btn__content">
-              <i aria-hidden="true" class="fa fa-award uiKudosAction uiIconKudos uiIconLightGrey"></i>
-              <span class="kudosLabelMobile">Kudos</span>
-            </div>
-          </button>
-          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="kudosActivityNumber grey--text" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> kudosCount </a>
-        </li>`,
+      htmlToAppend: ``,
       htmlToAppendToComment: `<li class="separator">-</li>
       <li class="SendKudosButtonTemplate VuetifyApp">
           <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
@@ -426,7 +418,6 @@ export default {
             if (entityType === 'COMMENT') {
              $(element).find('.dateTime').before($sendKudosLinkComment);
             } else {
-              $sendKudosLink.appendTo($(element).find('.statusAction.pull-right'));
               $(element).find('.CommentsNumber').after($sentKudosNumber);
             }
           } else {
