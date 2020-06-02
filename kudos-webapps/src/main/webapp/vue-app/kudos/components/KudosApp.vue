@@ -217,15 +217,6 @@ export default {
         (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
         (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
       ],
-      htmlToAppendToComment: `<li class="separator">-</li>
-      <li class="SendKudosButtonTemplate VuetifyApp">
-          <button rel="tooltip" data-placement="bottom" title="${this.$t('exoplatform.kudos.button.sendKudos')}" type="button" class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : 'entityId', 'type': 'entityType', 'parentId': 'parentEntityId'}}));event.preventDefault();event.stopPropagation();">
-            <div class="v-btn__content">
-              <span class="kudosLabel lightGrey">Kudos</span>
-            </div>
-          </button>
-          <a rel="tooltip" data-placement="top" title="${this.$t('exoplatform.kudos.button.displayKudosList')}" href="javascript:void(0);" class="lightGrey" onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : 'entityId', 'type': 'entityType'}}));event.preventDefault();event.stopPropagation();"> (kudosCount) </a>
-        </li>`,
     };
   },
   watch: {
@@ -308,16 +299,6 @@ export default {
 
         document.addEventListener('exo-kudos-open-send-modal', this.openDialog);
         document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
-
-        // Attach link to activities
-        $(window.parentToWatch).bind("DOMSubtreeModified", event => {
-          this.addButtonToActivities();
-          this.addButtonToComments();
-        });
-        this.$nextTick(() => {
-          this.addButtonToActivities();
-          this.addButtonToComments();
-        });
       });
   },
   methods: {
@@ -342,59 +323,6 @@ export default {
           this.error = e;
         });
     },
-    addButtonToComments() {
-      if (!this.disabled) {
-        const commentsToAddButtons = $(window.parentToWatch).find('.activityStream .commentItem .statusAction:not(.kudoContainer)');
-        commentsToAddButtons.each((index, element) => {
-          let commentId = $(element).closest('.CommentBlock').data('comment-id');
-          if (commentId && this.entityIds.indexOf(commentId) < 0) {
-            $(element).addClass('kudoContainer');
-            const entityId = commentId;
-            this.entityIds.push(entityId);
-            commentId = commentId.replace('comment', '');
-            let activityId = $(element).closest('.activityStream').attr('id');
-            activityId = activityId ? activityId.replace('activityContainer', '') : '';
-            this.refreshLink(element, 'COMMENT', commentId, activityId)
-              .then(() => {
-                const index = this.entityIds.indexOf(entityId);
-                if (index >= 0) {
-                  this.entityIds.splice(index, 1);
-                }
-              });
-          }
-        });
-      }
-    },
-    addButtonToActivities() {
-      if (!this.disabled) {
-        const activitiesToAddButtons = $(window.parentToWatch).find('.activityStream:not(.kudoActivityContainer)');
-        activitiesToAddButtons.each((index, element) => {
-          if($(element).attr("id") === "welcomeActivity") {
-              return false;
-          } else {
-          let activityId = $(element).closest('.activityStream').attr('id');
-          if (activityId && this.entityIds.indexOf(activityId) < 0) {
-            $(element).addClass('kudoActivityContainer');
-            $(element).find('.statusAction.pull-right:not(.kudoContainer)').addClass('kudoContainer');
-            $(element).find('.actionBarMobile:not(.kudoContainer)').addClass('kudoContainer');
-            const entityId = activityId;
-            this.entityIds.push(entityId);
-            activityId = activityId.replace('activityContainer', '');
-            this.refreshLink(element, 'ACTIVITY', activityId, '')
-              .then(() => {
-                const index = this.entityIds.indexOf(entityId);
-                if (index >= 0) {
-                  this.entityIds.splice(index, 1);
-                }
-              });
-          }
-          }
-        });
-
-      }
-    },
-
-
     refreshLink(element, entityType, entityId, parentEntityId) {
       if(this.ignoreRefresh) {
         return Promise.resolve(null);
@@ -404,16 +332,7 @@ export default {
           const linkId = `SendKudosButton${entityType}${entityId}`;
           const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
           const kudosCount = kudosList ? kudosList.length : 0;
-          const $sendKudosLinkComment = $(this.htmlToAppendToComment.replace(new RegExp('entityId', 'g'), entityId).replace(new RegExp('entityType', 'g'), entityType).replace(new RegExp('parentEntityId', 'g'), parentEntityId ? parentEntityId : '').replace('kudosCount', kudosCount).replace('lightGrey', hasSentKudos ? 'hasKudos' : 'lightGrey').replace('lightGrey', kudosCount ? 'hasKudos' : 'lightGrey'));
-          $sendKudosLinkComment.attr('id', linkId);
           const $existingLink = $(`#${linkId}`);
-          if(element) {
-            if (entityType === 'COMMENT') {
-             $(element).find('.dateTime').before($sendKudosLinkComment);
-            }
-          } else {
-            return;
-          }
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data("kudosList", kudosList);
         });

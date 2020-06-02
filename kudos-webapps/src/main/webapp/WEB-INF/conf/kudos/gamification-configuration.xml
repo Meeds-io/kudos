@@ -113,6 +113,18 @@
         </values-param>
       </init-params>
     </component-plugin>
+    <component-plugin>
+      <name>UIActivityCommentActionBar-actions-after</name>
+      <set-method>addTemplateExtension</set-method>
+      <type>org.exoplatform.groovyscript.text.TemplateExtensionPlugin</type>
+      <init-params>
+        <values-param>
+          <name>templates</name>
+          <description>The actionBar kudos mobile activity template to include in all activity templates</description>
+          <value>war:/groovy/social-extension/activity/commons/UIActivityCommentActions.gtmpl</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
   </external-component-plugins>
 
 </configuration>
