@@ -1,0 +1,40 @@
+<%
+  import org.exoplatform.kudos.service.KudosService;
+  
+  import static org.exoplatform.social.webui.activity.BaseUIActivity.TEMPLATE_PARAM_COMMENT;
+
+  def comment = _ctx.get(TEMPLATE_PARAM_COMMENT);
+  def kudosTitle = _ctx.appRes("exoplatform.kudos.button.sendKudos");
+  def displayKudosListTilte = _ctx.appRes("exoplatform.kudos.button.displayKudosList");
+
+  def activity = uicomponent.getActivity();
+  KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
+  def commentId = comment.id.replace('comment','');
+  def kudosCount = kudosService.countKudosByEntity("COMMENT", commentId);
+
+%>
+<li class="separator">-</li>
+<li class="SendKudosButtonTemplate VuetifyApp">
+  <button rel="tooltip"
+          data-placement="bottom"
+          title="$kudosTitle"
+          type="button"
+          class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0"
+          onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT', 'parentId': '${activity.id}'}}));event.preventDefault();event.stopPropagation();">
+    <div class="v-btn__content">
+      <span class="kudosLabel lightGrey">Kudos</span>
+    </div>
+  </button>
+  <a rel="tooltip"
+     data-placement="top"
+     title="$displayKudosListTilte"
+     href="javascript:void(0);"
+     class="lightGrey"
+     onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT'}}));event.preventDefault();event.stopPropagation();"> 
+     <%
+     if(kudosCount > 0) { %>
+     	($kudosCount)
+     <%}%>
+	 </a>
+</li>
+

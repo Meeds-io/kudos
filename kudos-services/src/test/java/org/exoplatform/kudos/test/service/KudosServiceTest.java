@@ -70,6 +70,21 @@ public class KudosServiceTest extends BaseKudosTest {
   }
 
   @Test
+  public void testCountKudosByEntity() {
+    KudosService kudosService = getService(KudosService.class);
+    long count = kudosService.countKudosByEntity(ENTITY_TYPE, ENTITY_ID);
+    assertEquals(0, count);
+
+    newKudos();
+
+    count = kudosService.countKudosByEntity(ENTITY_TYPE, ENTITY_ID);
+    assertEquals(1, count);
+
+    count = kudosService.countKudosByEntity(ENTITY_TYPE, "25");
+    assertEquals(0, count);
+  }
+
+  @Test
   public void testGetKudosByPeriodAndReceiver() {
     KudosService kudosService = getService(KudosService.class);
     long startTime = getTime(2019, 1, 1);
