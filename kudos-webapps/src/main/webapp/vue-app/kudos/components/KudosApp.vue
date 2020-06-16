@@ -335,6 +335,7 @@ export default {
           const $existingLink = $(`#${linkId}`);
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data("kudosList", kudosList);
+          this.kudosList = kudosList;
         });
     },
     openDialog(event) {
@@ -356,6 +357,7 @@ export default {
         this.kudosList = [];
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
+        this.refreshLink(null, this.entityType, this.entityId, '');
         this.listDialog = true;
       }
     },
