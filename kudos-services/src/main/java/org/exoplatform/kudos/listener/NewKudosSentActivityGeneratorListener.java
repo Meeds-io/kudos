@@ -5,6 +5,8 @@ import static org.exoplatform.kudos.service.utils.Utils.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.commons.search.index.IndexingService;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.service.KudosService;
@@ -17,6 +19,7 @@ import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
+import org.exoplatform.social.core.jpa.search.ActivityIndexingServiceConnector;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.processor.I18NActivityUtils;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
@@ -82,6 +85,12 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
       } else {
         activityStorage.saveActivity(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), getActivityId(activity.getId()));
+
+        IndexingService indexingService = CommonsUtils.getService(IndexingService.class);
+        if (indexingService != null) {
+          LOG.info("Notifying indexing service for kudos activity with id={}.", activity.getId());
+          indexingService.reindex(ActivityIndexingServiceConnector.TYPE, activity.getId());
+        }
       }
     }
   }
