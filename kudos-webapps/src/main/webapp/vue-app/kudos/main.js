@@ -35,3 +35,5 @@ export function init() {
     }).$mount(`#${appId}`);
   });
 }
+
+

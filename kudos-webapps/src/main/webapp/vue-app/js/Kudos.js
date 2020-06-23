@@ -107,3 +107,18 @@ export function registerExternalExtensions(title) {
   document.dispatchEvent(new CustomEvent('profile-extension-updated', { detail: profileExtensionAction}));
 }
 
+export function registerActivityReactionTabs(activityType, activityId,kudosNumber,
+                                             kudosList) {
+  const activityExtensionReaction = {
+    icon: 'fa fa-award uiIconKudos',
+    order: 3,
+    activityType: activityType,
+    activityId: activityId,
+    kudosNumber: kudosNumber,
+    reactionListItems: kudosList,
+    class: 'kudos'
+  };
+  extensionRegistry.registerExtension('activity-reactions', 'activity-kudos-reactions', activityExtensionReaction);
+}
+
+
