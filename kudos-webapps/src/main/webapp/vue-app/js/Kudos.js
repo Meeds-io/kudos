@@ -116,7 +116,7 @@ export function registerActivityReactionTabs(activityType, activityId,kudosNumbe
     activityId: activityId,
     kudosNumber: kudosNumber,
     reactionListItems: kudosList,
-    class: 'kudos'
+    class: 'Kudos'
   };
   extensionRegistry.registerExtension('activity-reactions', 'activity-kudos-reactions', activityExtensionReaction);
 }

@@ -3,12 +3,6 @@ import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExtern
 import {getEntityKudos} from "../../js/Kudos";
 
 export default {
-  data (){
-    return {
-      kudosTest: [],
-      activityId: ''
-    }
-  },
   created() {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);

@@ -4,6 +4,7 @@ import org.exoplatform.kudos.service.KudosService;
 def activity = uicomponent.getActivity();
 KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
 def kudosCount = kudosService.countKudosByEntity("ACTIVITY", activity.getId());
+    if(kudosCount > 0) {
 %>
 <a rel="tooltip"
    data-placement="top"
@@ -13,3 +14,4 @@ def kudosCount = kudosService.countKudosByEntity("ACTIVITY", activity.getId());
    onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : '${activity.id}', 'type': 'ACTIVITY'}}));event.preventDefault();event.stopPropagation();">
     $kudosCount Kudos
 </a>
+<% } %>
