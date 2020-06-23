@@ -44,6 +44,8 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
     Kudos kudos = event.getData();
     KudosService kudosService = event.getSource();
+    IndexingService indexingService = CommonsUtils.getService(IndexingService.class);
+
     if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
         || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
       String activityId = kudos.getEntityId();
@@ -69,6 +71,11 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         ExoSocialActivity activityComment = createActivity(kudos, parentCommentId);
         activityStorage.saveComment(activity, activityComment);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), getActivityId(activityComment.getId()));
+
+        if (indexingService != null) {
+          LOG.info("Notifying indexing service for kudos activity with id={}.", activityComment.getId());
+          indexingService.reindex(ActivityIndexingServiceConnector.TYPE, activityComment.getId());
+        }
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
@@ -86,7 +93,6 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         activityStorage.saveActivity(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), getActivityId(activity.getId()));
 
-        IndexingService indexingService = CommonsUtils.getService(IndexingService.class);
         if (indexingService != null) {
           LOG.info("Notifying indexing service for kudos activity with id={}.", activity.getId());
           indexingService.reindex(ActivityIndexingServiceConnector.TYPE, activity.getId());
