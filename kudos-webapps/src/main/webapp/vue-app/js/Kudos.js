@@ -110,6 +110,7 @@ export function registerExternalExtensions(title) {
 export function registerActivityReactionTabs(activityType, activityId,kudosNumber,
                                              kudosList) {
   const activityExtensionReaction = {
+    id: 'kudos',
     icon: 'fa fa-award uiIconKudos',
     order: 3,
     activityType: activityType,
@@ -118,7 +119,10 @@ export function registerActivityReactionTabs(activityType, activityId,kudosNumbe
     reactionListItems: kudosList,
     class: 'Kudos'
   };
-  extensionRegistry.registerExtension('activity-reactions', 'activity-kudos-reactions', activityExtensionReaction);
+  const contentsToLoad = extensionRegistry.loadExtensions('activity-reactions', 'activity-reactions') || [];
+  if (!contentsToLoad || !contentsToLoad.length || !contentsToLoad.find(activityReactionPlugin => activityReactionPlugin.id && activityReactionPlugin.id === activityExtensionReaction.id)) {
+    extensionRegistry.registerExtension('activity-reactions', 'activity-reactions', activityExtensionReaction);
+  }
 }
 
 
