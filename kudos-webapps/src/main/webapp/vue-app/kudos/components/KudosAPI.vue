@@ -1,15 +1,25 @@
 <script>
-import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions} from '../../js/Kudos.js';
+import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions, registerActivityReactionTabs} from '../../js/Kudos.js';
+import {getEntityKudos} from "../../js/Kudos";
 
 export default {
   created() {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
     registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
+    document.addEventListener('display-activity-details', this.getActivityInformations);
   },
   methods: {
     init() {
       this.initTiptip();
+    },
+    getActivityInformations(event) {
+      const entityType = event && event.detail && event.detail.type;
+      const entityId = event && event.detail && event.detail.id;
+      return getEntityKudos(entityType, entityId).then(kudosList => {
+        const kudosCount = kudosList ? kudosList.length : 0;
+        registerActivityReactionTabs(entityType, entityId, kudosCount,kudosList);
+      });
     },
     getPeriodDates(event) {
       if(event && event.detail && event.detail.date && event.detail.periodType) {
