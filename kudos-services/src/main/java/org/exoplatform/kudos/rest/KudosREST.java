@@ -56,7 +56,7 @@ public class KudosREST implements ResourceContainer {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed({"administrators","professional"})
   @ApiOperation(value = "Get Kudos list created in a period contained a selected date in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request fulfilled"),
@@ -105,7 +105,7 @@ public class KudosREST implements ResourceContainer {
   @GET
   @Path("byDates")
   @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed({"administrators","professional"})
   @ApiOperation(value = "Get Kudos list created between start and end dates in seconds", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns list of Kudos")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Request fulfilled"),

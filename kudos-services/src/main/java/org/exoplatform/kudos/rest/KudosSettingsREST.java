@@ -56,7 +56,7 @@ public class KudosSettingsREST implements ResourceContainer {
   @Path("save")
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @RolesAllowed({"administrators","professional"})
   @ApiOperation(value = "Saves Kudos global settings", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
   @ApiResponses(value = {
       @ApiResponse(code = 204, message = "Request fulfilled"),
