@@ -29,10 +29,10 @@
     <page-nodes>
         <node>
             <name>rewardAdministration</name>
-            <label>Reward</label>
+            <label>#{kudos.navigation.Reward}</label>
             <node>
                 <name>kudosAdministration</name>
-                <label>Kudos</label>
+                <label>#{kudos.navigation.Kudos}</label>
                 <page-reference>group::/platform/rewarding::kudosAdministration</page-reference>
             </node>
         </node>
