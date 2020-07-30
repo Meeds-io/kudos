@@ -63,8 +63,8 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         Map<String, String> gam = new HashMap<>();
         gam.put("ruleTitle", "sendKudos");
         gam.put("object", activityURL);
-        gam.put("senderId", kudos.getSenderId());
-        gam.put("receiverId", kudos.getSenderId());
+        gam.put("senderId", kudos.getSenderId()); // matches the gamification's earner id
+        gam.put("receiverId", kudos.getReceiverId());
         listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
@@ -74,8 +74,8 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         Map<String, String> gam = new HashMap<>();
         gam.put("ruleTitle", "receiveKudos");
         gam.put("object", activityURL);
-        gam.put("senderId", kudos.getSenderId());
-        gam.put("receiverId", kudos.getReceiverId());
+        gam.put("senderId", kudos.getReceiverId()); // matches the gamification's earner id
+        gam.put("receiverId", kudos.getSenderId());
         listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
