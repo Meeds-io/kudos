@@ -11,12 +11,6 @@
   KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
   def commentId = comment.id.replace('comment','');
   def kudosCount = kudosService.countKudosByEntity("COMMENT", commentId);
-  def kudosCommentClass = "";
-  if (kudosCount>0) {
-      kudosCommentClass = "kudosLabel hasKudos";
-  } else {
-      kudosCommentClass = "kudosLabel lightGrey";
-  }
 
 %>
 <li class="separator">-</li>
@@ -28,14 +22,14 @@
           class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0"
           onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT', 'parentId': '${activity.id}'}}));event.preventDefault();event.stopPropagation();">
     <div class="v-btn__content">
-      <span class="$kudosCommentClass">Kudos</span>
+      <span class="kudosLabel lightGrey">Kudos</span>
     </div>
   </button>
   <a rel="tooltip"
      data-placement="top"
      title="$displayKudosListTilte"
      href="javascript:void(0);"
-     class="hasKudos"
+     class="lightGrey"
      onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT'}}));event.preventDefault();event.stopPropagation();"> 
      <%
      if(kudosCount > 0) { %>
