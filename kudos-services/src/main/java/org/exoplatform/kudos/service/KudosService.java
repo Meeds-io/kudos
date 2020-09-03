@@ -252,14 +252,27 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   public long countKudosByEntity(String entityType, String entityId) {
     return kudosStorage.countKudosByEntity(entityType, entityId);
   }
+  
+  /**
+   * Count kudos sent by an identity using a dedicated entity (activity, comment,
+   * profile header, tiptip...)
+   * 
+   * @param entityType entity type of type {@link KudosEntityType}
+   * @param entityId entity technical id
+   * @param senderIdentityId {@link Identity} technical id
+   * @return 0 if identity not found, else kudos count
+   */
+  public long countKudosByEntityAndSender(String entityType, String entityId, String senderIdentityId) {
+    return kudosStorage.countKudosByEntityAndSender(entityType, entityId, senderIdentityId);
+  }
 
   /**
-   * Count kudos received by an identity in a period of time
+   * Count kudos sent by an identity in a period of time
    * 
    * @param senderIdentityId {@link Identity} technical id
    * @param startDateInSeconds timestamp in seconds
    * @param endDateInSeconds timestamp in seconds
-   * @return 0 id identity not found, else kudos count
+   * @return 0 if identity not found, else kudos count
    */
   public long countKudosByPeriodAndSender(long senderIdentityId,
                                           long startDateInSeconds,
@@ -291,7 +304,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    * @param identityId {@link Identity} technical id
    * @param startDateInSeconds timestamp in seconds
    * @param endDateInSeconds timestamp in seconds
-   * @return 0 id identity not found, else kudos count
+   * @return 0 if identity not found, else kudos count
    */
   public long countKudosByPeriodAndReceiver(long identityId,
                                             long startDateInSeconds,

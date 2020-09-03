@@ -84,6 +84,10 @@ public class KudosStorage {
   public long countKudosByEntity(String entityType, String entityId) {
     return kudosDAO.countKudosByEntity(KudosEntityType.valueOf(entityType).ordinal(), Long.parseLong(entityId));
   }
+  
+  public long countKudosByEntityAndSender(String entityType, String entityId, String senderIdentityId) {
+    return kudosDAO.countKudosByEntityAndSender(KudosEntityType.valueOf(entityType).ordinal(), Long.parseLong(entityId), Long.parseLong(senderIdentityId));
+  }
 
   public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
