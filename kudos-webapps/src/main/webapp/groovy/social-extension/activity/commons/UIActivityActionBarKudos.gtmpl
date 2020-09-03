@@ -1,9 +1,18 @@
 <%
   import org.exoplatform.kudos.service.KudosService;
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.social.core.manager.IdentityManager;
+  import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+  import org.exoplatform.commons.utils.CommonsUtils;
 
   def activity = uicomponent.getActivity();
   KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
   def kudosCount = kudosService.countKudosByEntity("ACTIVITY", activity.getId());
+  def currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+  def identityManager = CommonsUtils.getService(IdentityManager.class);
+  def identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
+  def kudosSentByCurrentUserCount = kudosService.countKudosByEntityAndSender("ACTIVITY", activity.getId(), identity.getId());
+  def kudosLabelColor = kudosSentByCurrentUserCount > 0 ? "hasKudos" : "";
 %>
 <li
   class="SendKudosButtonTemplate VuetifyApp"
@@ -14,7 +23,7 @@
       <i
         aria-hidden="true"
         class="fa fa-award uiKudosAction uiIconKudos uiIconLightGrey"></i>
-      <span class="reactionLabel">
+      <span class="reactionLabel $kudosLabelColor">
         Kudos
       </span>
   </a>

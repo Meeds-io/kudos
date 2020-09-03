@@ -1,5 +1,9 @@
 <%
   import org.exoplatform.kudos.service.KudosService;
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.social.core.manager.IdentityManager;
+  import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+  import org.exoplatform.commons.utils.CommonsUtils;
   
   import static org.exoplatform.social.webui.activity.BaseUIActivity.TEMPLATE_PARAM_COMMENT;
 
@@ -11,6 +15,11 @@
   KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
   def commentId = comment.id.replace('comment','');
   def kudosCount = kudosService.countKudosByEntity("COMMENT", commentId);
+  def currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+  def identityManager = CommonsUtils.getService(IdentityManager.class);
+  def identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
+  def kudosSentByCurrentUserCount = kudosService.countKudosByEntityAndSender("COMMENT", commentId, identity.getId());
+  def kudosLabelColor = kudosSentByCurrentUserCount > 0 ? "hasKudos" : "lightGrey";
 
 %>
 <li class="separator">-</li>
@@ -22,7 +31,7 @@
           class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0"
           onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT', 'parentId': '${activity.id}'}}));event.preventDefault();event.stopPropagation();">
     <div class="v-btn__content">
-      <span class="kudosLabel lightGrey">Kudos</span>
+      <span class="kudosLabel $kudosLabelColor">Kudos</span>
     </div>
   </button>
   <a rel="tooltip"
