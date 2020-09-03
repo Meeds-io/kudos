@@ -22,6 +22,8 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
     @NamedQuery(name = "Kudos.getKudosByEntity", query = "select k from Kudos k" + " WHERE k.entityType = :entityType"
         + " AND k.entityId = :entityId"
         + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(name = "Kudos.countKudosByEntityAndSender", query = "select count(k) from Kudos k" + " WHERE k.entityType = :entityType"
+        + " AND k.entityId = :entityId" + " AND k.senderId = :senderId"),
     @NamedQuery(name = "Kudos.countKudosByEntity", query = "select count(k) from Kudos k" + " WHERE k.entityType = :entityType"
         + " AND k.entityId = :entityId"),
     @NamedQuery(name = "Kudos.getKudosByParentEntity", query = "select k from Kudos k" + " WHERE k.entityType = :entityType"

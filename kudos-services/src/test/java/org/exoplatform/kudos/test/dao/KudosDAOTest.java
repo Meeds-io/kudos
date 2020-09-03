@@ -86,6 +86,21 @@ public class KudosDAOTest extends BaseKudosTest {
     count = kudosDAO.countKudosByEntity(entityType, 25);
     assertEquals(0, count);
   }
+  
+  @Test
+  public void testCountKudosByEntityAndSender() {
+    KudosDAO kudosDAO = getService(KudosDAO.class);
+    long count = kudosDAO.countKudosByEntityAndSender(entityType, entityId, senderId);
+    assertEquals(0, count);
+
+    newKudos();
+
+    count = kudosDAO.countKudosByEntityAndSender(entityType, entityId, senderId);
+    assertEquals(1, count);
+
+    count = kudosDAO.countKudosByEntityAndSender(entityType, 25, senderId);
+    assertEquals(0, count);
+  }
 
   @Test
   public void testCountKudosByPeriodAndReceiver() {
