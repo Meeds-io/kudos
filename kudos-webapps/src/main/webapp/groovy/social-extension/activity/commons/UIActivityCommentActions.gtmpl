@@ -1,9 +1,5 @@
 <%
   import org.exoplatform.kudos.service.KudosService;
-  import org.exoplatform.services.security.ConversationState;
-  import org.exoplatform.social.core.manager.IdentityManager;
-  import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-  import org.exoplatform.commons.utils.CommonsUtils;
   
   import static org.exoplatform.social.webui.activity.BaseUIActivity.TEMPLATE_PARAM_COMMENT;
 
@@ -15,11 +11,8 @@
   KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
   def commentId = comment.id.replace('comment','');
   def kudosCount = kudosService.countKudosByEntity("COMMENT", commentId);
-  def currentUser = ConversationState.getCurrent().getIdentity().getUserId();
-  def identityManager = CommonsUtils.getService(IdentityManager.class);
-  def identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
-  def kudosSentByCurrentUserCount = kudosService.countKudosByEntityAndSender("COMMENT", commentId, identity.getId());
-  def kudosLabelColor = kudosSentByCurrentUserCount > 0 ? "hasKudos" : "lightGrey";
+  def currentUserSentKudosCount = kudosService.countKudosByEntityAndSender("COMMENT", commentId, uicomponent.getCommenterIdentity().getId());
+  def kudosLabelColor = currentUserSentKudosCount > 0 ? "hasKudos" : "lightGrey";
 
 %>
 <li class="separator">-</li>
