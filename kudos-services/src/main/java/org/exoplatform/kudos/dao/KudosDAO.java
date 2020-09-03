@@ -53,6 +53,15 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     Long count = query.getSingleResult();
     return count == null ? 0 : count;
   }
+  
+  public long countKudosByEntityAndSender(int entityType, long entityId, long senderId) {
+    TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByEntityAndSender", Long.class);
+    query.setParameter("entityId", entityId);
+    query.setParameter("entityType", entityType);
+    query.setParameter("senderId", senderId);
+    Long count = query.getSingleResult();
+    return count == null ? 0 : count;
+  }
 
   public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, long receiverId, boolean isReceiverUser) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndReceiver", Long.class);
