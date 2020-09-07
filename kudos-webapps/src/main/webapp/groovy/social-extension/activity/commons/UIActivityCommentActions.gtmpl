@@ -12,7 +12,7 @@
   def commentId = comment.id.replace('comment','');
   def kudosCount = kudosService.countKudosByEntity("COMMENT", commentId);
   def currentUserSentKudosCount = kudosService.countKudosByEntityAndSender("COMMENT", commentId, uicomponent.getCommenterIdentity().getId());
-  def kudosLabelColor = currentUserSentKudosCount > 0 ? "hasKudos" : "lightGrey";
+  def kudosLabelColor = currentUserSentKudosCount > 0 ? "hasKudos" : "";
 
 %>
 <li class="separator">-</li>
@@ -31,7 +31,7 @@
      data-placement="top"
      title="$displayKudosListTilte"
      href="javascript:void(0);"
-     class="lightGrey"
+     class="$kudosLabelColor"
      onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT'}}));event.preventDefault();event.stopPropagation();"> 
      <%
      if(kudosCount > 0) { %>
