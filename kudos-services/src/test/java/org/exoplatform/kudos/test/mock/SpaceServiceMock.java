@@ -582,4 +582,17 @@ public class SpaceServiceMock implements SpaceService {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void addRedactor(Space space, String userId) {
+    throw new UnsupportedOperationException();
+  }
+
+  public void removeRedactor(Space space, String userId) {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean isRedactor(Space space, String userId) {
+    return false;
+  }
+
 }
