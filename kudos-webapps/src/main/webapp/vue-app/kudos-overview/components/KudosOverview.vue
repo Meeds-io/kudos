@@ -99,10 +99,6 @@ export default {
   created() {
     this.refresh();
   },
-  mounted() {
-    // Decrement 'loading' effect after having incremented it in main.js
-    document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-  },
   methods: {
     openDrawer(kudosType) {
       if (this.owner) {

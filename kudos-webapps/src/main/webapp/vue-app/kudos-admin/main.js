@@ -30,6 +30,9 @@ export function init() {
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
   // init Vue app when locale ressources are ready
     new Vue({
+      mounted() {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      },
       template: `<kudos-admin id="${appId}" />`,
       i18n,
       vuetify,

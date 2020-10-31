@@ -242,7 +242,6 @@ export default {
                 }
               });
           }
-          document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
         })
         .catch(e => {
           this.error = e;
