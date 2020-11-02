@@ -18,6 +18,7 @@ const vuetify = new Vuetify({
 });
 
 const appId = 'KudosOverview';
+const cacheId = `${appId}_${eXo.env.portal.profileOwnerIdentityId}`;
 
 //should expose the locale ressources as REST API 
 const lang = (eXo && eXo.env && eXo.env.portal && eXo.env.portal.language) || 'en';
@@ -25,11 +26,16 @@ const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale
 
 export function init() {
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
-  // init Vue app when locale ressources are ready
+    const appElement = document.createElement('div');
+    appElement.id = appId;
+
     new Vue({
-      template: `<kudos-overview id="${appId}" />`,
+      mounted() {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      },
+      template: `<kudos-overview id="${appId}" v-cacheable="{cacheId: '${cacheId}'}" />`,
       i18n,
       vuetify,
-    }).$mount(`#${appId}`);
+    }).$mount(appElement);
   });
 }

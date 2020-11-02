@@ -7,16 +7,12 @@
       height="48"
       flat
       class="border-box-sizing py-3">
-      <div
-        :class="skeleton && 'skeleton-text skeleton-text-width skeleton-background skeleton-text-height-thick skeleton-border-radius'"
-        class="text-header-title text-sub-title text-no-wrap">
+      <div class="text-header-title text-sub-title text-no-wrap">
         {{ $t('exoplatform.kudos.button.rewardedKudos') }}
       </div>
       <v-spacer />
       <select
         v-model="periodType"
-        :disabled="skeleton"
-        :class="skeleton && 'skeleton-background skeleton-text'"
         class="kudosOverviewPeriodSelect fill-height col-auto mr-2 my-auto px-3 py-0 subtitle-1 ignore-vuetify-classes">
         <option
           v-for="period in periods"
@@ -30,8 +26,6 @@
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :clickable="owner && receivedKudosCount > 0"
-          :skeleton="skeleton"
-          :class="skeleton && 'skeleton-background skeleton-text skeleton-border-radius skeleton-text-height-block mx-10 my-4'"
           class="kudosReceivedOverviewPeriod"
           @open-drawer="openDrawer('received')">
           <template slot="count">
@@ -46,8 +40,6 @@
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :clickable="owner && sentKudosCount > 0"
-          :skeleton="skeleton"
-          :class="skeleton && 'skeleton-background skeleton-text skeleton-border-radius skeleton-text-height-block mx-10 my-4'"
           class="kudosSentOverviewPeriod"
           @open-drawer="openDrawer('sent')">
           <template slot="count">
@@ -78,7 +70,6 @@ export default {
     receivedKudosCount: 0,
     sentKudos: [],
     receivedKudos: [],
-    skeleton: true,
   }),
   computed: {
     periods() {
@@ -108,10 +99,6 @@ export default {
   created() {
     this.refresh();
   },
-  mounted() {
-    // Decrement 'loading' effect after having incremented it in main.js
-    document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-  },
   methods: {
     openDrawer(kudosType) {
       if (this.owner) {
@@ -133,11 +120,12 @@ export default {
         .then(kudosList => {
           this.receivedKudosCount = kudosList && kudosList.size || 0;
           this.receivedKudos = kudosList && kudosList.kudos || [];
+          return this.$nextTick();
         })
         .finally(() => {
+          this.$root.$emit('application-loaded');
           // Decrement 'loading' effect in top of the page
           document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-          this.skeleton = false;
         });
     },
   },

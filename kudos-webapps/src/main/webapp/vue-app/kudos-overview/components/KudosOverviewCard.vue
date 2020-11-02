@@ -22,10 +22,6 @@ export default {
       type: Boolean,
       default: null,
     },
-    skeleton: {
-      type: Boolean,
-      default: null,
-    },
   },
 };
 </script>
