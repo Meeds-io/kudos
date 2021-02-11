@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.exoplatform.kudos.model.Kudos;
 import org.junit.Test;
 
 import org.exoplatform.kudos.dao.KudosDAO;
@@ -203,5 +204,17 @@ public class KudosDAOTest extends BaseKudosTest {
     count = kudosDAO.countKudosByPeriodAndSender(kudosPeriod, 30);
     assertEquals(0, count);
   }
+  @Test
+  public void testGetKudosByActivityId() {
+    KudosDAO kudosDAO = getService(KudosDAO.class);
+    KudosEntity kudos = newKudos();
+    Long activityId= 1L ;
+    kudos.setActivityId(activityId);
+    kudosDAO.create(kudos);
+    KudosEntity newKudos = kudosDAO.getKudosByActivityId(activityId);
+    assertNotNull(newKudos);
+
+  }
 
 }
+

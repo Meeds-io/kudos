@@ -2,6 +2,7 @@ package org.exoplatform.kudos.dao;
 
 import java.util.List;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
@@ -78,6 +79,12 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     query.setParameter("senderId", senderId);
     query.setMaxResults(limit);
     return query.getResultList();
+  }
+
+  public KudosEntity getKudosByActivityId(Long  activityId) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByActivityId", KudosEntity.class);
+    query.setParameter("activityId",activityId);
+    return  query.getSingleResult();
   }
 
   public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {

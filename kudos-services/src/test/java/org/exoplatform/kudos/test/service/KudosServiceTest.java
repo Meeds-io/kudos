@@ -528,4 +528,17 @@ public class KudosServiceTest extends BaseKudosTest {
     assertTrue(listenerInvoked.get());
   }
 
+  @Test
+  public void testGetKudosByActivityId() throws Exception {
+    KudosService kudosService = getService(KudosService.class);
+    KudosStorage kudosStorage = getService(KudosStorage.class);
+    Kudos kudos = newKudosDTO();
+    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
+    kudos=kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
+    entitiesToClean.add(kudos);
+    KudosEntity newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
+    assertNotNull(newKudos);
+  }
+
 }
