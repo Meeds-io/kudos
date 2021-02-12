@@ -2,7 +2,6 @@ package org.exoplatform.kudos.dao;
 
 import java.util.List;
 
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
