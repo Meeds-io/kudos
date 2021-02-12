@@ -539,7 +539,7 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
     entitiesToClean.add(kudos);
     KudosEntity newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
-    assertNotNull(newKudos);
+    compareResults(newKudos, storedKudos);
   }
 
   @Test
@@ -556,6 +556,8 @@ public class KudosServiceTest extends BaseKudosTest {
     updatedKudos.setId(storedKudos.getTechnicalId());
     KudosEntity newKudos = kudosService.updateKudos(updatedKudos) ;
     assertEquals(newKudos.getMessage(),storedKudos.getMessage());
+    compareResults(newKudos, storedKudos);
+
   }
 
 }

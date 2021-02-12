@@ -1,11 +1,11 @@
 package org.exoplatform.kudos.test.dao;
 
+import static org.exoplatform.kudos.service.utils.Utils.fromEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.exoplatform.kudos.model.Kudos;
 import org.junit.Test;
 
 import org.exoplatform.kudos.dao.KudosDAO;
@@ -212,9 +212,7 @@ public class KudosDAOTest extends BaseKudosTest {
     kudos.setActivityId(activityId);
     kudosDAO.create(kudos);
     KudosEntity newKudos = kudosDAO.getKudosByActivityId(activityId);
-    assertNotNull(newKudos);
+    compareResults(newKudos, fromEntity(kudos));
 
   }
-
 }
-
