@@ -1,10 +1,7 @@
 package org.exoplatform.kudos.listener;
 
-import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.service.KudosService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.ActivityLifeCycleEvent;
 import org.exoplatform.social.core.activity.ActivityListenerPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -14,12 +11,9 @@ import static org.exoplatform.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_T
 import static org.exoplatform.social.core.processor.I18NActivityUtils.getParamValues;
 
 public class KudosActivityListener extends ActivityListenerPlugin {
-    private static final Log LOG = ExoLogger.getLogger(KudosActivityListener.class);
-    private KudosDAO kudosDAO;
     private KudosService kudosService;
 
-    public KudosActivityListener(KudosDAO kudosDAO, KudosService kudosService) {
-        this.kudosDAO = kudosDAO;
+    public KudosActivityListener( KudosService kudosService) {
         this.kudosService = kudosService;
     }
 
@@ -45,7 +39,7 @@ public class KudosActivityListener extends ActivityListenerPlugin {
             activity.setTemplateParams(templateParams);
             KudosEntity kudos = kudosService.getKudosByActivityId(Long.parseLong(activity.getId()));
             kudos.setMessage(msg);
-            kudosDAO.update(kudos);
+            kudosService.updateKudos(kudos);
         }
     }
 

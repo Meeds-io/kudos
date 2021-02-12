@@ -166,4 +166,9 @@ public class KudosStorage {
   public KudosEntity getKudosByActivityId(Long  activityId){
     return kudosDAO.getKudosByActivityId(activityId);
   }
+
+  public KudosEntity updateKudos(KudosEntity kudosEntity) {
+    return kudosDAO.update(kudosEntity);
+  }
+
 }

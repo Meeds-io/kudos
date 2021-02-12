@@ -192,15 +192,24 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     Kudos kudos = kudosStorage.getKudoById(kudosId);
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
   }
+
   /**
    * Retrieves kudos by activityId
    * @param activityId {@link ExoSocialActivity}  identifier
-   * @return {@link Kudos}
+   * @return {@link KudosEntity}
    */
   public KudosEntity getKudosByActivityId(Long activityId) {
    return kudosStorage.getKudosByActivityId(activityId);
   }
 
+ /**
+   * Updates a kudos
+   * @param kudosEntity {@link KudosEntity}
+   * @return {@link KudosEntity}
+   */
+  public KudosEntity updateKudos(KudosEntity kudosEntity) {
+   return kudosStorage.updateKudos(kudosEntity);
+  }
 
   /**
    * Retrieves the list of kudos sent in a period of time.
