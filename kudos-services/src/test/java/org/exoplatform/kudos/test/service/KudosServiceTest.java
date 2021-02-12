@@ -535,7 +535,7 @@ public class KudosServiceTest extends BaseKudosTest {
     KudosStorage kudosStorage = getService(KudosStorage.class);
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
-    kudos=kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
     entitiesToClean.add(kudos);
     KudosEntity newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
@@ -548,11 +548,11 @@ public class KudosServiceTest extends BaseKudosTest {
     KudosStorage kudosStorage = getService(KudosStorage.class);
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
-    kudos=kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    Kudos storedKudos = kudosStorage.getKudoById(kudos.getTechnicalId());
     storedKudos.setMessage("updated message");
     entitiesToClean.add(kudos);
-    KudosEntity updatedKudos =toNewEntity(storedKudos);
+    KudosEntity updatedKudos = toNewEntity(storedKudos);
     updatedKudos.setId(storedKudos.getTechnicalId());
     KudosEntity newKudos = kudosService.updateKudos(updatedKudos) ;
     assertEquals(newKudos.getMessage(),storedKudos.getMessage());

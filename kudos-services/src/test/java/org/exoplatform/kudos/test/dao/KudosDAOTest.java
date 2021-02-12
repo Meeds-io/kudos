@@ -208,7 +208,7 @@ public class KudosDAOTest extends BaseKudosTest {
   public void testGetKudosByActivityId() {
     KudosDAO kudosDAO = getService(KudosDAO.class);
     KudosEntity kudos = newKudos();
-    Long activityId= 1L ;
+    Long activityId = 1L ;
     kudos.setActivityId(activityId);
     kudosDAO.create(kudos);
     KudosEntity newKudos = kudosDAO.getKudosByActivityId(activityId);
