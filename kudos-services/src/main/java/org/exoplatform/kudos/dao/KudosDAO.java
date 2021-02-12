@@ -80,6 +80,12 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     return query.getResultList();
   }
 
+  public KudosEntity getKudosByActivityId(Long  activityId) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByActivityId", KudosEntity.class);
+    query.setParameter("activityId",activityId);
+    return  query.getSingleResult();
+  }
+
   public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndSender", Long.class);
     setPeriodParameters(query, kudosPeriod);

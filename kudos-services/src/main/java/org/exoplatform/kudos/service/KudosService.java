@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.kudos.entity.KudosEntity;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -190,6 +191,24 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     kudosStorage.saveKudosActivityId(kudosId, activityId);
     Kudos kudos = kudosStorage.getKudoById(kudosId);
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+  }
+
+  /**
+   * Retrieves kudos by activityId
+   * @param activityId {@link ExoSocialActivity}  identifier
+   * @return {@link KudosEntity}
+   */
+  public KudosEntity getKudosByActivityId(Long activityId) {
+   return kudosStorage.getKudosByActivityId(activityId);
+  }
+
+ /**
+   * Updates a kudos
+   * @param kudosEntity {@link KudosEntity}
+   * @return {@link KudosEntity}
+   */
+  public KudosEntity updateKudos(KudosEntity kudosEntity) {
+   return kudosStorage.updateKudos(kudosEntity);
   }
 
   /**

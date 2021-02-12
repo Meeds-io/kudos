@@ -1,5 +1,6 @@
 package org.exoplatform.kudos.test.service;
 
+import static org.exoplatform.kudos.service.utils.Utils.toNewEntity;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -526,6 +527,37 @@ public class KudosServiceTest extends BaseKudosTest {
       i++;
     }
     assertTrue(listenerInvoked.get());
+  }
+
+  @Test
+  public void testGetKudosByActivityId() throws Exception {
+    KudosService kudosService = getService(KudosService.class);
+    KudosStorage kudosStorage = getService(KudosStorage.class);
+    Kudos kudos = newKudosDTO();
+    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
+    entitiesToClean.add(kudos);
+    KudosEntity newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
+    compareResults(newKudos, storedKudos);
+  }
+
+  @Test
+  public void testUpdateKudos() throws Exception {
+    KudosService kudosService = getService(KudosService.class);
+    KudosStorage kudosStorage = getService(KudosStorage.class);
+    Kudos kudos = newKudosDTO();
+    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    Kudos storedKudos = kudosStorage.getKudoById(kudos.getTechnicalId());
+    storedKudos.setMessage("updated message");
+    entitiesToClean.add(kudos);
+    KudosEntity updatedKudos = toNewEntity(storedKudos);
+    updatedKudos.setId(storedKudos.getTechnicalId());
+    KudosEntity newKudos = kudosService.updateKudos(updatedKudos) ;
+    assertEquals(newKudos.getMessage(),storedKudos.getMessage());
+    compareResults(newKudos, storedKudos);
+
   }
 
 }
