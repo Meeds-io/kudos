@@ -13,6 +13,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
 @DynamicUpdate
 @Table(name = "ADDONS_KUDOS")
 @NamedQueries({
+    @NamedQuery(name = "Kudos.getKudosByActivityId", query = "select k from Kudos k" + " WHERE k.activityId = :activityId"),
     @NamedQuery(name = "Kudos.getKudosByPeriod", query = "select k from Kudos k" + " WHERE k.createdDate > :startDate"
         + " AND k.createdDate < :endDate"
         + " ORDER BY k.createdDate DESC"),

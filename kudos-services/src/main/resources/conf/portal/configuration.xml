@@ -55,4 +55,13 @@
     </component-plugin>
   </external-component-plugins>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.social.core.manager.ActivityManager</target-component>
+    <component-plugin>
+      <name>KudosActivityListener</name>
+      <set-method>addActivityEventListener</set-method>
+      <type>org.exoplatform.kudos.listener.KudosActivityListener</type>
+      <description>update kudos activity listener</description>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>
