@@ -1,5 +1,6 @@
 package org.exoplatform.kudos.test.dao;
 
+import static org.exoplatform.kudos.service.utils.Utils.fromEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -203,5 +204,15 @@ public class KudosDAOTest extends BaseKudosTest {
     count = kudosDAO.countKudosByPeriodAndSender(kudosPeriod, 30);
     assertEquals(0, count);
   }
+  @Test
+  public void testGetKudosByActivityId() {
+    KudosDAO kudosDAO = getService(KudosDAO.class);
+    KudosEntity kudos = newKudos();
+    Long activityId = 1L ;
+    kudos.setActivityId(activityId);
+    kudosDAO.create(kudos);
+    KudosEntity newKudos = kudosDAO.getKudosByActivityId(activityId);
+    compareResults(newKudos, fromEntity(kudos));
 
+  }
 }
