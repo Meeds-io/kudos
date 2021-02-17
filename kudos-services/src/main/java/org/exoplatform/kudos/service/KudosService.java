@@ -18,20 +18,26 @@ package org.exoplatform.kudos.service;
 
 import static org.exoplatform.kudos.service.utils.Utils.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
-import org.exoplatform.kudos.entity.KudosEntity;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.statistic.ExoKudosStatistic;
 import org.exoplatform.kudos.statistic.ExoKudosStatisticService;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.rpc.RPCService;
+import org.exoplatform.services.rpc.RemoteCommand;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -44,6 +50,12 @@ import org.exoplatform.social.core.space.spi.SpaceService;
  */
 public class KudosService implements ExoKudosStatisticService, Startable {
 
+  private static final Log    LOG                             = ExoLogger.getLogger(KudosService.class);
+
+  private static final String CLUSTER_GLOBAL_SETTINGS_UPDATED = "KudosService-GlobalSettings-Updated";
+
+  private static final String CLUSTER_NODE_ID                 = UUID.randomUUID().toString();
+
   private IdentityManager identityManager;
 
   private SpaceService    spaceService;
@@ -54,19 +66,30 @@ public class KudosService implements ExoKudosStatisticService, Startable {
 
   private SettingService  settingService;
 
+  private PortalContainer container;
+
+  private RPCService      rpcService;
+
   private GlobalSettings  globalSettings;
+
+  /**
+   * The generic command used to replicate changes over the cluster
+   */
+  private RemoteCommand   reloadSettingsCommand;
 
   public KudosService(KudosStorage kudosStorage,
                       SettingService settingService,
                       SpaceService spaceService,
                       IdentityManager identityManager,
                       ListenerService listenerService,
+                      PortalContainer container,
                       InitParams params) {
     this.kudosStorage = kudosStorage;
     this.identityManager = identityManager;
     this.spaceService = spaceService;
     this.settingService = settingService;
     this.listenerService = listenerService;
+    this.container = container;
 
     if (params != null) {
       this.globalSettings = new GlobalSettings();
@@ -87,6 +110,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     if (loadedGlobalSettings != null) {
       this.globalSettings = loadedGlobalSettings;
     }
+    installClusterListener();
   }
 
   @Override
@@ -112,6 +136,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   public void saveGlobalSettings(GlobalSettings settings) {
     settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toStringToPersist()));
     this.globalSettings = null;
+    clearCacheClusterWide();
   }
 
   /**
@@ -195,20 +220,22 @@ public class KudosService implements ExoKudosStatisticService, Startable {
 
   /**
    * Retrieves kudos by activityId
-   * @param activityId {@link ExoSocialActivity}  identifier
+   * 
+   * @param activityId {@link ExoSocialActivity} identifier
    * @return {@link KudosEntity}
    */
   public KudosEntity getKudosByActivityId(Long activityId) {
-   return kudosStorage.getKudosByActivityId(activityId);
+    return kudosStorage.getKudosByActivityId(activityId);
   }
 
- /**
+  /**
    * Updates a kudos
+   * 
    * @param kudosEntity {@link KudosEntity}
    * @return {@link KudosEntity}
    */
   public KudosEntity updateKudos(KudosEntity kudosEntity) {
-   return kudosStorage.updateKudos(kudosEntity);
+    return kudosStorage.updateKudos(kudosEntity);
   }
 
   /**
@@ -271,10 +298,10 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   public long countKudosByEntity(String entityType, String entityId) {
     return kudosStorage.countKudosByEntity(entityType, entityId);
   }
-  
+
   /**
-   * Count kudos sent by an identity using a dedicated entity (activity, comment,
-   * profile header, tiptip...)
+   * Count kudos sent by an identity using a dedicated entity (activity,
+   * comment, profile header, tiptip...)
    * 
    * @param entityType entity type of type {@link KudosEntityType}
    * @param entityId entity technical id
@@ -329,7 +356,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
                                             long startDateInSeconds,
                                             long endDateInSeconds) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
     if (identity == null) {
       return 0;
     }
@@ -351,7 +378,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
                                                  long endDateInSeconds,
                                                  int limit) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
     if (identity == null) {
       return Collections.emptyList();
     }
@@ -458,4 +485,42 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     }
   }
 
+  private void installClusterListener() {
+    RPCService clusterRpcService = getRpcService();
+    if (clusterRpcService != null) {
+      // Clear global settings in current node
+      // to force reload it from store
+      // if another cluster node had changed
+      // the settings
+      this.reloadSettingsCommand = clusterRpcService.registerCommand(new RemoteCommand() {
+        public String getId() {
+          return CLUSTER_GLOBAL_SETTINGS_UPDATED;
+        }
+
+        public Serializable execute(Serializable[] args) throws Throwable {
+          if (!CLUSTER_NODE_ID.equals(args[0])) {
+            KudosService.this.globalSettings = null;
+          }
+          return true;
+        }
+      });
+    }
+  }
+
+  private void clearCacheClusterWide() {
+    if (this.reloadSettingsCommand != null) {
+      try {
+        getRpcService().executeCommandOnAllNodes(this.reloadSettingsCommand, false, CLUSTER_NODE_ID);
+      } catch (Exception e) {
+        LOG.warn("An error occurred while clearing global settings cache on other nodes", e);
+      }
+    }
+  }
+
+  private RPCService getRpcService() {
+    if (rpcService == null) {
+      rpcService = container.getComponentInstanceOfType(RPCService.class);
+    }
+    return rpcService;
+  }
 }
