@@ -5,6 +5,8 @@ import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.social.core.activity.ActivityLifeCycleEvent;
 import org.exoplatform.social.core.activity.ActivityListenerPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.manager.ActivityManager;
+
 import java.util.Map;
 
 import static org.exoplatform.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
@@ -12,11 +14,13 @@ import static org.exoplatform.social.core.processor.I18NActivityUtils.getParamVa
 
 public class KudosActivityListener extends ActivityListenerPlugin {
     private KudosService kudosService;
+    private ActivityManager activityManager;
     private String RESOURCE_BUNDLE_VALUES_PARAM = "RESOURCE_BUNDLE_VALUES_PARAM";
 
 
-    public KudosActivityListener( KudosService kudosService) {
+    public KudosActivityListener( KudosService kudosService, ActivityManager activityManager) {
         this.kudosService = kudosService;
+        this.activityManager = activityManager;
     }
 
     @Override
@@ -39,6 +43,7 @@ public class KudosActivityListener extends ActivityListenerPlugin {
                     .append(activityParamValues[3]);
             templateParams.put(RESOURCE_BUNDLE_VALUES_PARAM,new_resourve_bundle_values_param.toString());
             activity.setTemplateParams(templateParams);
+            activityManager.updateActivity(activity, false);
             KudosEntity kudos = kudosService.getKudosByActivityId(Long.parseLong(activity.getId()));
             kudos.setMessage(activityTitle);
             kudosService.updateKudos(kudos);
