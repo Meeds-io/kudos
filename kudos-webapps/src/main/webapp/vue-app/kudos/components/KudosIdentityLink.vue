@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     url() {
-      if(this.type === 'user' || this.type === 'organization') {
+      if (this.type === 'user' || this.type === 'organization') {
         return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.id}`;
       } else {
         return `${eXo.env.portal.context}/g/:spaces:${this.id}/`;
@@ -64,7 +64,7 @@ export default {
     }
   },
   watch: {
-    id(oldValue, newValue) {
+    id() {
       if (this.id) {
         // TODO disable tiptip because of high CPU usage using its code
         this.initTiptip();
@@ -87,14 +87,14 @@ export default {
             restURL: '/portal/rest/v1/social/spaces/{0}',
             membersRestURL: '/portal/rest/v1/social/spaces/{0}/users?returnSize=true',
             managerRestUrl: '/portal/rest/v1/social/spaces/{0}/users?role=manager&returnSize=true',
-            membershipRestUrl : '/portal/rest/v1/social/spacesMemberships?space={0}&returnSize=true',
-            defaultAvatarUrl : `/portal/rest/v1/social/spaces/${this.id}/avatar`,
-            deleteMembershipRestUrl : '/portal/rest/v1/social/spacesMemberships/{0}:{1}:{2}',
+            membershipRestUrl: '/portal/rest/v1/social/spacesMemberships?space={0}&returnSize=true',
+            defaultAvatarUrl: `/portal/rest/v1/social/spaces/${this.id}/avatar`,
+            deleteMembershipRestUrl: '/portal/rest/v1/social/spacesMemberships/{0}:{1}:{2}',
             labels: this.labels,
             content: false,
             keepAlive: true,
-            defaultPosition: "left",
-            maxWidth: "240px"
+            defaultPosition: 'left',
+            maxWidth: '240px'
           });
         });
       } else {
@@ -105,8 +105,8 @@ export default {
             labels: this.labels,
             content: false,
             keepAlive: true,
-            defaultPosition: "left",
-            maxWidth: "240px"
+            defaultPosition: 'left',
+            maxWidth: '240px'
           });
         });
       }

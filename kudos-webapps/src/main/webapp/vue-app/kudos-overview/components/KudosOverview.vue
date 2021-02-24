@@ -103,8 +103,8 @@ export default {
     openDrawer(kudosType) {
       if (this.owner) {
         const title = kudosType === 'sent' ?
-            this.$t('exoplatform.kudos.button.sentKudos'):
-            this.$t('exoplatform.kudos.button.receivedKudos');
+          this.$t('exoplatform.kudos.button.sentKudos'):
+          this.$t('exoplatform.kudos.button.receivedKudos');
         this.$refs.kudosOverviewDrawer.open(title, kudosType, this.identityId, this.periodType);
       }
     },

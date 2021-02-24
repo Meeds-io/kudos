@@ -35,7 +35,7 @@ export function getReceiver(entityType, entityId) {
         }
       })
       .catch((e) => {
-        console.debug('Error retrieving activity details with id', entityId, e);
+        console.error('Error retrieving activity details with id', entityId, e);
       });
   } else {
     console.error('Unkown entity type', entityType, entityId);
@@ -83,6 +83,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
       }
     })
     .catch((e) => {
+      console.error('Error identity details with remoteId', remoteId, e);
       return ownerDetails;
     });
 }

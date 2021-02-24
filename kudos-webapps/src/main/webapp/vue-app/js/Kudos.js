@@ -96,10 +96,10 @@ export function registerExternalExtensions(title) {
       const id = profile.prettyName ? profile.id : profile.username;
       if (id) {
         document.dispatchEvent(
-          new CustomEvent('exo-kudos-open-send-modal', {detail : {
-            id : id,
+          new CustomEvent('exo-kudos-open-send-modal', {detail: {
+            id: id,
             type: type,
-        }}));
+          }}));
       }
     },
   };
