@@ -13,7 +13,7 @@
       <v-spacer />
       <select
         v-model="periodType"
-        class="kudosOverviewPeriodSelect fill-height col-auto mr-2 my-auto px-3 py-0 subtitle-1 ignore-vuetify-classes">
+        class="kudosOverviewPeriodSelect fill-height col-auto me-2 my-auto px-3 py-0 subtitle-1 ignore-vuetify-classes">
         <option
           v-for="period in periods"
           :key="period.value"

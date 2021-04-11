@@ -14,10 +14,7 @@ window.parentToWatch = '#UISpaceActivityStreamPortlet, #UIUserActivityStreamPort
 
 Vue.use(Vuetify);
 
-const vuetify = new Vuetify({
-  dark: true,
-  iconfont: 'mdi',
-});
+const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
 
 const appId = 'KudosApp';
 
