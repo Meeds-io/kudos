@@ -32,12 +32,14 @@
 
     .uiIconKudosCheck {
       position: absolute;
-      left: ~"calc(50% - 8px)";
+      left: ~"calc(50% - 8px)" ~'; /** orientation=lt */ ';
+      right: ~"calc(50% - 8px)" ~'; /** orientation=rt */ ';
       top: 15px;
     }
   }
   .kudosIconContainerCurrent {
-    left: 0;
+    left: 0 ~'; /** orientation=lt */ ';
+    right: 0 ~'; /** orientation=rt */ ';
     top: -3px;
     position: absolute;
     background-color: @primaryColor;
@@ -102,7 +104,8 @@
   }
   .contactAutoCompleteContent {
     top: 55px !important;
-    left: 0 !important;
+    left: 0 ~'!important; /** orientation=lt */ ';
+    right: 0 ~'!important; /** orientation=rt */ ';
     position: absolute;
     width: 100%;
     z-index: 1050 !important;
@@ -138,7 +141,8 @@
   }
   .autocompleteSelectedItem {
     cursor: pointer;
-    margin: 0 3px 3px 0;
+    margin: 0 3px 3px 0 ~'; /** orientation=lt */ ';
+    margin: 0 0 3px 3px ~'; /** orientation=rt */ ';
     padding: 2px 6px;
     background: @primaryColor;
     color: #fff;
