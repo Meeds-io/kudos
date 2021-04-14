@@ -29,9 +29,11 @@
       <v-menu
         ref="selectedDateMenu"
         v-model="selectedDateMenu"
+        :nudge-right="$vuetify.rtl"
         attach="#selectedDateMenu"
         transition="scale-transition"
         offset-y
+        offset-x
         eager
         class="kudosDateSelector">
         <v-date-picker
@@ -50,7 +52,7 @@
         :items-per-page="1000"
         :loading="loading"
         :sortable="true"
-        class="elevation-1 mr-3 mb-2"
+        class="elevation-1 me-3 mb-2"
         hide-default-footer>
         <template slot="item" slot-scope="props">
           <tr>
@@ -61,7 +63,7 @@
                   onerror="this.src = '/eXoSkin/skin/images/system/SpaceAvtDefault.png'">
               </v-avatar>
             </td>
-            <td class="text-left">
+            <td class="text-start">
               <a
                 :href="props.item.url"
                 rel="nofollow"
@@ -108,14 +110,12 @@ export default {
       return [
         {
           text: '',
-          align: 'right',
           sortable: false,
           value: 'avatar',
           width: '36px'
         },
         {
           text: this.$t('exoplatform.kudos.label.name'),
-          align: 'left',
           sortable: false,
           value: 'name'
         },

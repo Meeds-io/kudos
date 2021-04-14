@@ -21,7 +21,7 @@
           data-placement="bottom"
           title="$kudosTitle"
           type="button"
-          class="v-btn v-btn--icon small mt-0 mb-0 mr-0 ml-0"
+          class="v-btn v-btn--icon small ma-0"
           onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {'detail' : {'id' : '${commentId}', 'type': 'COMMENT', 'parentId': '${activity.id}'}}));event.preventDefault();event.stopPropagation();">
     <div class="v-btn__content">
       <span class="kudosLabel $kudosLabelColor">Kudos</span>

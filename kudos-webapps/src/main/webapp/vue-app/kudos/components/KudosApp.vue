@@ -30,7 +30,7 @@
               flat
               fluid
               grid-list-lg
-              class="pl-0 pr-0 pb-0 pt-0">
+              class="pa-0">
               <v-layout
                 row
                 wrap
@@ -103,7 +103,7 @@
             <button
               v-if="kudosToSend"
               :disabled="loading || error"
-              class="ignore-vuetify-classes btn btn-primary mr-3"
+              class="ignore-vuetify-classes btn btn-primary me-3"
               @click="send">
               {{ $t('exoplatform.kudos.button.send') }}
             </button>
@@ -144,7 +144,7 @@
               flat
               fluid
               grid-list-lg
-              class="pl-0 pr-0 pb-0 pt-0">
+              class="pa-0">
               <v-layout
                 row
                 wrap

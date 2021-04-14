@@ -24,10 +24,10 @@
                 v-if="loading"
                 indeterminate
                 color="white"
-                class="mr-2" />
+                class="me-2" />
               <v-card v-else flat>
                 <v-card-text>
-                  <div class="text-left kudosPeriodConfiguration">
+                  <div class="text-start kudosPeriodConfiguration">
                     <div class="ma-auto">
                       <v-text-field
                         v-model="kudosPerPeriod"
@@ -37,7 +37,7 @@
                         required />
                     </div>
                     <div class="ma-auto">
-                      <span class="ml-2 mr-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
+                      <span class="mx-2"> {{ $t('exoplatform.kudos.label.kudosPer') }} </span>
                     </div>
                     <div class="ma-auto">
                       <v-combobox
@@ -108,7 +108,7 @@
                           size="20">
                           <img :src="item.avatar">
                         </v-list-item-avatar>
-                        <v-list-item-title class="text-left" v-text="item.name" />
+                        <v-list-item-title class="text-start" v-text="item.name" />
                       </template>
                     </v-autocomplete>
                   </v-flex>
