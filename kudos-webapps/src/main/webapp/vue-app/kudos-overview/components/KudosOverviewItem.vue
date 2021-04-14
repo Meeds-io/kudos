@@ -42,7 +42,7 @@ export default {
     lang: eXo.env.portal.language,
     dateFormat: {
       dateStyle: 'long',
-      timeStyle : 'short',
+      timeStyle: 'short',
     },
   }),
   computed: {

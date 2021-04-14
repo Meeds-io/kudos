@@ -1,6 +1,6 @@
 <script>
 import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions, registerActivityReactionTabs} from '../../js/Kudos.js';
-import {getEntityKudos} from "../../js/Kudos";
+import {getEntityKudos} from '../../js/Kudos';
 
 export default {
   created() {
@@ -22,15 +22,15 @@ export default {
       });
     },
     getPeriodDates(event) {
-      if(event && event.detail && event.detail.date && event.detail.periodType) {
+      if (event && event.detail && event.detail.date && event.detail.periodType) {
         getPeriodDates(event.detail.date, event.detail.periodType)
           .then(period =>
-            document.dispatchEvent(new CustomEvent('exo-kudos-get-period-result', {'detail' : {'period' : period}}))
+            document.dispatchEvent(new CustomEvent('exo-kudos-get-period-result', {'detail': {'period': period}}))
           );
       }
     },
     getKudosList(event) {
-      if(event && event.detail && (event.detail.date || (event.detail.startDate && event.detail.endDate))) {
+      if (event && event.detail && (event.detail.date || (event.detail.startDate && event.detail.endDate))) {
         document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list-loading'));
         const kudosIdentitiesMap = {};
         this.getKudosByDate(event.detail)
@@ -65,17 +65,17 @@ export default {
                 };
               }
             });
-            document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list-result', {'detail' : {'list' : Object.values(kudosIdentitiesMap)}}));
+            document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list-result', {'detail': {'list': Object.values(kudosIdentitiesMap)}}));
           })
           .catch(e => {
-            document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list-result', {'detail' : {'error' : e}}));
+            document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list-result', {'detail': {'error': e}}));
           });
       } else {
-        console.debug('Event seems to be empty, please verify the API usage');
+        console.error('Event seems to be empty, please verify the API usage');
       }
     },
     getKudosByDate(detail) {
-      if(detail.date) {
+      if (detail.date) {
         return getKudosByPeriodOfDate(detail.date);
       } else {
         return getKudosByPeriod(detail.startDate, detail.endDate);
@@ -89,14 +89,14 @@ export default {
       const sendKudosLabel = this.$t('exoplatform.kudos.button.sendKudos');
       eXo.social.tiptip.extraActions.push({
         appendContentTo(divUIAction, ownerId, type) {
-          if(!type || type === 'username' || type === 'user' || type === 'organization') {
+          if (!type || type === 'username' || type === 'user' || type === 'organization') {
             type = 'USER';
           } else {
             type = 'SPACE';
           }
           // FIXME disable TIPTIP button to send Kudos to a space because of a limitation
           // in eXo Platform REST Services that couldn't retrieve Space details by prettyName
-         if(type === 'USER') {
+          if (type === 'USER') {
             divUIAction.append(`<a title="${sendKudosLabel}" 
                 class="sendKudosTipTipButton"
                 href="javascript:void(0);"
@@ -107,7 +107,7 @@ export default {
           }
         }
       });
-      if(!$(".SendKudosButtonBanner").length) {
+      if (!$('.SendKudosButtonBanner').length) {
         if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
           $('.profileMenuNav .profileMenuNavHeader .profileMenuApps').append(`<li class="SendKudosButtonBanner">
               <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',

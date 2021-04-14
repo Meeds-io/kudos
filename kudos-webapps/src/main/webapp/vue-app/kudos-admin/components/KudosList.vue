@@ -164,9 +164,9 @@ export default {
       return (this.selectedEndDateInSeconds && this.formatDate(new Date(this.selectedEndDateInSeconds * 1000), this.lang)) || 0;
     },
     periodDatesDisplay() {
-      if(this.selectedStartDate && this.selectedEndDate) {
+      if (this.selectedStartDate && this.selectedEndDate) {
         return `${this.selectedStartDate} ${this.$t('exoplatform.kudos.label.to')} ${this.selectedEndDate}`;
-      } else if(this.selectedStartDate) {
+      } else if (this.selectedStartDate) {
         return this.selectedStartDate;
       } else {
         return '';
@@ -185,7 +185,7 @@ export default {
       this.loadAll();
     },
     defaultKudosPeriodType() {
-      if(!this.kudosPeriodType && this.defaultKudosPeriodType) {
+      if (!this.kudosPeriodType && this.defaultKudosPeriodType) {
         this.selectedDate = new Date().toISOString().substr(0, 10);
       }
       this.kudosPeriodType = this.defaultKudosPeriodType;
@@ -205,26 +205,26 @@ export default {
       }
       this.selectedStartDateInSeconds = new Date(this.selectedDate).getTime() / 1000;
       this.selectedEndDateInSeconds = null;
-      document.dispatchEvent(new CustomEvent('exo-kudos-get-period', {'detail' : {'date' : new Date(this.selectedDate), 'periodType': this.kudosPeriodType}}));
+      document.dispatchEvent(new CustomEvent('exo-kudos-get-period', {'detail': {'date': new Date(this.selectedDate), 'periodType': this.kudosPeriodType}}));
     },
     loadPeriodDates(event) {
-      if(event && event.detail && event.detail.period) {
+      if (event && event.detail && event.detail.period) {
         this.selectedStartDateInSeconds = event.detail.period.startDateInSeconds;
         this.selectedEndDateInSeconds = event.detail.period.endDateInSeconds;
-        document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail' : {'startDate' : new Date(this.selectedStartDateInSeconds * 1000), 'endDate' : new Date(this.selectedEndDateInSeconds * 1000)}}));
+        document.dispatchEvent(new CustomEvent('exo-kudos-get-kudos-list', {'detail': {'startDate': new Date(this.selectedStartDateInSeconds * 1000), 'endDate': new Date(this.selectedEndDateInSeconds * 1000)}}));
       } else {
-        console.debug("Retrieved event detail doesn't have the period as result");
+        console.error('Retrieved event detail doesn\'t have the period as result');
       }
     },
     loadKudosList(event) {
       this.error = null;
       this.kudosIdentitiesList = [];
-      if(!event || !event.detail) {
+      if (!event || !event.detail) {
         this.error = this.$t('exoplatform.kudos.warning.emptyKudosList');
-      } else if(event.detail.error) {
-        console.debug(event.detail.error);
+      } else if (event.detail.error) {
+        console.error(event.detail.error);
         this.error = event.detail.error;
-      } else if(event.detail.list) {
+      } else if (event.detail.list) {
         this.kudosIdentitiesList = event.detail.list;
       } else {
         this.error = this.$t('exoplatform.kudos.warning.emptyKudosList');

@@ -144,7 +144,7 @@ import {initSettings, saveSettings} from '../../js/KudosSettings.js';
 import {searchSpaces} from '../../js/KudosIdentity.js';
 
 export default {
-  data: vm => {
+  data: () => {
     return {
       loading: false,
       selectedTab: 'general',
@@ -179,13 +179,13 @@ export default {
           text: this.$t('exoplatform.kudos.label.year'),
           value: 'YEAR'
         }
-      ]
+      ];
     },
     selectedPeriodTypeText() {
       let selectedPeriodType = this.periods.find(period => period.value === this.kudosPeriodType);
       selectedPeriodType = selectedPeriodType ? selectedPeriodType.value : this.kudosPeriodType;
       if (selectedPeriodType) {
-        return this.$t(`exoplatform.kudos.label.${selectedPeriodType.toLowerCase()}`)
+        return this.$t(`exoplatform.kudos.label.${selectedPeriodType.toLowerCase()}`);
       }
       return '';
     }
@@ -203,7 +203,7 @@ export default {
           this.isLoadingSuggestions = false;
         })
         .catch((e) => {
-          console.debug("searchSpaces method - error", e);
+          console.error('searchSpaces method - error', e);
           this.isLoadingSuggestions = false;
         });
     },
@@ -238,7 +238,7 @@ export default {
                   this.accessPermissionOptions = [];
                 }
                 if (!this.accessPermissionOptions.find(item => item.id === this.accessPermission)) {
-                  this.accessPermissionOptions.push({id : this.accessPermission, name : this.accessPermission, error : true});
+                  this.accessPermissionOptions.push({id: this.accessPermission, name: this.accessPermission, error: true});
                 }
               });
           }
@@ -256,13 +256,13 @@ export default {
         kudosPeriodType: this.kudosPeriodType
       })
         .then(status => {
-          if(!status) {
+          if (!status) {
             throw new Error(this.$t('exoplatform.kudos.error.errorSavingKudosSettings'));
           }
           return this.init();
         })
         .catch(e => {
-          console.debug("Error saving kudo", e);
+          console.error('Error saving kudo', e);
           this.error = String(e);
           throw e;
         })

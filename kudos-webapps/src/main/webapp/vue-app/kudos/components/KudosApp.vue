@@ -221,31 +221,31 @@ export default {
   },
   watch: {
     listDialog() {
-      if(!this.listDialog || !this.entityId || !this.entityType) {
+      if (!this.listDialog || !this.entityId || !this.entityType) {
         return;
       }
       const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${this.entityType}${this.entityId}`);
-      const kudosList = $sendKudosLink.data("kudosList");
-      if(!kudosList || !kudosList.length) {
+      const kudosList = $sendKudosLink.data('kudosList');
+      if (!kudosList || !kudosList.length) {
         return;
       }
       this.kudosList = kudosList;
     },
     dialog() {
-      if(!this.dialog) {
+      if (!this.dialog) {
         return;
       }
       this.kudosMessage = null;
       this.kudosToSend = null;
       this.error = null;
-      if(this.entityId && this.entityType) {
+      if (this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
         if (this.remainingKudos > 0) {
           getReceiver(this.entityType, this.entityId)
             .then(receiverDetails => {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
-                if(!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
+                if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
                   const kudosToSend = {
@@ -256,10 +256,10 @@ export default {
                     receiverFullName: receiverDetails.fullname,
                     isCurrent: true
                   };
-                  if(receiverDetails.entityId) {
+                  if (receiverDetails.entityId) {
                     this.entityId = receiverDetails.entityId;
                   }
-                  if(receiverDetails.notAuthorized) {
+                  if (receiverDetails.notAuthorized) {
                     this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
                   } else {
                     this.kudosToSend = kudosToSend;
@@ -269,21 +269,21 @@ export default {
                     this.allKudos.push({});
                   }
                   this.$nextTick(() => {
-                    if($(".kudosIconContainerTop.kudosIconContainerCurrent").length) {
-                      $(".kudosIconContainerTop.kudosIconContainerCurrent")[0].scrollIntoView();
+                    if ($('.kudosIconContainerTop.kudosIconContainerCurrent').length) {
+                      $('.kudosIconContainerTop.kudosIconContainerCurrent')[0].scrollIntoView();
                     }
                   });
                 } else {
                   throw new Error(this.$t('exoplatform.kudos.warning.cantSendKudosToYourSelf'));
                 }
               } else {
-                console.debug("Receiver not found for entity type/id", this.entityType, this.entityId, receiverDetails);
+                console.error('Receiver not found for entity type/id', this.entityType, this.entityId, receiverDetails);
                 throw new Error(this.$t('exoplatform.kudos.error.errorGettingReceiverInformation'));
               }
             })
             .catch(e => {
               this.error = String(e);
-              console.debug("Error retrieving entity details with type and id", this.entityType, this.entityId, e);
+              console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
             });
         }
       }
@@ -323,18 +323,14 @@ export default {
           this.error = e;
         });
     },
-    refreshLink(element, entityType, entityId, parentEntityId) {
-      if(this.ignoreRefresh) {
+    refreshLink(element, entityType, entityId) {
+      if (this.ignoreRefresh) {
         return Promise.resolve(null);
       }
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
-          const linkId = `SendKudosButton${entityType}${entityId}`;
-          const hasSentKudos = kudosList && kudosList.find(kudos => kudos.senderId === eXo.env.portal.userName);
-          const kudosCount = kudosList ? kudosList.length : 0;
-          const $existingLink = $(`#${linkId}`);
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
-          $sendKudosLink.data("kudosList", kudosList);
+          $sendKudosLink.data('kudosList', kudosList);
           this.kudosList = kudosList;
         });
     },
@@ -364,7 +360,7 @@ export default {
     send() {
       this.error = null;
 
-      if(!this.$refs.form.validate()) {
+      if (!this.$refs.form.validate()) {
         return;
       }
 
@@ -378,56 +374,56 @@ export default {
         message: this.kudosMessage
       })
         .then(status => {
-          if(!status) {
+          if (!status) {
             throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
           }
         })
         .catch(e => {
-          console.debug("Error saving kudo", e);
+          console.error('Error saving kudo', e);
           this.error = String(e);
           throw e;
         })
         .then(() => {
           return this.init()
             .catch(e => {
-              console.debug("Error refreshing allowed number of kudos for current user", e);
+              console.error('Error refreshing allowed number of kudos for current user', e);
             });
         })
         .then(() => {
           return this.refreshLink(null, this.entityType, this.entityId, this.parentEntityId)
             .catch(e => {
-              console.debug("Error refreshing number of kudos", e);
+              console.error('Error refreshing number of kudos', e);
             });
         })
         .then(() => this.dialog = false)
         .catch(e => {
-          console.debug("Error refreshing UI", e);
+          console.error('Error refreshing UI', e);
           this.error = String(e);
         })
         .finally(() => {
           this.loading = false;
-          if(!this.dialog) {
-            if(this.entityType === 'ACTIVITY') {
+          if (!this.dialog) {
+            if (this.entityType === 'ACTIVITY') {
               this.refreshActivity(this.entityId);
-            } else if(this.entityType === 'COMMENT') {
+            } else if (this.entityType === 'COMMENT') {
               let activityId = $(`#commentContainercomment${this.entityId}`).closest('.activityStream').attr('id');
               if (activityId) {
                 const thiss = this;
                 activityId = activityId.replace('activityContainer', '');
                 thiss.refreshActivity(activityId);
                 setTimeout(() => {
-                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last().attr("id");
-                  if(commentToScrollTo) {
+                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last().attr('id');
+                  if (commentToScrollTo) {
                     commentToScrollTo = commentToScrollTo.replace('commentContainer', '');
-                    window.require(["SHARED/social-ui-activity"], (UIActivity) => {
+                    window.require(['SHARED/social-ui-activity'], (UIActivity) => {
                       UIActivity.focusToComment(commentToScrollTo);
                     });
                   }
                 }, 400);
               }
             } else {
-              if($(".activityStreamStatus .uiIconRefresh").length && $(".activityStreamStatus .uiIconRefresh").is(":visible")) {
-                $(".activityStreamStatus .uiIconRefresh").click();
+              if ($('.activityStreamStatus .uiIconRefresh').length && $('.activityStreamStatus .uiIconRefresh').is(':visible')) {
+                $('.activityStreamStatus .uiIconRefresh').click();
               }
             }
           }
@@ -435,7 +431,7 @@ export default {
     },
     getRemainingDays() {
       const remainingDateInMillis = window.kudosSettings.endPeriodDateInSeconds * 1000 - Date.now();
-      if(remainingDateInMillis < 0) {
+      if (remainingDateInMillis < 0) {
         return 0;
       }
       return parseInt(remainingDateInMillis / 86400000) + 1;
@@ -443,8 +439,8 @@ export default {
     refreshActivity(activityId) {
       const $activityItem = $(`#UIActivityLoader${activityId}`);
       $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
-      $activityItem.addClass("activity-loadding");
-      window.require(["SHARED/social-ui-activities-loader"], (UIActivityLoader) => {
+      $activityItem.addClass('activity-loadding');
+      window.require(['SHARED/social-ui-activities-loader'], (UIActivityLoader) => {
         UIActivityLoader.renderActivity($activityItem);
       });
     },
