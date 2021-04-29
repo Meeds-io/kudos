@@ -87,7 +87,11 @@ export default {
       eXo.social.tiptip = eXo.social.tiptip ? eXo.social.tiptip : {};
       eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];
       const sendKudosLabel = this.$t('exoplatform.kudos.button.sendKudos');
+      if (eXo.social.tiptip.extraActions.find(action => action.id === 'profile-kudos')) {
+        return;
+      }
       eXo.social.tiptip.extraActions.push({
+        id: 'profile-kudos',
         appendContentTo(divUIAction, ownerId, type) {
           if (!type || type === 'username' || type === 'user' || type === 'organization') {
             type = 'USER';

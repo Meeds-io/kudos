@@ -87,6 +87,7 @@ export function getPeriodDates(date, periodType) {
 
 export function registerExternalExtensions(title) {
   const profileExtensionAction = {
+    id: `profile-kudos`,
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
     order: 20,
