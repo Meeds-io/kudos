@@ -34,8 +34,6 @@
     <org.lombok.version>1.18.2</org.lombok.version>
     <org.lombok.plugin.version>1.18.0.0</org.lombok.plugin.version>
 
-    <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
-    <com.github.eirslett.frontend.version>1.6</com.github.eirslett.frontend.version>
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
     <jenkins.job.name>addon-kudos-master-ci</jenkins.job.name>

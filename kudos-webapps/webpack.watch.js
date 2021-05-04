@@ -1,6 +1,5 @@
 const path = require('path');
 const merge = require('webpack-merge');
-const apiMocker = require('connect-api-mocker');
 
 const webpackProductionConfig = require('./webpack.prod.js');
 
