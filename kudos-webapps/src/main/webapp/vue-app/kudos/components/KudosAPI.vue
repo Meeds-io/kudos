@@ -1,12 +1,10 @@
 <script>
-import {getKudosByPeriod, getKudosByPeriodOfDate, getPeriodDates, registerExternalExtensions, registerActivityReactionTabs} from '../../js/Kudos.js';
-import {getEntityKudos} from '../../js/Kudos';
-
 export default {
   created() {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
-    registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
+    this.$kudosService.registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
+    this.$kudosService.registerActivityActionExtension();
     document.addEventListener('display-activity-details', this.getActivityInformations);
   },
   methods: {
@@ -16,14 +14,14 @@ export default {
     getActivityInformations(event) {
       const entityType = event && event.detail && event.detail.type;
       const entityId = event && event.detail && event.detail.id;
-      return getEntityKudos(entityType, entityId).then(kudosList => {
+      return this.$kudosService.getEntityKudos(entityType, entityId).then(kudosList => {
         const kudosCount = kudosList ? kudosList.length : 0;
-        registerActivityReactionTabs(entityType, entityId, kudosCount,kudosList);
+        this.$kudosService.registerActivityReactionTabs(entityType, entityId, kudosCount, kudosList);
       });
     },
     getPeriodDates(event) {
       if (event && event.detail && event.detail.date && event.detail.periodType) {
-        getPeriodDates(event.detail.date, event.detail.periodType)
+        this.$kudosService.getPeriodDates(event.detail.date, event.detail.periodType)
           .then(period =>
             document.dispatchEvent(new CustomEvent('exo-kudos-get-period-result', {'detail': {'period': period}}))
           );
@@ -76,9 +74,9 @@ export default {
     },
     getKudosByDate(detail) {
       if (detail.date) {
-        return getKudosByPeriodOfDate(detail.date);
+        return this.$kudosService.getKudosByPeriodOfDate(detail.date);
       } else {
-        return getKudosByPeriod(detail.startDate, detail.endDate);
+        return this.$kudosService.getKudosByPeriod(detail.startDate, detail.endDate);
       }
     },
     initTiptip() {
