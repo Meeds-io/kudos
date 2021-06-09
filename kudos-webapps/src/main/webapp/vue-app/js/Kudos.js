@@ -48,6 +48,13 @@ export function getEntityKudos(entityType, entityId, limit) {
   }
 }
 
+export function countUserKudosSentByEntity(entityType, entityId) {
+  return fetch(`/portal/rest/kudos/api/kudos/byEntity/sent/count?entityId=${entityId}&entityType=${entityType}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => resp && resp.ok && resp.text());
+}
+
 export function getKudosByPeriodOfDate(date, limit) {
   // convert from milliseconds to seconds
   date = parseInt(date.getTime() / 1000);
@@ -87,7 +94,7 @@ export function getPeriodDates(date, periodType) {
 
 export function registerExternalExtensions(title) {
   const profileExtensionAction = {
-    id: `profile-kudos`,
+    id: 'profile-kudos',
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
     order: 20,
@@ -125,4 +132,11 @@ export function registerActivityReactionTabs(activityType, activityId,kudosNumbe
   }
 }
 
+export function registerActivityActionExtension() {
 
+  extensionRegistry.registerComponent('ActivityFooter', 'activity-footer-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['kudos-button'],
+    rank: 50,
+  });
+}

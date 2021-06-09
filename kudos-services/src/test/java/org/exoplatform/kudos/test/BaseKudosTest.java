@@ -22,7 +22,9 @@ public abstract class BaseKudosTest {
 
   protected static PortalContainer container;
 
-  protected int                    entityType       = KudosEntityType.USER_TIPTIP.ordinal();
+  protected KudosEntityType        kudosEntityType  = KudosEntityType.USER_TIPTIP;
+
+  protected int                    entityType       = kudosEntityType.ordinal();
 
   protected long                   entityId         = 1;
 
