@@ -365,14 +365,15 @@ export default {
       }
 
       this.loading = true;
-      sendKudos({
+      const kudos = {
         entityType: this.entityType,
         entityId: this.entityId,
         parentEntityId: this.parentEntityId,
         receiverType: this.receiverType,
         receiverId: this.receiverId,
         message: this.kudosMessage
-      })
+      };
+      sendKudos(kudos)
         .then(status => {
           if (!status) {
             throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
@@ -384,6 +385,7 @@ export default {
           throw e;
         })
         .then(() => {
+          document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudos}));
           return this.init()
             .catch(e => {
               console.error('Error refreshing allowed number of kudos for current user', e);

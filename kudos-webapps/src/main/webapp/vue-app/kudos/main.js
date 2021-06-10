@@ -10,6 +10,13 @@ if (extensionRegistry) {
   }
 }
 
+import * as kudosService from '../js/Kudos.js';
+if (!Vue.prototype.$kudosService) {
+  window.Object.defineProperty(Vue.prototype, '$kudosService', {
+    value: kudosService,
+  });
+}
+
 window.parentToWatch = '#UISpaceActivityStreamPortlet, #UIUserActivityStreamPortlet';
 
 Vue.use(Vuetify);

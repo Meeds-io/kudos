@@ -3,7 +3,6 @@
 
   def activity = uicomponent.getActivity();
   KudosService kudosService = uicomponent.getApplicationComponent(KudosService.class);
-  def kudosCount = kudosService.countKudosByEntity("ACTIVITY", activity.getId());
   def currentUserSentKudosCount = kudosService.countKudosByEntityAndSender("ACTIVITY", activity.getId(), uicomponent.getCommenterIdentity().getId());
   def kudosLabelColor = currentUserSentKudosCount > 0 ? "hasKudos" : "";
   def kudosIconColor = currentUserSentKudosCount > 0 ? "" : "uiIconLightGrey";

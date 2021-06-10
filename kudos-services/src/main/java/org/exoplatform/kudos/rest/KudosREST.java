@@ -34,6 +34,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 import io.swagger.annotations.*;
@@ -102,6 +103,52 @@ public class KudosREST implements ResourceContainer {
     }
   }
 
+  @Path("byEntity/sent/count")
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @RolesAllowed("users")
+  @ApiOperation(
+      value = "Get Kudos count by entity and current user as sender",
+      httpMethod = "GET",
+      response = Response.class,
+      produces = "text/plain",
+      notes = "returns Kudos count"
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 403, message = "Unauthorized operation"),
+          @ApiResponse(code = 500, message = "Internal server error") }
+  )
+  public Response countKudosByEntityAndSender(
+                                              @ApiParam(
+                                                  value = "kudos entity type (for example activity, comment...)",
+                                                  required = true
+                                              )
+                                              @QueryParam("entityType")
+                                              String entityType,
+                                              @ApiParam(value = "kudos entity id", required = true)
+                                              @QueryParam("entityId")
+                                              String entityId) {
+    if (StringUtils.isBlank(entityType) || StringUtils.isBlank(entityId)) {
+      LOG.warn("Bad request sent to server with empty 'attached entity id or type'");
+      return Response.status(400).build();
+    }
+    String currentUsername = getCurrentUserId();
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUsername);
+    if (identity == null) {
+      return Response.status(400).entity("Can't find current user identity").build();
+    }
+    try {
+      long count = kudosService.countKudosByEntityAndSender(entityType, entityId, identity.getId());
+      return Response.ok(String.valueOf(count)).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
+      return Response.serverError().build();
+    }
+  }
+
   @GET
   @Path("byDates")
   @Produces(MediaType.APPLICATION_JSON)
@@ -158,7 +205,7 @@ public class KudosREST implements ResourceContainer {
                      .build();
     }
 
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
     if (identity == null) {
       return Response.status(400).entity("Can't find identity with id " + identityId).build();
     }
@@ -226,7 +273,7 @@ public class KudosREST implements ResourceContainer {
                      .build();
     }
 
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId), true);
+    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
     if (identity == null) {
       return Response.status(400).entity("Can't find identity with id " + identityId).build();
     }

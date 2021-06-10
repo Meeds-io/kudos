@@ -113,4 +113,47 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertNotNull(retrievedKudos);
   }
 
+  @Test
+  public void testCountSentKudosByEntityAndUser() throws Exception {
+    resourceTest.startSessionAs("root4");
+
+    String url = resourceTest.getURLResource("byEntity/sent/count?entityType=" + kudosEntityType + "&entityId=" + entityId);
+    ContainerResponse response = resourceTest.service("GET",
+                                                      url,
+                                                      "",
+                                                      null,
+                                                      null);
+    assertNotNull(response);
+    assertEquals(200, response.getStatus());
+    String count = (String) response.getEntity();
+    assertNotNull(count);
+    assertEquals("0", count);
+
+    newKudos();
+    
+    response = resourceTest.service("GET",
+                                    url,
+                                    "",
+                                    null,
+                                    null);
+    assertNotNull(response);
+    assertEquals(200, response.getStatus());
+    count = (String) response.getEntity();
+    assertNotNull(count);
+    assertEquals("1", count);
+
+    resourceTest.startSessionAs("root3");
+
+    response = resourceTest.service("GET",
+                                    url,
+                                    "",
+                                    null,
+                                    null);
+    assertNotNull(response);
+    assertEquals(200, response.getStatus());
+    count = (String) response.getEntity();
+    assertNotNull(count);
+    assertEquals("0", count);
+  }
+
 }
