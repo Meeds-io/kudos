@@ -133,10 +133,14 @@ export function registerActivityReactionTabs(activityType, activityId,kudosNumbe
 }
 
 export function registerActivityActionExtension() {
-
   extensionRegistry.registerComponent('ActivityFooter', 'activity-footer-action', {
     id: 'kudos',
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
+    init: null,
+    isEnabled: params => {
+      const activityOwnerId = params && params.activity && params.activity.owner && params.activity.owner.id;
+      return activityOwnerId !== eXo.env.portal.userIdentityId;
+    }
   });
 }
