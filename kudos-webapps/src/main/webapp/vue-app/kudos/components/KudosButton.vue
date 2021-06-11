@@ -3,7 +3,7 @@
     :id="`KudosActivity${entityId}`"
     :title="$t('exoplatform.kudos.title.sendAKudos')"
     :class="textColorClass"
-    class="pa-0"
+    class="pa-0 mx-2"
     text
     link
     small
