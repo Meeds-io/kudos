@@ -8,13 +8,15 @@
     link
     small
     @click="openKudosForm">
-    <v-icon
-      :class="iconColorClass"
-      class="me-1 pb-1"
-      size="12">
-      fa-award
-    </v-icon>
-    <span>{{ $t('exoplatform.kudos.label.kudos') }}</span>
+    <span>
+      <v-icon
+        :class="iconColorClass"
+        class="baseline-vertical-align"
+        size="14">
+        fa-award
+      </v-icon>
+      {{ $t('exoplatform.kudos.label.kudos') }}
+    </span>
   </v-btn>
 </template>
 
