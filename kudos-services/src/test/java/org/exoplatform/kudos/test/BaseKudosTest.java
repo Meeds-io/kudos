@@ -2,11 +2,8 @@ package org.exoplatform.kudos.test;
 
 import static org.junit.Assert.*;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.*;
 
@@ -38,8 +35,6 @@ public abstract class BaseKudosTest {
 
   protected String                 message          = "message";
 
-  protected List<Serializable>     entitiesToClean  = new ArrayList<>();
-
   @BeforeClass
   public static void beforeTest() {
     RootContainer rootContainer = RootContainer.getInstance();
@@ -60,21 +55,7 @@ public abstract class BaseKudosTest {
     end();
     RequestLifeCycle.begin(container);
 
-    if (!entitiesToClean.isEmpty()) {
-      for (Serializable entity : entitiesToClean) {
-        if (entity instanceof KudosEntity) {
-          kudosDAO.delete((KudosEntity) entity);
-        } else if (entity instanceof Kudos) {
-          Kudos kudos = (Kudos) entity;
-          KudosEntity kudosEntity = kudosDAO.find(kudos.getTechnicalId());
-          if (kudosEntity != null) {
-            kudosDAO.delete(kudosEntity);
-          }
-        } else {
-          throw new IllegalStateException("Entity not managed" + entity);
-        }
-      }
-    }
+    kudosDAO.deleteAll();
 
     int kudosCount = kudosDAO.findAll().size();
     assertEquals("The previous test didn't cleaned kudos entities correctly, should add entities to clean into 'entitiesToClean' list.",
@@ -96,6 +77,10 @@ public abstract class BaseKudosTest {
   protected KudosEntity newKudos() {
     return newKudos(parentEntityId, entityId, entityType, receiverId, senderId, createdTimestamp, message);
   }
+  
+  protected KudosEntity newKudosInstance() {
+    return newKudosInstance(parentEntityId, entityId, entityType, receiverId, senderId, createdTimestamp, message);
+  }
 
   protected KudosEntity newKudos(long parentEntityId,
                                  long entityId,
@@ -113,9 +98,7 @@ public abstract class BaseKudosTest {
                                                senderId,
                                                createdTimestamp,
                                                message);
-    kudosEntity = kudosDAO.create(kudosEntity);
-    entitiesToClean.add(kudosEntity);
-    return kudosEntity;
+    return kudosDAO.create(kudosEntity);
   }
 
   private KudosEntity newKudosInstance(long parentEntityId,

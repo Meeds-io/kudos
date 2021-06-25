@@ -29,7 +29,6 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.statistic.ExoKudosStatistic;
 import org.exoplatform.kudos.statistic.ExoKudosStatisticService;
@@ -41,6 +40,7 @@ import org.exoplatform.services.rpc.RemoteCommand;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
@@ -56,29 +56,33 @@ public class KudosService implements ExoKudosStatisticService, Startable {
 
   private static final String CLUSTER_NODE_ID                 = UUID.randomUUID().toString();
 
-  private IdentityManager identityManager;
+  private ActivityManager     activityManager;
 
-  private SpaceService    spaceService;
+  private IdentityManager     identityManager;
 
-  private ListenerService listenerService;
+  private SpaceService        spaceService;
 
-  private KudosStorage    kudosStorage;
+  private ListenerService     listenerService;
 
-  private SettingService  settingService;
+  private KudosStorage        kudosStorage;
 
-  private PortalContainer container;
+  private SettingService      settingService;
 
-  private RPCService      rpcService;
+  private PortalContainer     container;
 
-  private GlobalSettings  globalSettings;
+  private RPCService          rpcService;
+
+  private GlobalSettings      globalSettings;
 
   /**
    * The generic command used to replicate changes over the cluster
    */
-  private RemoteCommand   reloadSettingsCommand;
+  private RemoteCommand       reloadSettingsCommand;
 
-  public KudosService(KudosStorage kudosStorage,
+  public KudosService(KudosStorage kudosStorage, // NOSONAR : Needed for
+                                                 // dependency injection
                       SettingService settingService,
+                      ActivityManager activityManager,
                       SpaceService spaceService,
                       IdentityManager identityManager,
                       ListenerService listenerService,
@@ -86,6 +90,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
                       InitParams params) {
     this.kudosStorage = kudosStorage;
     this.identityManager = identityManager;
+    this.activityManager = activityManager;
     this.spaceService = spaceService;
     this.settingService = settingService;
     this.listenerService = listenerService;
@@ -222,20 +227,51 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    * Retrieves kudos by activityId
    * 
    * @param activityId {@link ExoSocialActivity} identifier
-   * @return {@link KudosEntity}
+   * @param currentUser {@link org.exoplatform.services.security.Identity}
+   * @return {@link Kudos}
+   * @throws IllegalAccessException when user doesn't have access to kudos
    */
-  public KudosEntity getKudosByActivityId(Long activityId) {
+  public Kudos getKudosByActivityId(Long activityId,
+                                    org.exoplatform.services.security.Identity currentUser) throws IllegalAccessException {
+    Kudos kudos = kudosStorage.getKudosByActivityId(activityId);
+    if (kudos == null) {
+      return null;
+    }
+    if (StringUtils.equals(kudos.getSenderId(), currentUser.getUserId())
+        || StringUtils.equals(kudos.getReceiverId(), currentUser.getUserId())) {
+      return kudos;
+    }
+
+    ExoSocialActivity activity = activityManager.getActivity(String.valueOf(activityId));
+    if (activity == null) {
+      // Can't check permissions, thus return null
+      return null;
+    }
+    if (!activityManager.isActivityViewable(activity, currentUser)) {
+      throw new IllegalAccessException("User " + currentUser.getUserId() + " isn't allowed to access kudos of activity with id "
+          + activityId);
+    }
+    return kudos;
+  }
+
+  /**
+   * Retrieves kudos by activityId
+   * 
+   * @param activityId {@link ExoSocialActivity} identifier
+   * @return {@link Kudos}
+   */
+  public Kudos getKudosByActivityId(Long activityId) {
     return kudosStorage.getKudosByActivityId(activityId);
   }
 
   /**
    * Updates a kudos
    * 
-   * @param kudosEntity {@link KudosEntity}
-   * @return {@link KudosEntity}
+   * @param kudos {@link Kudos}
+   * @return {@link Kudos}
    */
-  public KudosEntity updateKudos(KudosEntity kudosEntity) {
-    return kudosStorage.updateKudos(kudosEntity);
+  public Kudos updateKudos(Kudos kudos) {
+    return kudosStorage.updateKudos(kudos);
   }
 
   /**
@@ -383,6 +419,31 @@ public class KudosService implements ExoKudosStatisticService, Startable {
       return Collections.emptyList();
     }
     return kudosStorage.getKudosByPeriodAndReceiver(kudosPeriod, identity.getProviderId(), identity.getRemoteId(), limit);
+  }
+
+  /**
+   * Retrieves the list of kudos for a given parent entity id and with a set of
+   * entity types
+   * 
+   * @param activityId {@link ExoSocialActivity} id
+   * @param currentUser user requesting access to kudos list
+   * @return {@link List} of {@link Kudos}
+   * @throws IllegalAccessException when user doesn't have access to kudos
+   */
+  public List<Kudos> getKudosListOfActivity(String activityId,
+                                            org.exoplatform.services.security.Identity currentUser) throws IllegalAccessException {
+    if (currentUser == null) {
+      throw new IllegalArgumentException("User is mandatory");
+    }
+    ExoSocialActivity activity = activityManager.getActivity(activityId);
+    if (activity == null) {
+      return Collections.emptyList();
+    }
+    if (!activityManager.isActivityViewable(activity, currentUser)) {
+      throw new IllegalAccessException("User " + currentUser.getUserId() + " isn't allowed to access kudos of activity with id "
+          + activityId);
+    }
+    return kudosStorage.getKudosListOfActivity(getActivityId(activityId));
   }
 
   /**

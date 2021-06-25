@@ -25,6 +25,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -33,6 +34,7 @@ import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -99,6 +101,69 @@ public class KudosREST implements ResourceContainer {
       return Response.ok(allKudosByEntity).build();
     } catch (Exception e) {
       LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("byActivity/{activityId}")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get Kudos by its generated comment or activity id", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns Kudos object")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "Unauthorized operation"),
+      @ApiResponse(code = 404, message = "Entity Not found"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getKudosByActivityId(
+                                       @ApiParam(value = "kudos activity or comment identifier", required = true)
+                                       @PathParam("activityId")
+                                       String activityId) {
+    if (StringUtils.isBlank(activityId)) {
+      LOG.warn("Bad request sent to server with empty 'attached activityId'");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    org.exoplatform.services.security.Identity currentUser = ConversationState.getCurrent().getIdentity();
+    try {
+      Kudos kudos = kudosService.getKudosByActivityId(getActivityId(activityId), currentUser);
+      return Response.ok(kudos).build();
+    } catch (IllegalAccessException e) {
+      LOG.error("Access denied to user {} to access Kudos of activity by id {}", currentUser.getUserId(), activityId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos by activity Id {}", activityId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("byActivity/{activityId}/all")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get Kudos List attached to a parent activity, whether the activity itself or in a comment", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns Kudos List")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Request fulfilled"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "Unauthorized operation"),
+      @ApiResponse(code = 404, message = "Entity Not found"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getKudosListOfActivity(@ApiParam(value = "kudos parent activity identifier", required = true)
+                                         @PathParam("activityId")
+                                         String activityId) {
+    if (StringUtils.isBlank(activityId)) {
+      LOG.warn("Bad request sent to server with empty 'activityId'");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    org.exoplatform.services.security.Identity currentUser = ConversationState.getCurrent().getIdentity();
+    try {
+      List<Kudos> kudosList = kudosService.getKudosListOfActivity(activityId, currentUser);
+      return Response.ok(kudosList).build();
+    } catch (IllegalAccessException e) {
+      LOG.error("Access denied to user {} to access Kudos of parent activity by id {}", currentUser.getUserId(), activityId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      LOG.warn("Error getting kudos by parent activity Id {}", activityId, e);
       return Response.serverError().build();
     }
   }
@@ -315,10 +380,18 @@ public class KudosREST implements ResourceContainer {
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Creates new Kudos", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
+  @ApiOperation(
+      value = "Creates new Kudos",
+      httpMethod = "POST",
+      response = Response.class,
+      consumes = "application/json",
+      produces = "application/json",
+      notes = "returns empty response"
+  )
   @ApiResponses(value = {
-      @ApiResponse(code = 204, message = "Request fulfilled"),
+      @ApiResponse(code = 200, message = "Request fulfilled"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 403, message = "Unauthorized operation"),
       @ApiResponse(code = 500, message = "Internal server error") })
@@ -341,8 +414,8 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       kudos.setSenderId(getCurrentUserId());
-      kudosService.createKudos(kudos, getCurrentUserId());
-      return Response.noContent().build();
+      Kudos kudosSent = kudosService.createKudos(kudos, getCurrentUserId());
+      return Response.ok(kudosSent).build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);
       return Response.serverError().build();
@@ -384,5 +457,10 @@ public class KudosREST implements ResourceContainer {
       limit = 1000;
     }
     return limit;
+  }
+
+
+  private Long getActivityId(String commentId) {
+    return (commentId == null || commentId.trim().isEmpty()) ? null : Long.valueOf(commentId.replace("comment", ""));
   }
 }

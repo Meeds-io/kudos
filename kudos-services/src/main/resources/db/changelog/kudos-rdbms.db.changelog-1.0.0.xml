@@ -83,4 +83,18 @@
     </sql>
   </changeSet>
 
+  <changeSet author="kudos" id="1.0.0-7">
+    <dropUniqueConstraint constraintName="UK_ADDONS_KUDOS_01" uniqueColumns="CREATED_DATE" tableName="ADDONS_KUDOS" />
+  </changeSet>
+
+  <changeSet author="kudos" id="1.0.0-8">
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_06">
+      <column name="ACTIVITY_ID"></column>
+    </createIndex>
+    <createIndex tableName="ADDONS_KUDOS" indexName="IDX_ADDONS_KUDOS_07">
+      <column name="PARENT_ENTITY_ID"></column>
+      <column name="ENTITY_TYPE"></column>
+    </createIndex>
+  </changeSet>
+
 </databaseChangeLog>

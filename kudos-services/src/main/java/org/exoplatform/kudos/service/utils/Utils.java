@@ -4,6 +4,7 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
@@ -15,15 +16,17 @@ import org.exoplatform.kudos.model.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.core.BaseActivityProcessorPlugin;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.processor.I18NActivityUtils;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.service.rest.Util;
 
 public class Utils {
   private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
@@ -58,6 +61,8 @@ public class Utils {
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos_content";
+
+  public static final String                 KUDOS_MESSAGE_PARAM             = "kudosMessage";
 
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
 
@@ -123,6 +128,9 @@ public class Utils {
   }
 
   public static Kudos fromEntity(KudosEntity kudosEntity) {
+    if (kudosEntity == null) {
+      return null;
+    }
     Kudos kudos = new Kudos();
     kudos.setTechnicalId(kudosEntity.getId());
     kudos.setMessage(kudosEntity.getMessage());
@@ -149,7 +157,8 @@ public class Utils {
         kudos.setReceiverIdentityId(String.valueOf(kudosEntity.getReceiverId()));
         kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
         kudos.setReceiverFullName(space.getDisplayName());
-        kudos.setReceiverURL(LinkProvider.getActivityUriForSpace(space.getPrettyName(), space.getGroupId().replace("/spaces/", "")));
+        kudos.setReceiverURL(LinkProvider.getActivityUriForSpace(space.getPrettyName(),
+                                                                 space.getGroupId().replace("/spaces/", "")));
         kudos.setReceiverAvatar(getAvatar(null, space));
       }
     }
@@ -163,8 +172,9 @@ public class Utils {
     return kudos;
   }
 
-  public static KudosEntity toNewEntity(Kudos kudos) {
+  public static KudosEntity toEntity(Kudos kudos) {
     KudosEntity kudosEntity = new KudosEntity();
+    kudosEntity.setId(kudos.getTechnicalId());
     kudosEntity.setMessage(kudos.getMessage());
     kudosEntity.setEntityId(Long.parseLong(kudos.getEntityId()));
     kudosEntity.setActivityId(kudos.getActivityId());
@@ -216,6 +226,32 @@ public class Utils {
     return kudosPeriodType;
   }
 
+  public static void computeKudosActivityProperties(ExoSocialActivity activity, Kudos kudos) {
+    String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
+    senderLink = StringEscapeUtils.unescapeHtml(senderLink);
+    String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
+    receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
+
+    String kudosMessage = kudos.getMessage();
+    String message = StringUtils.isBlank(kudosMessage) ? "." : ": " + kudosMessage;
+
+    if (activity.getTemplateParams() != null) {
+      activity.getTemplateParams().remove(BaseActivityProcessorPlugin.TEMPLATE_PARAM_TO_PROCESS);
+      activity.getTemplateParams().remove(I18NActivityUtils.RESOURCE_BUNDLE_KEY_TO_PROCESS);
+      activity.getTemplateParams().remove(I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM);
+      activity.getTemplateParams().remove(KUDOS_MESSAGE_PARAM);
+    }
+    activity.setTitleId(null);
+
+    I18NActivityUtils.addResourceKeyToProcess(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID);
+    I18NActivityUtils.addResourceKey(activity, KUDOS_ACTIVITY_COMMENT_TITLE_ID, senderLink, receiverLink, message, KUDOS_ICON);
+    activity.getTemplateParams()
+            .put(BaseActivityProcessorPlugin.TEMPLATE_PARAM_TO_PROCESS,
+                 I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM + BaseActivityProcessorPlugin.TEMPLATE_PARAM_LIST_DELIM
+                     + KUDOS_MESSAGE_PARAM);
+    activity.getTemplateParams().put(KUDOS_MESSAGE_PARAM, kudosMessage);
+  }
+
   private static String getIdentityIdByType(Identity receiverIdentity) {
     if (SpaceIdentityProvider.NAME.equals(receiverIdentity.getProviderId())) {
       Space space = getSpace(receiverIdentity.getRemoteId());
@@ -228,7 +264,7 @@ public class Utils {
 
   private static Identity getIdentityById(long identityId) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    return identityManager.getIdentity(String.valueOf(identityId), true);
+    return identityManager.getIdentity(String.valueOf(identityId));
   }
 
   private static String getAvatar(Identity identity, Space space) {
@@ -245,5 +281,9 @@ public class Utils {
       }
     }
     return avatarUrl;
+  }
+
+  public static long getActivityId(String id) {
+    return StringUtils.isBlank(id) ? null : Long.valueOf(id.replace(ACTIVITY_COMMENT_ID_PREFIX, ""));
   }
 }
