@@ -1,6 +1,35 @@
-export function sendKudos(kudo, limit) {
+const kudosListByActivity = {};
+
+export function computeActivityKudosList(activity) {
+  const activityKudosListPromise = kudosListByActivity[activity.id] = getKudosListByActivity(activity.id);
+  return activityKudosListPromise
+    .then(kudosList => {
+      kudosListByActivity[activity.id] = kudosList;
+      const activityId = Number(activity.id);
+      activity.kudos = kudosList.find(kudosTmp => kudosTmp.activityId === activityId);
+      activity.linkedKudosList = kudosList.filter(kudosTmp => kudosTmp.entityId === activity.id);
+      return kudosList;
+    });
+}
+
+export function computeCommentKudosList(activity, comment) {
+  const activityKudosList = kudosListByActivity[activity.id];
+  if (!activityKudosList) {
+    return computeActivityKudosList(activity).then(() => computeCommentKudosList(activity, comment));
+  } else {
+    const activityKudosListPromise = activityKudosList.then ? activityKudosList : Promise.resolve(activityKudosList);
+    return activityKudosListPromise
+      .then(kudosList => {
+        comment.kudos = kudosList.find(kudosTmp => kudosTmp.activityId === comment.id || `comment${kudosTmp.activityId}` === comment.id);
+        comment.linkedKudosList = kudosList.filter(kudosTmp => kudosTmp.entityId === comment.id || `comment${kudosTmp.entityId}` === comment.id);
+        return kudosList;
+      });
+  }
+}
+
+export function sendKudos(kudo) {
   if (kudo) {
-    return fetch(`/portal/rest/kudos/api/kudos?limit=${limit || 0}`, {
+    return fetch(`/portal/rest/kudos/api/kudos`, {
       credentials: 'include',
       method: 'POST',
       headers: {
@@ -8,7 +37,13 @@ export function sendKudos(kudo, limit) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(kudo),
-    }).then((resp) => resp && resp.ok);
+    }).then(resp => {
+      if (!resp || !resp.ok) {
+        throw new Error('Response code indicates a server error', resp);
+      } else {
+        return resp.json();
+      }
+    });
   } else {
     return Promise.resolve(null);
   }
@@ -21,7 +56,13 @@ export function getKudosSent(senderIdentityId, limit, returnSize, periodType, da
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then((resp) => resp && resp.ok && resp.json());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 export function getKudosReceived(receiverIdentityId, limit, returnSize, periodType, dateInSeconds) {
@@ -31,18 +72,38 @@ export function getKudosReceived(receiverIdentityId, limit, returnSize, periodTy
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then((resp) => resp && resp.ok && resp.json());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
+}
+
+export function getKudosListByActivity(activityId) {
+  return fetch(`/portal/rest/kudos/api/kudos/byActivity/${activityId}/all`, {
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 export function getEntityKudos(entityType, entityId, limit) {
   if (entityType && entityId) {
     return fetch(`/portal/rest/kudos/api/kudos/byEntity?entityId=${entityId}&entityType=${entityType}&limit=${limit || 0}`, {
       credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }).then((resp) => resp && resp.ok && resp.json());
+    }).then(resp => {
+      if (!resp || !resp.ok) {
+        throw new Error('Response code indicates a server error', resp);
+      } else {
+        return resp.json();
+      }
+    });
   } else {
     return Promise.resolve([]);
   }
@@ -52,7 +113,13 @@ export function countUserKudosSentByEntity(entityType, entityId) {
   return fetch(`/portal/rest/kudos/api/kudos/byEntity/sent/count?entityId=${entityId}&entityType=${entityType}`, {
     credentials: 'include',
     method: 'GET',
-  }).then((resp) => resp && resp.ok && resp.text());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.text();
+    }
+  });
 }
 
 export function getKudosByPeriodOfDate(date, limit) {
@@ -64,7 +131,13 @@ export function getKudosByPeriodOfDate(date, limit) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then((resp) => resp && resp.ok && resp.json());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 export function getKudosByPeriod(startDate, endDate, limit) {
@@ -77,7 +150,13 @@ export function getKudosByPeriod(startDate, endDate, limit) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then((resp) => resp && resp.ok && resp.json());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 export function getPeriodDates(date, periodType) {
@@ -89,7 +168,13 @@ export function getPeriodDates(date, periodType) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-  }).then((resp) => resp && resp.ok && resp.json());
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 export function registerExternalExtensions(title) {
@@ -141,6 +226,95 @@ export function registerActivityActionExtension() {
     isEnabled: params => {
       const activityOwnerId = params && params.activity && params.activity.owner && params.activity.owner.id;
       return activityOwnerId !== eXo.env.portal.userIdentityId;
+    }
+  });
+  extensionRegistry.registerComponent('ActivityCommentFooter', 'activity-footer-comment-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['kudos-button'],
+    rank: 50,
+    init: null,
+    isEnabled: params => {
+      const commentOwnerId = params && params.comment && params.comment.identity && params.comment.identity.id;
+      return commentOwnerId !== eXo.env.portal.userIdentityId;
+    }
+  });
+
+  // Register predefined activity types
+  extensionRegistry.registerExtension('activity', 'type', {
+    type: 'exokudos:activity',
+    options: {
+      init: (activityOrComment, isActivityDetail,  parentActivity) => {
+        const activity = parentActivity || activityOrComment;
+        const comment = parentActivity && activityOrComment;
+        if (comment) {
+          return computeCommentKudosList(activity, comment);
+        } else {
+          return computeActivityKudosList(activity);
+        }
+      },
+      refresh: (activityOrComment) => {
+        const activityId = activityOrComment && activityOrComment.activityId || activityOrComment.id;
+        kudosListByActivity[activityId] = null;
+      },
+      getSourceLink: () => '#',
+      getTitle: activityOrComment => {
+        const kudos = activityOrComment && activityOrComment.kudos;
+        if (kudos) {
+          return {
+            key: 'NewKudosSentActivityComment.activity_kudos_title',
+            params: {
+              0: `<a href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}">
+                    ${kudos.receiverFullName}
+                  </a>`
+            },
+          };
+        }
+        const title = (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage) || (activityOrComment.title) || (activityOrComment.body);
+        if (title && title.includes('</i>')) {
+          return title.split('</i>')[1].split(':')[0] || '';
+        }
+        return activityOrComment.body;
+      },
+      getSummary: activityOrComment => 
+                  (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage)
+                  || (activityOrComment.kudos && activityOrComment.kudos.message)
+                  || activityOrComment.title
+                  || activityOrComment.body
+                  || '',
+      noTitleEllipsis: true,
+      noSummaryEllipsis: true,
+      supportsIcon: true,
+      useSameViewForMobile: true,
+      defaultIcon: {
+        icon: 'fa fa-award primary--text',
+        size: 72,
+        height: 'auto',
+        width: '60px',
+        noBorder: true,
+      },
+      getBodyToEdit: activityOrComment => {
+        if (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage) {
+          return activityOrComment.templateParams.kudosMessage;
+        } else {
+          return activityOrComment.kudos && activityOrComment.kudos.message || '';
+        }
+      },
+      canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
+      forceCanEditOverwrite: true,
+    },
+  });
+
+  document.addEventListener('exo-kudos-sent', (event) => {
+    const kudosSent = event && event.detail;
+    if (kudosSent) {
+      const activityId = kudosSent.parentEntityId || kudosSent.entityId;
+      kudosListByActivity[activityId] = null;
+      if (kudosSent.entityType === 'ACTIVITY' || kudosSent.entityType === 'COMMENT') { // is a comment
+        document.dispatchEvent(new CustomEvent('activity-comment-created', {detail: {
+          id: kudosSent.activityId,
+          activityId,
+        }}));
+      }
     }
   });
 }

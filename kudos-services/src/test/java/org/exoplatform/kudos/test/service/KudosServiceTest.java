@@ -1,6 +1,5 @@
 package org.exoplatform.kudos.test.service;
 
-import static org.exoplatform.kudos.service.utils.Utils.toNewEntity;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -18,12 +17,13 @@ import org.exoplatform.kudos.service.KudosStorage;
 import org.exoplatform.kudos.service.utils.Utils;
 import org.exoplatform.kudos.test.BaseKudosTest;
 import org.exoplatform.services.listener.*;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.storage.api.ActivityStorage;
 
 public class KudosServiceTest extends BaseKudosTest {
   private static final String ENTITY_TYPE        = KudosEntityType.USER_TIPTIP.name();
@@ -84,7 +84,7 @@ public class KudosServiceTest extends BaseKudosTest {
     count = kudosService.countKudosByEntity(ENTITY_TYPE, "25");
     assertEquals(0, count);
   }
-  
+
   @Test
   public void testCountKudosByEntityAndSender() {
     KudosService kudosService = getService(KudosService.class);
@@ -271,7 +271,6 @@ public class KudosServiceTest extends BaseKudosTest {
     }
 
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    entitiesToClean.add(kudos);
 
     KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
     IdentityManager identityManager = getService(IdentityManager.class);
@@ -306,7 +305,6 @@ public class KudosServiceTest extends BaseKudosTest {
     restartTransaction();
 
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    entitiesToClean.add(kudos);
 
     KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
     IdentityManager identityManager = getService(IdentityManager.class);
@@ -398,7 +396,6 @@ public class KudosServiceTest extends BaseKudosTest {
 
       Kudos kudos = newKudosDTO();
       kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-      entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
       Thread.sleep(1000);
@@ -431,7 +428,6 @@ public class KudosServiceTest extends BaseKudosTest {
 
       Kudos kudos = newKudosDTO();
       kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-      entitiesToClean.add(kudos);
 
       // Time is stored in seconds, thus, we have to wait a second
       Thread.sleep(1000);
@@ -462,8 +458,8 @@ public class KudosServiceTest extends BaseKudosTest {
       AccountSettings savedAccountSettings = kudosService.getAccountSettings(SENDER_REMOTE_ID);
       assertNotNull(savedAccountSettings);
       assertTrue(savedAccountSettings.isDisabled());
-      assertFalse(accountSettings.equals(savedAccountSettings));
-      assertTrue(accountSettings.hashCode() != savedAccountSettings.hashCode());
+      assertNotEquals(accountSettings, savedAccountSettings);
+      assertNotEquals(accountSettings.hashCode(), savedAccountSettings.hashCode());
     } finally {
       kudosService.saveGlobalSettings(defaultSettings);
     }
@@ -476,7 +472,6 @@ public class KudosServiceTest extends BaseKudosTest {
 
     Kudos kudos = newKudosDTO();
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    entitiesToClean.add(kudos);
 
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
     listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT, new Listener<KudosService, Kudos>() {
@@ -496,10 +491,9 @@ public class KudosServiceTest extends BaseKudosTest {
     KudosStorage kudosStorage = getService(KudosStorage.class);
     ListenerService listenerService = getService(ListenerService.class);
     ActivityManager activityManager = getService(ActivityManager.class);
-    ActivityStorage activityStorage = getService(ActivityStorage.class);
 
     listenerService.addListener(Utils.KUDOS_SENT_EVENT,
-                                new NewKudosSentActivityGeneratorListener(activityManager, activityStorage));
+                                new NewKudosSentActivityGeneratorListener(activityManager));
 
     listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT,
                                 new GamificationIntegrationListener(container, listenerService));
@@ -515,7 +509,6 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    entitiesToClean.add(kudos);
 
     kudos = kudosStorage.getKudoById(kudos.getTechnicalId());
     assertTrue(kudos.getActivityId() > 0);
@@ -530,16 +523,91 @@ public class KudosServiceTest extends BaseKudosTest {
   }
 
   @Test
-  public void testGetKudosByActivityId() throws Exception {
+  public void testGetKudosByActivityId() throws Exception { // NOSONAR
+                                                            // comparaison is
+                                                            // made in private
+                                                            // method
     KudosService kudosService = getService(KudosService.class);
     KudosStorage kudosStorage = getService(KudosStorage.class);
-    Kudos kudos = newKudosDTO();
-    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
-    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
-    Kudos storedKudos=kudosStorage.getKudoById(kudos.getTechnicalId());
-    entitiesToClean.add(kudos);
-    KudosEntity newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
-    compareResults(newKudos, storedKudos);
+    KudosEntity kudosEntity = newKudos();
+    kudosEntity.setEntityType(KudosEntityType.USER_PROFILE.ordinal());
+    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), SENDER_REMOTE_ID);
+    Kudos storedKudos = kudosStorage.getKudoById(kudos.getTechnicalId());
+    Kudos newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
+    compareResults(Utils.toEntity(storedKudos), newKudos);
+  }
+
+  @Test
+  public void testGetKudosListOfActivity() throws Exception {
+    resetGlobalSettings();
+
+    KudosService kudosService = getService(KudosService.class);
+
+    KudosEntity kudosEntity = newKudosInstance();
+    kudosEntity.setEntityType(KudosEntityType.SPACE_PROFILE.ordinal());
+    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), SENDER_REMOTE_ID);
+
+    ActivityManager activityManager = getService(ActivityManager.class);
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setUserId("root");
+    activityManager.saveActivityNoReturn(activity);
+    parentKudos.setActivityId(Long.parseLong(activity.getId()));
+    kudosService.updateKudosGeneratedActivityId(parentKudos.getTechnicalId(), Long.parseLong(activity.getId()));
+
+    KudosEntity childKudosEntity = newKudosInstance();
+    childKudosEntity.setEntityType(KudosEntityType.ACTIVITY.ordinal());
+    childKudosEntity.setEntityId(250l);
+    childKudosEntity.setParentEntityId(parentKudos.getActivityId());
+    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity), SENDER_REMOTE_ID);
+
+    try { // NOSONAR Test expected exception
+      kudosService.getKudosListOfActivity(activity.getId(), null);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    List<Kudos> kudosList = kudosService.getKudosListOfActivity("2556",
+                                                                new org.exoplatform.services.security.Identity("root"));
+    assertNotNull(kudosList);
+    assertTrue(kudosList.isEmpty());
+
+    try {
+      kudosService.getKudosListOfActivity(activity.getId(),
+                                          new org.exoplatform.services.security.Identity("root4"));
+      fail();
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+
+    kudosList = kudosService.getKudosListOfActivity(activity.getId(),
+                                                    new org.exoplatform.services.security.Identity("root"));
+
+    assertNotNull(kudosList);
+    assertEquals(2, kudosList.size());
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == parentKudos.getTechnicalId()));
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == childKudos.getTechnicalId()));
+
+    ExoSocialActivity comment = new ExoSocialActivityImpl();
+    comment.setUserId("root,root4");
+    activityManager.saveActivityNoReturn(comment);
+    childKudos.setActivityId(Long.parseLong(comment.getId()));
+    kudosService.updateKudosGeneratedActivityId(childKudos.getTechnicalId(), Long.parseLong(comment.getId()));
+
+    KudosEntity subCommentKudosEntity = newKudosInstance();
+    subCommentKudosEntity.setEntityType(KudosEntityType.COMMENT.ordinal());
+    subCommentKudosEntity.setEntityId(255l);
+    subCommentKudosEntity.setParentEntityId(parentKudos.getActivityId());
+    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity), SENDER_REMOTE_ID);
+
+    kudosList = kudosService.getKudosListOfActivity(activity.getId(),
+                                                    new org.exoplatform.services.security.Identity("root"));
+
+    assertNotNull(kudosList);
+    assertEquals(3, kudosList.size());
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == parentKudos.getTechnicalId()));
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == childKudos.getTechnicalId()));
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == subCommentKudos.getTechnicalId()));
   }
 
   @Test
@@ -551,13 +619,17 @@ public class KudosServiceTest extends BaseKudosTest {
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     Kudos storedKudos = kudosStorage.getKudoById(kudos.getTechnicalId());
     storedKudos.setMessage("updated message");
-    entitiesToClean.add(kudos);
-    KudosEntity updatedKudos = toNewEntity(storedKudos);
-    updatedKudos.setId(storedKudos.getTechnicalId());
-    KudosEntity newKudos = kudosService.updateKudos(updatedKudos) ;
-    assertEquals(newKudos.getMessage(),storedKudos.getMessage());
-    compareResults(newKudos, storedKudos);
-
+    Kudos newKudos = kudosService.updateKudos(storedKudos);
+    assertEquals(newKudos.getMessage(), storedKudos.getMessage());
+    compareResults(Utils.toEntity(newKudos), storedKudos);
   }
 
+  private void resetGlobalSettings() {
+    KudosService kudosService = getService(KudosService.class);
+    GlobalSettings globalSettings = kudosService.getGlobalSettings();
+    globalSettings.setAccessPermission(null);
+    globalSettings.setKudosPeriodType(KudosPeriodType.WEEK);
+    globalSettings.setKudosPerPeriod(100);
+    kudosService.saveGlobalSettings(globalSettings);
+  }
 }

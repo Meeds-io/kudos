@@ -6,182 +6,164 @@
     class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
-    <v-dialog
-      v-model="dialog"
-      content-class="uiPopup with-overflow"
+    <exo-modal
+      ref="sendKudosModal"
+      :title="$t('exoplatform.kudos.title.sendAKudos')"
       width="500px"
-      max-width="100vw"
-      persistent
-      @keydown.esc="dialog = false">
-      <v-card class="elevation-12">
-        <div class="ignore-vuetify-classes popupHeader ClearFix">
-          <a
-            class="uiIconClose pull-right"
-            aria-hidden="true"
-            @click="dialog = false"></a>
-          <span class="ignore-vuetify-classes PopupTitle popupTitle">{{ $t('exoplatform.kudos.title.sendAKudos') }}</span>
+      hide-actions
+      @dialog-opened="dialog = true"
+      @dialog-closed="dialog = false">
+      <v-card flat>
+        <div v-if="error && !loading" class="alert alert-error v-content">
+          <i class="uiIconError"></i>{{ error }}
         </div>
-        <v-card flat>
-          <div v-if="error && !loading" class="alert alert-error v-content">
-            <i class="uiIconError"></i>{{ error }}
-          </div>
-          <v-card-text v-if="allKudos && allKudos.length && !error">
-            <v-container
-              flat
-              fluid
-              grid-list-lg
-              class="pa-0">
-              <v-layout
-                row
-                wrap
-                class="kudosIconsContainer">
-                <v-card
-                  v-for="(kudos, index) in allKudos"
-                  :key="index"
-                  :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
-                  flat
-                  class="text-center kudosIconContainerTop">
-                  <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
-                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                    <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
-                  </v-card-text>
-                  <v-card-text v-else-if="kudos.isCurrent" class="kudosIconContainer">
-                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                  </v-card-text>
-                  <v-card-text v-else class="kudosIconContainer">
-                    <v-icon
-                      :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))"
-                      class="uiIconKudos uiIconLightGrey"
-                      size="64">
-                      fa-award
-                    </v-icon>
-                  </v-card-text>
-                  <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
-                  <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
-                  <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
-                    <kudos-identity-link
-                      :id="kudos.receiverId"
-                      :technical-id="kudos.receiverIdentityId"
-                      :type="kudos.receiverType"
-                      :name="kudos.receiverFullName" />
-                  </v-card-text>
-                  <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
-                  <v-card-text v-else-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
-                    <kudos-identity-link
-                      :id="kudos.receiverId"
-                      :technical-id="kudos.receiverIdentityId"
-                      :type="kudos.receiverType"
-                      :name="kudos.receiverFullName" />
-                  </v-card-text>
-                  <v-card-text v-else class="px-0 py-0">
-                    <a :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
-                  </v-card-text>
-                </v-card>
-              </v-layout>
-            </v-container>
-            <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
-              <i class="uiIconInfo"></i>
-              {{ $t('exoplatform.kudos.info.noKudosLeft', {0: remainingDaysToReset, 1: remainingDaysToReset === 1 ? $t('exoplatform.kudos.label.day') : $t('exoplatform.kudos.label.days') }) }}
-            </div>
-            <v-form v-else-if="kudosToSend" ref="form">
-              <v-textarea
-                id="kudosMessage"
-                v-model="kudosMessage"
-                :disabled="loading"
-                :rules="kudosMessageRules"
-                :label="$t('exoplatform.kudos.label.kudosMessage')"
-                :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
-                name="kudosMessage"
-                class="mb-0"
-                rows="3"
+        <v-card-text v-if="allKudos && allKudos.length && !error">
+          <v-container
+            flat
+            fluid
+            grid-list-lg
+            class="pa-0">
+            <v-layout
+              row
+              wrap
+              class="kudosIconsContainer">
+              <v-card
+                v-for="(kudos, index) in allKudos"
+                :key="index"
+                :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
                 flat
-                no-resize />
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <button
-              v-if="kudosToSend"
-              :disabled="loading || error"
-              class="ignore-vuetify-classes btn btn-primary me-3"
-              @click="send">
-              {{ $t('exoplatform.kudos.button.send') }}
-            </button>
-            <button
-              :disabled="loading"
-              class="ignore-vuetify-classes btn"
-              @click="dialog = false">
-              {{ $t('exoplatform.kudos.button.close') }}
-            </button>
-            <v-spacer />
-          </v-card-actions>
-        </v-card>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog
-      v-model="listDialog"
-      content-class="uiPopup with-overflow"
-      width="500px"
-      max-width="100vw"
-      persistent
-      @keydown.esc="listDialog = false">
-      <v-card class="elevation-12">
-        <div class="ignore-vuetify-classes popupHeader ClearFix">
-          <a
-            class="uiIconClose pull-right"
-            aria-hidden="true"
-            @click="listDialog = false"></a>
-          <span class="ignore-vuetify-classes PopupTitle popupTitle">{{ $t('exoplatform.kudos.label.kudosList') }}</span>
-        </div>
-        <v-card flat>
-          <div v-if="error && !loading" class="alert alert-error v-content">
-            <i class="uiIconError"></i>{{ error }}
+                class="text-center kudosIconContainerTop">
+                <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
+                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                  <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
+                </v-card-text>
+                <v-card-text v-else-if="kudos.isCurrent" class="kudosIconContainer">
+                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                </v-card-text>
+                <v-card-text v-else class="kudosIconContainer">
+                  <v-icon
+                    :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))"
+                    class="uiIconKudos uiIconLightGrey"
+                    size="64">
+                    fa-award
+                  </v-icon>
+                </v-card-text>
+                <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
+                <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
+                <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
+                  <kudos-identity-link
+                    :id="kudos.receiverId"
+                    :technical-id="kudos.receiverIdentityId"
+                    :type="kudos.receiverType"
+                    :name="kudos.receiverFullName" />
+                </v-card-text>
+                <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
+                <v-card-text v-else-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
+                  <kudos-identity-link
+                    :id="kudos.receiverId"
+                    :technical-id="kudos.receiverIdentityId"
+                    :type="kudos.receiverType"
+                    :name="kudos.receiverFullName" />
+                </v-card-text>
+                <v-card-text v-else class="px-0 py-0">
+                  <a :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
+                </v-card-text>
+              </v-card>
+            </v-layout>
+          </v-container>
+          <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
+            <i class="uiIconInfo"></i>
+            {{ $t('exoplatform.kudos.info.noKudosLeft', {0: remainingDaysToReset, 1: remainingDaysToReset === 1 ? $t('exoplatform.kudos.label.day') : $t('exoplatform.kudos.label.days') }) }}
           </div>
-          <v-card-text>
-            <v-container
-              v-if="kudosList && kudosList.length"
+          <v-form v-else-if="kudosToSend" ref="form">
+            <v-textarea
+              id="kudosMessage"
+              v-model="kudosMessage"
+              :disabled="loading"
+              :rules="kudosMessageRules"
+              :label="$t('exoplatform.kudos.label.kudosMessage')"
+              :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
+              name="kudosMessage"
+              class="mb-0"
+              rows="3"
               flat
-              fluid
-              grid-list-lg
-              class="pa-0">
-              <v-layout
-                row
-                wrap
-                class="kudosIconsContainer">
-                <v-card
-                  v-for="(kudos, index) in kudosList"
-                  :key="index"
-                  :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
-                  flat
-                  class="text-center kudosIconContainerTop">
-                  <v-card-text v-if="kudos.senderFullName" class="kudosIconContainer">
-                    <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                    <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
-                  </v-card-text>
-                  <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
-                    <kudos-identity-link
-                      :id="kudos.senderId"
-                      :technical-id="kudos.senderIdentityId"
-                      :type="kudos.senderType"
-                      :name="kudos.senderFullName" />
-                  </v-card-text>
-                </v-card>
-              </v-layout>
-            </v-container>
-            <div v-else class="alert alert-info">
-              <i class="uiIconInfo"></i>
-              {{ $t('exoplatform.kudos.info.noKudosOnActivity') }}
-            </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <button class="ignore-vuetify-classes btn" @click="listDialog = false">{{ $t('exoplatform.kudos.button.close') }}</button>
-            <v-spacer />
-          </v-card-actions>
-        </v-card>
+              no-resize />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <button
+            v-if="kudosToSend"
+            :disabled="loading || error"
+            class="ignore-vuetify-classes btn btn-primary me-3"
+            @click="send">
+            {{ $t('exoplatform.kudos.button.send') }}
+          </button>
+          <button
+            :disabled="loading"
+            class="ignore-vuetify-classes btn"
+            @click="$refs.sendKudosModal.close()">
+            {{ $t('exoplatform.kudos.button.close') }}
+          </button>
+          <v-spacer />
+        </v-card-actions>
       </v-card>
-    </v-dialog>
+    </exo-modal>
+
+    <exo-modal
+      ref="kudosListModal"
+      :title="$t('exoplatform.kudos.label.kudosList')"
+      width="500px"
+      hide-actions
+      @dialog-opened="listDialog = true"
+      @dialog-closed="listDialog = false">
+      <v-card flat>
+        <div v-if="error && !loading" class="alert alert-error v-content">
+          <i class="uiIconError"></i>{{ error }}
+        </div>
+        <v-card-text>
+          <v-container
+            v-if="kudosList && kudosList.length"
+            flat
+            fluid
+            grid-list-lg
+            class="pa-0">
+            <v-layout
+              row
+              wrap
+              class="kudosIconsContainer">
+              <v-card
+                v-for="(kudos, index) in kudosList"
+                :key="index"
+                :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
+                flat
+                class="text-center kudosIconContainerTop">
+                <v-card-text v-if="kudos.senderFullName" class="kudosIconContainer">
+                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
+                  <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
+                </v-card-text>
+                <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
+                  <kudos-identity-link
+                    :id="kudos.senderId"
+                    :technical-id="kudos.senderIdentityId"
+                    :type="kudos.senderType"
+                    :name="kudos.senderFullName" />
+                </v-card-text>
+              </v-card>
+            </v-layout>
+          </v-container>
+          <div v-else class="alert alert-info">
+            <i class="uiIconInfo"></i>
+            {{ $t('exoplatform.kudos.info.noKudosOnActivity') }}
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <button class="ignore-vuetify-classes btn" @click="$refs.kudosListModal.close()">{{ $t('exoplatform.kudos.button.close') }}</button>
+          <v-spacer />
+        </v-card-actions>
+      </v-card>
+    </exo-modal>
   </v-app>
 </template>
 
@@ -337,13 +319,13 @@ export default {
     openDialog(event) {
       if (!this.disabled) {
         this.error = null;
-        this.dialog = false;
+        this.$refs.sendKudosModal.close();
         this.$nextTick(() => {
           this.entityType = event && event.detail && event.detail.type;
           this.entityId = event && event.detail && event.detail.id;
           this.parentEntityId = event && event.detail && event.detail.parentId;
           this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-          this.dialog = true;
+          this.$refs.sendKudosModal.open();
         });
       }
     },
@@ -354,7 +336,7 @@ export default {
         this.entityType = event && event.detail && event.detail.type;
         this.entityId = event && event.detail && event.detail.id;
         this.refreshLink(null, this.entityType, this.entityId, '');
-        this.listDialog = true;
+        this.$refs.kudosListModal.open();
       }
     },
     send() {
@@ -374,18 +356,11 @@ export default {
         message: this.kudosMessage
       };
       sendKudos(kudos)
-        .then(status => {
-          if (!status) {
+        .then(kudosSent => {
+          if (!kudosSent) {
             throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
           }
-        })
-        .catch(e => {
-          console.error('Error saving kudo', e);
-          this.error = String(e);
-          throw e;
-        })
-        .then(() => {
-          document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudos}));
+          document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudosSent}));
           return this.init()
             .catch(e => {
               console.error('Error refreshing allowed number of kudos for current user', e);
@@ -397,7 +372,7 @@ export default {
               console.error('Error refreshing number of kudos', e);
             });
         })
-        .then(() => this.dialog = false)
+        .then(() => this.$refs.sendKudosModal.close())
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
@@ -414,8 +389,8 @@ export default {
                 activityId = activityId.replace('activityContainer', '');
                 thiss.refreshActivity(activityId);
                 setTimeout(() => {
-                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last().attr('id');
-                  if (commentToScrollTo) {
+                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last();
+                  if (commentToScrollTo && commentToScrollTo.is(':visible')) {
                     commentToScrollTo = commentToScrollTo.replace('commentContainer', '');
                     window.require(['SHARED/social-ui-activity'], (UIActivity) => {
                       UIActivity.focusToComment(commentToScrollTo);
@@ -440,11 +415,13 @@ export default {
     },
     refreshActivity(activityId) {
       const $activityItem = $(`#UIActivityLoader${activityId}`);
-      $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
-      $activityItem.addClass('activity-loadding');
-      window.require(['SHARED/social-ui-activities-loader'], (UIActivityLoader) => {
-        UIActivityLoader.renderActivity($activityItem);
-      });
+      if ($activityItem.length && $activityItem.is('visible')) {
+        $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
+        $activityItem.addClass('activity-loadding');
+        window.require(['SHARED/social-ui-activities-loader'], (UIActivityLoader) => {
+          UIActivityLoader.renderActivity($activityItem);
+        });
+      }
     },
     escapeCharacters(value) {
       return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();

@@ -3,11 +3,15 @@ package org.exoplatform.kudos.service;
 import static org.exoplatform.kudos.service.utils.Utils.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.service.utils.Utils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -38,7 +42,8 @@ public class KudosStorage {
   }
 
   public Kudos createKudos(Kudos kudos) {
-    KudosEntity kudosEntity = toNewEntity(kudos);
+    KudosEntity kudosEntity = toEntity(kudos);
+    kudosEntity.setId(null);
     kudosEntity = kudosDAO.create(kudosEntity);
     return fromEntity(kudosEntity);
   }
@@ -163,12 +168,21 @@ public class KudosStorage {
     return identityManager;
   }
 
-  public KudosEntity getKudosByActivityId(Long  activityId){
-    return kudosDAO.getKudosByActivityId(activityId);
+  public Kudos getKudosByActivityId(Long  activityId){
+    KudosEntity kudosEntity = kudosDAO.getKudosByActivityId(activityId);
+    return fromEntity(kudosEntity);
   }
 
-  public KudosEntity updateKudos(KudosEntity kudosEntity) {
-    return kudosDAO.update(kudosEntity);
+  public List<Kudos> getKudosListOfActivity(Long activityId) {
+    List<KudosEntity> kudosEntities = kudosDAO.getKudosListOfActivity(activityId);
+    return CollectionUtils.isEmpty(kudosEntities) ? Collections.emptyList()
+                                                  : kudosEntities.stream().map(Utils::fromEntity).collect(Collectors.toList());
+  }
+
+  public Kudos updateKudos(Kudos kudos) {
+    KudosEntity kudosEntity = toEntity(kudos);
+    kudosEntity = kudosDAO.update(kudosEntity);
+    return fromEntity(kudosEntity);
   }
 
 }

@@ -27,10 +27,14 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         + " AND k.entityId = :entityId" + " AND k.senderId = :senderId"),
     @NamedQuery(name = "Kudos.countKudosByEntity", query = "select count(k) from Kudos k" + " WHERE k.entityType = :entityType"
         + " AND k.entityId = :entityId"),
-    @NamedQuery(name = "Kudos.getKudosByParentEntity", query = "select k from Kudos k" + " WHERE k.entityType = :entityType"
-        + " AND (k.parentEntityId = :parentEntityId "
-        + " OR k.entityId = :parentEntityId)"
-        + " ORDER BY k.createdDate DESC"),
+    @NamedQuery(
+        name = "Kudos.getKudosListOfActivity",
+        query = "select k from Kudos k"
+            + " WHERE"
+            + "   k.activityId = :activityId"
+            + "     OR "
+            + "   (k.entityType in (:activityTypes) AND (k.parentEntityId = :activityId OR k.entityId in :activityId) )"
+    ),
     @NamedQuery(name = "Kudos.getKudosByPeriodAndSender", query = "select k from Kudos k" + " WHERE k.senderId = :senderId"
         + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"
         + " ORDER BY k.createdDate DESC"),

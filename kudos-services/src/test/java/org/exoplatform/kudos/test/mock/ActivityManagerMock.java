@@ -1,6 +1,10 @@
 package org.exoplatform.kudos.test.mock;
 
-import java.util.List;
+import java.util.*;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.social.common.RealtimeListAccess;
 import org.exoplatform.social.core.ActivityProcessor;
@@ -13,27 +17,32 @@ import org.exoplatform.social.core.storage.ActivityStorageException;
 
 public class ActivityManagerMock implements ActivityManager {
 
+  private Map<String, ExoSocialActivity> activities = new HashMap<>();
+
   @Override
   public void saveActivityNoReturn(Identity streamOwner, ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
+    saveActivity(activity);
   }
 
   @Override
   public void saveActivityNoReturn(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
-
+    saveActivity(activity);
   }
 
   @Override
   public void saveActivity(Identity streamOwner, String type, String title) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public ExoSocialActivity getActivity(String activityId) {
-    // TODO Auto-generated method stub
-    return null;
+    return activities.get(activityId);
+  }
+
+  @Override
+  public boolean isActivityViewable(ExoSocialActivity activity, org.exoplatform.services.security.Identity viewer) {
+    return activity != null && activity.getUserId() != null
+        && ArrayUtils.contains(StringUtils.split(activity.getUserId()), viewer.getUserId());
   }
 
   @Override
@@ -62,8 +71,7 @@ public class ActivityManagerMock implements ActivityManager {
 
   @Override
   public void saveComment(ExoSocialActivity activity, ExoSocialActivity newComment) {
-    // TODO Auto-generated method stub
-
+    saveActivity(activity);
   }
 
   @Override
@@ -176,8 +184,10 @@ public class ActivityManagerMock implements ActivityManager {
 
   @Override
   public ExoSocialActivity saveActivity(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
-    return null;
+    String id = String.valueOf(RandomUtils.nextLong());
+    activities.put(id, activity);
+    activity.setId(id);
+    return activity;
   }
 
   @Override

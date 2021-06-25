@@ -30,10 +30,6 @@
     <org.exoplatform.social.version>6.2.x-SNAPSHOT</org.exoplatform.social.version>
     <org.exoplatform.platform-ui.version>6.2.x-SNAPSHOT</org.exoplatform.platform-ui.version>
 
-    <!-- Used to generate default methods for POJO -->
-    <org.lombok.version>1.18.2</org.lombok.version>
-    <org.lombok.plugin.version>1.18.0.0</org.lombok.plugin.version>
-
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
     <jenkins.job.name>addon-kudos-master-ci</jenkins.job.name>
@@ -74,40 +70,6 @@
         <scope>provided</scope>
         <type>war</type>
       </dependency>
-
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>${org.lombok.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Maven Plugin for JS and CSS bundling and Unit Test execution -->
-        <plugin>
-          <groupId>com.github.eirslett</groupId>
-          <artifactId>frontend-maven-plugin</artifactId>
-          <version>${com.github.eirslett.frontend.version}</version>
-        </plugin>
-        <!-- Maven Plugin for generating contracts JAVA sources -->
-        <plugin>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok-maven-plugin</artifactId>
-          <version>${org.lombok.plugin.version}</version>
-          <executions>
-            <execution>
-              <phase>generate-sources</phase>
-              <goals>
-                <goal>delombok</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

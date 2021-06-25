@@ -1,11 +1,14 @@
 package org.exoplatform.kudos.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
 import org.exoplatform.kudos.entity.KudosEntity;
+import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.model.KudosPeriod;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
@@ -83,14 +86,26 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
   public KudosEntity getKudosByActivityId(Long  activityId) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByActivityId", KudosEntity.class);
     query.setParameter("activityId",activityId);
-    return  query.getSingleResult();
+    try {
+      return query.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
+  }
+
+  public List<KudosEntity> getKudosListOfActivity(Long activityId) {
+    TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosListOfActivity", KudosEntity.class);
+    query.setParameter("activityId", activityId);
+    query.setParameter("activityTypes", Arrays.asList(KudosEntityType.ACTIVITY.ordinal(), KudosEntityType.COMMENT.ordinal()));
+    return query.getResultList();
   }
 
   public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndSender", Long.class);
     setPeriodParameters(query, kudosPeriod);
     query.setParameter("senderId", senderId);
-    return query.getSingleResult();
+    Long count = query.getSingleResult();
+    return count == null ? 0 : count;
   }
 
   private void setPeriodParameters(TypedQuery<?> query, KudosPeriod kudosPeriod) {
