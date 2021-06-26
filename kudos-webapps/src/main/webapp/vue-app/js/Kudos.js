@@ -233,10 +233,6 @@ export function registerActivityActionExtension() {
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
     init: null,
-    isEnabled: params => {
-      const commentOwnerId = params && params.comment && params.comment.identity && params.comment.identity.id;
-      return commentOwnerId !== eXo.env.portal.userIdentityId;
-    }
   });
 
   // Register predefined activity types
