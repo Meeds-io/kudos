@@ -1,37 +1,53 @@
 <template>
   <div class="d-inline-flex pe-1 ms-1">
-    <v-btn
-      :id="`KudosActivity${entityId}`"
-      :title="$t('exoplatform.kudos.title.sendAKudos')"
-      :disabled="buttonDisabled"
-      :class="textColorClass"
-      :small="!isComment"
-      :x-small="isComment"
-      class="px-0 width-auto"
-      text
-      link
-      @click="openKudosForm">
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-label v-bind="attrs" v-on="on">
+          <v-btn
+            :id="`KudosActivity${entityId}`"
+            :disabled="buttonDisabled"
+            :class="textColorClass"
+            :small="!isComment"
+            :x-small="isComment"
+            class="px-0 width-auto"
+            text
+            link
+            @click="openKudosForm">
+            <span>
+              <v-icon
+                v-if="!isComment"
+                class="baseline-vertical-align primary--text"
+                size="14">
+                fa-award
+              </v-icon>
+              {{ $t('exoplatform.kudos.label.kudos') }}
+            </span>
+          </v-btn>
+        </v-label>
+      </template>
       <span>
-        <v-icon
-          v-if="!isComment"
-          class="baseline-vertical-align primary--text"
-          size="14">
-          fa-award
-        </v-icon>
-        {{ $t('exoplatform.kudos.label.kudos') }}
+        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
-    </v-btn>
-    <v-btn
-      v-if="kudosCount"
-      :id="`KudusCountLink${commentId}`"
-      :title="$t('exoplatform.kudos.button.displayKudosList')"
-      :small="!isComment"
-      :x-small="isComment"
-      class="primary--text font-weight-bold baseline-vertical-align"
-      icon
-      @click="openKudosList">
-      ({{ kudosCount }})
-    </v-btn>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-show="kudosCount"
+          :id="`KudusCountLink${commentId}`"
+          :small="!isComment"
+          :x-small="isComment"
+          class="primary--text font-weight-bold baseline-vertical-align"
+          icon
+          v-bind="attrs"
+          v-on="on"
+          @click="openKudosList">
+          ({{ kudosCount }})
+        </v-btn>
+      </template>
+      <span>
+        {{ $t('exoplatform.kudos.button.displayKudosList') }}
+      </span>
+    </v-tooltip>
   </div>
 </template>
 
