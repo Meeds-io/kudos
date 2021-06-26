@@ -222,17 +222,11 @@ export function registerActivityActionExtension() {
     id: 'kudos',
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
-    init: null,
-    isEnabled: params => {
-      const activityOwnerId = params && params.activity && params.activity.owner && params.activity.owner.id;
-      return activityOwnerId !== eXo.env.portal.userIdentityId;
-    }
   });
   extensionRegistry.registerComponent('ActivityCommentFooter', 'activity-footer-comment-action', {
     id: 'kudos',
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
-    init: null,
   });
 
   // Register predefined activity types
@@ -271,23 +265,25 @@ export function registerActivityActionExtension() {
         }
         return activityOrComment.body;
       },
-      getSummary: activityOrComment => 
-                  (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage)
-                  || (activityOrComment.kudos && activityOrComment.kudos.message)
-                  || activityOrComment.title
-                  || activityOrComment.body
-                  || '',
+      getSummary: activityOrComment => {
+        const summary = (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage)
+                        || (activityOrComment.kudos && activityOrComment.kudos.message)
+                        || activityOrComment.title
+                        || activityOrComment.body
+                        || '';
+        return summary.includes('<oembed>') && summary.split('<oembed>')[0] || summary;
+      },
       noTitleEllipsis: true,
       noSummaryEllipsis: true,
       supportsIcon: true,
       useSameViewForMobile: true,
-      defaultIcon: {
+      getDefaultIcon: (activityOrComment) => ({
         icon: 'fa fa-award primary--text',
-        size: 72,
+        size: activityOrComment.activityId && 37 || 72,
         height: 'auto',
-        width: '60px',
+        width: activityOrComment.activityId && '30px' || '60px',
         noBorder: true,
-      },
+      }),
       getBodyToEdit: activityOrComment => {
         if (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage) {
           return activityOrComment.templateParams.kudosMessage;

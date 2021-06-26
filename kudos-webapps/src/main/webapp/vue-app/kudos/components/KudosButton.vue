@@ -16,7 +16,8 @@
             <span>
               <v-icon
                 v-if="!isComment"
-                class="baseline-vertical-align primary--text"
+                :class="kudosColorClass"
+                class="baseline-vertical-align"
                 size="14">
                 fa-award
               </v-icon>
@@ -91,6 +92,9 @@ export default {
     },
     hasSentKudos() {
       return this.linkedKudosList.find(kudos => kudos.senderIdentityId === eXo.env.portal.userIdentityId);
+    },
+    kudosColorClass() {
+      return this.hasSentKudos && 'primary--text' || 'disabled--text';
     },
     textColorClass() {
       return this.hasSentKudos && 'primary--text' || '';

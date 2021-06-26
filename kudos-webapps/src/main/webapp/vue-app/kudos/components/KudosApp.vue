@@ -152,7 +152,7 @@
               </v-card>
             </v-layout>
           </v-container>
-          <div v-else class="alert alert-info">
+          <div v-else-if="!loading" class="alert alert-info">
             <i class="uiIconInfo"></i>
             {{ $t('exoplatform.kudos.info.noKudosOnActivity') }}
           </div>
@@ -309,12 +309,14 @@ export default {
       if (this.ignoreRefresh) {
         return Promise.resolve(null);
       }
+      this.loading = true;
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data('kudosList', kudosList);
           this.kudosList = kudosList;
-        });
+        })
+        .finally(() => this.loading = false);
     },
     openDialog(event) {
       if (!this.disabled) {
