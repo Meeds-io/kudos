@@ -8,7 +8,7 @@
   <artifactId>kudos-services</artifactId>
   <name>eXo Add-on:: eXo Kudos - Services</name>
   <properties>
-    <exo.test.coverage.ratio>0.59</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <dependency>
