@@ -8,6 +8,7 @@
     <kudos-api ref="kudosAPI" />
     <exo-modal
       ref="sendKudosModal"
+      v-show="dialog"
       :title="$t('exoplatform.kudos.title.sendAKudos')"
       width="500px"
       hide-actions
@@ -112,6 +113,7 @@
 
     <exo-modal
       ref="kudosListModal"
+      v-show="listDialog"
       :title="$t('exoplatform.kudos.label.kudosList')"
       width="500px"
       hide-actions
