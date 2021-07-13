@@ -1,5 +1,5 @@
 <template>
-  <div class="d-inline-flex pe-1">
+  <div class="d-inline-flex ms-4">
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <v-label v-bind="attrs" v-on="on">
