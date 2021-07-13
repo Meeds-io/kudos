@@ -1,5 +1,7 @@
 <template>
-  <div class="d-inline-flex pe-1">
+  <div
+    :class="!isComment && 'ms-4'"
+    class="d-inline-flex">
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <v-label v-bind="attrs" v-on="on">
