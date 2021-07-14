@@ -383,31 +383,6 @@ export default {
         })
         .finally(() => {
           this.loading = false;
-          if (!this.dialog) {
-            if (this.entityType === 'ACTIVITY') {
-              this.refreshActivity(this.entityId);
-            } else if (this.entityType === 'COMMENT') {
-              let activityId = $(`#commentContainercomment${this.entityId}`).closest('.activityStream').attr('id');
-              if (activityId) {
-                const thiss = this;
-                activityId = activityId.replace('activityContainer', '');
-                thiss.refreshActivity(activityId);
-                setTimeout(() => {
-                  let commentToScrollTo = $(`[data-parent-comment=comment${this.entityId}]`).last();
-                  if (commentToScrollTo && commentToScrollTo.is(':visible')) {
-                    commentToScrollTo = commentToScrollTo.replace('commentContainer', '');
-                    window.require(['SHARED/social-ui-activity'], (UIActivity) => {
-                      UIActivity.focusToComment(commentToScrollTo);
-                    });
-                  }
-                }, 400);
-              }
-            } else {
-              if ($('.activityStreamStatus .uiIconRefresh').length && $('.activityStreamStatus .uiIconRefresh').is(':visible')) {
-                $('.activityStreamStatus .uiIconRefresh').click();
-              }
-            }
-          }
         });
     },
     getRemainingDays() {
@@ -416,16 +391,6 @@ export default {
         return 0;
       }
       return parseInt(remainingDateInMillis / 86400000) + 1;
-    },
-    refreshActivity(activityId) {
-      const $activityItem = $(`#UIActivityLoader${activityId}`);
-      if ($activityItem.length && $activityItem.is('visible')) {
-        $activityItem.data('url', $('.uiActivitiesLoaderURL').data('url'));
-        $activityItem.addClass('activity-loadding');
-        window.require(['SHARED/social-ui-activities-loader'], (UIActivityLoader) => {
-          UIActivityLoader.renderActivity($activityItem);
-        });
-      }
     },
     escapeCharacters(value) {
       return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();
