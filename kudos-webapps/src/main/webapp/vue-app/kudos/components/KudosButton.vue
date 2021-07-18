@@ -1,32 +1,39 @@
 <template>
   <div
-    :class="!isComment && 'ms-4'"
+    :class="!isComment && 'ms-md-4'"
     class="d-inline-flex">
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-label v-bind="attrs" v-on="on">
+        <div
+          class="d-flex"
+          v-bind="attrs"
+          v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
             :disabled="buttonDisabled"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
-            class="px-0 width-auto"
+            class="pa-0 mt-0"
             text
             link
             @click="openKudosForm">
-            <span>
+            <template v-if="isComment">
+              {{ $t('exoplatform.kudos.label.kudos') }}
+            </template>
+            <template v-else>
               <v-icon
-                v-if="!isComment"
                 :class="kudosColorClass"
                 class="baseline-vertical-align"
                 size="14">
                 fa-award
               </v-icon>
-              {{ $t('exoplatform.kudos.label.kudos') }}
-            </span>
+              <span class="hidden-xs-only ms-2">
+                {{ $t('exoplatform.kudos.label.kudos') }}
+              </span>
+            </template>
           </v-btn>
-        </v-label>
+        </div>
       </template>
       <span>
         {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
@@ -39,7 +46,7 @@
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
           :x-small="isComment"
-          class="primary--text font-weight-bold baseline-vertical-align"
+          class="primary--text font-weight-bold baseline-vertical-align mt-0"
           icon
           v-bind="attrs"
           v-on="on"
