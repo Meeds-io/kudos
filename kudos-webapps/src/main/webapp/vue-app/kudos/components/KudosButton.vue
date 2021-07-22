@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="!isComment && 'ms-md-4'"
+    :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
@@ -22,15 +22,17 @@
               {{ $t('exoplatform.kudos.label.kudos') }}
             </template>
             <template v-else>
-              <v-icon
-                :class="kudosColorClass"
-                class="baseline-vertical-align"
-                size="14">
-                fa-award
-              </v-icon>
-              <span class="hidden-xs-only ms-2">
-                {{ $t('exoplatform.kudos.label.kudos') }}
-              </span>
+              <div class="d-flex flex-lg-row flex-column">
+                <v-icon
+                  :class="kudosColorClass"
+                  class="baseline-vertical-align"
+                  size="14">
+                  fa-award
+                </v-icon>
+                <span class="mx-auto mt-1 mt-lg-0 ms-lg-2">
+                  {{ $t('exoplatform.kudos.label.kudos') }}
+                </span>
+              </div>
             </template>
           </v-btn>
         </div>
