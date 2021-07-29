@@ -51,11 +51,8 @@ export function sendKudos(kudo) {
 
 export function getKudosSent(senderIdentityId, limit, returnSize, periodType, dateInSeconds) {
   return fetch(`/portal/rest/kudos/api/kudos/${senderIdentityId}/sent?limit=${limit || 0}&returnSize=${returnSize || true}&periodType=${periodType || ''}&dateInSeconds=${dateInSeconds || '0'}`, {
+    method: 'GET',
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
@@ -67,11 +64,8 @@ export function getKudosSent(senderIdentityId, limit, returnSize, periodType, da
 
 export function getKudosReceived(receiverIdentityId, limit, returnSize, periodType, dateInSeconds) {
   return fetch(`/portal/rest/kudos/api/kudos/${receiverIdentityId}/received?limit=${limit || 0}&returnSize=${returnSize || true}&periodType=${periodType || ''}&dateInSeconds=${dateInSeconds || '0'}`, {
+    method: 'GET',
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
@@ -83,6 +77,7 @@ export function getKudosReceived(receiverIdentityId, limit, returnSize, periodTy
 
 export function getKudosListByActivity(activityId) {
   return fetch(`/portal/rest/kudos/api/kudos/byActivity/${activityId}/all`, {
+    method: 'GET',
     credentials: 'include',
   }).then(resp => {
     if (!resp || !resp.ok) {
@@ -96,6 +91,7 @@ export function getKudosListByActivity(activityId) {
 export function getEntityKudos(entityType, entityId, limit) {
   if (entityType && entityId) {
     return fetch(`/portal/rest/kudos/api/kudos/byEntity?entityId=${entityId}&entityType=${entityType}&limit=${limit || 0}`, {
+      method: 'GET',
       credentials: 'include',
     }).then(resp => {
       if (!resp || !resp.ok) {
@@ -111,8 +107,8 @@ export function getEntityKudos(entityType, entityId, limit) {
 
 export function countUserKudosSentByEntity(entityType, entityId) {
   return fetch(`/portal/rest/kudos/api/kudos/byEntity/sent/count?entityId=${entityId}&entityType=${entityType}`, {
-    credentials: 'include',
     method: 'GET',
+    credentials: 'include',
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
@@ -126,11 +122,8 @@ export function getKudosByPeriodOfDate(date, limit) {
   // convert from milliseconds to seconds
   date = parseInt(date.getTime() / 1000);
   return fetch(`/portal/rest/kudos/api/kudos?dateInSeconds=${date}&limit=${limit || 0}`, {
+    method: 'GET',
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
@@ -145,11 +138,8 @@ export function getKudosByPeriod(startDate, endDate, limit) {
   startDate = parseInt(startDate.getTime() / 1000);
   endDate = parseInt(endDate.getTime() / 1000);
   return fetch(`/portal/rest/kudos/api/kudos/byDates?startDateInSeconds=${startDate}&endDateInSeconds=${endDate}&limit=${limit || 0}`, {
+    method: 'GET',
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
@@ -163,11 +153,8 @@ export function getPeriodDates(date, periodType) {
   // convert from milliseconds to seconds
   date = parseInt(date.getTime() / 1000);
   return fetch(`/portal/rest/kudos/api/kudos/period?dateInSeconds=${date}&periodType=${periodType}`, {
+    method: 'GET',
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
   }).then(resp => {
     if (!resp || !resp.ok) {
       throw new Error('Response code indicates a server error', resp);
