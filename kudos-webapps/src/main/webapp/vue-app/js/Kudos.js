@@ -1,7 +1,7 @@
 const kudosListByActivity = {};
 
 export function computeActivityKudosList(activity) {
-  const activityKudosListPromise = kudosListByActivity[activity.id] = getKudosListByActivity(activity.id);
+  const activityKudosListPromise = kudosListByActivity[activity.id] = (activity && activity.kudosList && Promise.resolve(activity.kudosList)) || getKudosListByActivity(activity.id);
   return activityKudosListPromise
     .then(kudosList => {
       kudosListByActivity[activity.id] = kudosList;
