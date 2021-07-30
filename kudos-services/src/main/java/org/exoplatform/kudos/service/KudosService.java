@@ -443,6 +443,17 @@ public class KudosService implements ExoKudosStatisticService, Startable {
       throw new IllegalAccessException("User " + currentUser.getUserId() + " isn't allowed to access kudos of activity with id "
           + activityId);
     }
+    return getKudosListOfActivity(activityId);
+  }
+
+  /**
+   * Retrieves the list of kudos for a given parent entity id and with a set of
+   * entity types
+   * 
+   * @param activityId {@link ExoSocialActivity} id
+   * @return {@link List} of {@link Kudos}
+   */
+  public List<Kudos> getKudosListOfActivity(String activityId) {
     return kudosStorage.getKudosListOfActivity(getActivityId(activityId));
   }
 
