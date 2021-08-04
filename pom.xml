@@ -34,6 +34,10 @@
     <!-- Jenkins Settings -->
     <jenkins.job.name>addon-kudos-master-ci</jenkins.job.name>
     <!-- **************************************** -->
+    
+    <!-- Sonar properties -->
+    <sonar.organization>meeds-io</sonar.organization>
+   </properties>
   </properties>
   <dependencyManagement>
     <dependencies>
