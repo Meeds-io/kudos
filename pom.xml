@@ -37,7 +37,6 @@
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
-   </properties>
   </properties>
   <dependencyManagement>
     <dependencies>
