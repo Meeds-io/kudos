@@ -15,6 +15,8 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.storage.api.ActivityStorage;
+import org.exoplatform.social.core.storage.cache.CachedActivityStorage;
 import org.exoplatform.social.notification.Utils;
 
 /**
@@ -23,10 +25,13 @@ import org.exoplatform.social.notification.Utils;
 public class NewKudosSentActivityGeneratorListener extends Listener<KudosService, Kudos> {
   private static final Log LOG = ExoLogger.getLogger(NewKudosSentActivityGeneratorListener.class);
 
+  private ActivityStorage  activityStorage;
+
   private ActivityManager  activityManager;
 
-  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager) {
+  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
     this.activityManager = activityManager;
+    this.activityStorage = activityStorage;
   }
 
   @Override
@@ -61,6 +66,11 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         long commentId = org.exoplatform.kudos.service.utils.Utils.getActivityId(activityComment.getId());
         kudos.setActivityId(commentId);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), kudos.getActivityId());
+
+        if (activityStorage instanceof CachedActivityStorage) {
+          ((CachedActivityStorage) activityStorage).clearActivityCached(activity.getId());
+          ((CachedActivityStorage) activityStorage).clearActivityCached(activityComment.getId());
+        }
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
@@ -78,6 +88,9 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         activityManager.saveActivityNoReturn(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(),
                                                     org.exoplatform.kudos.service.utils.Utils.getActivityId(activity.getId()));
+        if (activityStorage instanceof CachedActivityStorage) {
+          ((CachedActivityStorage) activityStorage).clearActivityCached(activity.getId());
+        }
       }
     }
   }
