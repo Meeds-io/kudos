@@ -188,7 +188,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertNull(kudosByActivity);
 
     ActivityManager activityManager = getService(ActivityManager.class);
-    new NewKudosSentActivityGeneratorListener(activityManager).onEvent(new Event<KudosService, Kudos>(null,
+    new NewKudosSentActivityGeneratorListener(activityManager, null).onEvent(new Event<KudosService, Kudos>(null,
                                                                                                       kudosService,
                                                                                                       kudos));
     List<Kudos> kudosList = kudosService.getKudosByEntity(kudos.getEntityType(), kudos.getEntityId(), 1);

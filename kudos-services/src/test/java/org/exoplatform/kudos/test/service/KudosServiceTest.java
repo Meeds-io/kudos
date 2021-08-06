@@ -493,7 +493,7 @@ public class KudosServiceTest extends BaseKudosTest {
     ActivityManager activityManager = getService(ActivityManager.class);
 
     listenerService.addListener(Utils.KUDOS_SENT_EVENT,
-                                new NewKudosSentActivityGeneratorListener(activityManager));
+                                new NewKudosSentActivityGeneratorListener(activityManager, null));
 
     listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT,
                                 new GamificationIntegrationListener(container, listenerService));
