@@ -122,19 +122,25 @@ export default {
     },
   },
   created() {
-    document.addEventListener('activity-comment-created', this.resetActivity);
+    this.$root.$on('activity-comment-created', this.resetActivity);
+    this.$root.$on('kudos-refresh-comment', this.resetActivityComments);
     this.init();
   },
   beforeDestroy() {
-    document.removeEventListener('activity-comment-created', this.resetActivity);
+    this.$root.$off('activity-comment-created', this.resetActivity);
+    this.$root.$off('kudos-refresh-comment', this.resetActivityComments);
   },
   methods: {
-    resetActivity(event) {
-      if (!this.comment) {
-        const activityId = event && event.detail && event.detail.activityId;
-        if (activityId === this.activity.id) {
-          this.init();
-        }
+    resetActivity(comment) {
+      if (!this.comment && comment && comment.activityId === this.activityId) {
+        this.$kudosService.resetActivityKudosList(this.activity);
+        this.init();
+        this.$root.$emit('kudos-refresh-comment', this.activity.id);
+      }
+    },
+    resetActivityComments(activityId) {
+      if (activityId && this.comment && activityId === this.activityId) {
+        this.init();
       }
     },
     init() {

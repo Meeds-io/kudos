@@ -1,5 +1,10 @@
 const kudosListByActivity = {};
 
+export function resetActivityKudosList(activity) {
+  delete activity.kudosList;
+  delete kudosListByActivity[activity.id];
+}
+
 export function computeActivityKudosList(activity) {
   const activityKudosListPromise = kudosListByActivity[activity.id] = (activity && activity.kudosList && Promise.resolve(activity.kudosList)) || getKudosListByActivity(activity.id);
   return activityKudosListPromise
