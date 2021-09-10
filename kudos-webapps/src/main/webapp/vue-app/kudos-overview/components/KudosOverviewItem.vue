@@ -48,12 +48,6 @@ export default {
   computed: {
     labels() {
       return {
-        CancelRequest: this.$t('exoplatform.kudos.label.profile.CancelRequest'),
-        Confirm: this.$t('exoplatform.kudos.label.profile.Confirm'),
-        Connect: this.$t('exoplatform.kudos.label.profile.Connect'),
-        Ignore: this.$t('exoplatform.kudos.label.profile.Ignore'),
-        RemoveConnection: this.$t('exoplatform.kudos.label.profile.RemoveConnection'),
-        StatusTitle: this.$t('exoplatform.kudos.label.profile.StatusTitle'),
         join: this.$t('exoplatform.kudos.label.profile.join'),
         leave: this.$t('exoplatform.kudos.label.profile.leave'),
         members: this.$t('exoplatform.kudos.label.profile.members'),
