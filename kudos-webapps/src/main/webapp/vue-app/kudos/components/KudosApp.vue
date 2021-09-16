@@ -6,110 +6,73 @@
     class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
-    <exo-modal
-      ref="sendKudosModal"
-      v-show="dialog"
-      :title="$t('exoplatform.kudos.title.sendAKudos')"
+    <exo-drawer
+      ref="activityKudosDrawer"
       width="500px"
       hide-actions
-      @dialog-opened="dialog = true"
-      @dialog-closed="dialog = false">
-      <v-card flat>
-        <div v-if="error && !loading" class="alert alert-error v-content">
-          <i class="uiIconError"></i>{{ error }}
-        </div>
-        <v-card-text v-if="allKudos && allKudos.length && !error">
-          <v-container
-            flat
-            fluid
-            grid-list-lg
-            class="pa-0">
-            <v-layout
-              row
-              wrap
-              class="kudosIconsContainer">
-              <v-card
-                v-for="(kudos, index) in allKudos"
-                :key="index"
-                :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
-                flat
-                class="text-center kudosIconContainerTop">
-                <v-card-text v-if="kudos.receiverFullName && !kudos.isCurrent" class="kudosIconContainer">
-                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                  <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
-                </v-card-text>
-                <v-card-text v-else-if="kudos.isCurrent" class="kudosIconContainer">
-                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                </v-card-text>
-                <v-card-text v-else class="kudosIconContainer">
-                  <v-icon
-                    :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))"
-                    class="uiIconKudos uiIconLightGrey"
-                    size="64">
-                    fa-award
-                  </v-icon>
-                </v-card-text>
-                <div v-if="kudos.isCurrent" class="kudosIconContainerCurrent"></div>
-                <!-- Made absolute because when isCurrent = true, the item 'kudosIconContainerCurrent' will hide this block, thus no tiptip and no link click is possible -->
-                <v-card-text v-if="kudos.receiverFullName" class="kudosIconLink">
-                  <kudos-identity-link
-                    :id="kudos.receiverId"
-                    :technical-id="kudos.receiverIdentityId"
-                    :type="kudos.receiverType"
-                    :name="kudos.receiverFullName" />
-                </v-card-text>
-                <!-- The same block is displayed again because the first block is absolute, so this is to ensure that the element is displayed in its correct position -->
-                <v-card-text v-else-if="kudos.receiverFullName" class="kudosIconLink kudosIconLinkInvisible">
-                  <kudos-identity-link
-                    :id="kudos.receiverId"
-                    :technical-id="kudos.receiverIdentityId"
-                    :type="kudos.receiverType"
-                    :name="kudos.receiverFullName" />
-                </v-card-text>
-                <v-card-text v-else class="px-0 py-0">
-                  <a :title="$t('exoplatform.kudos.label.remainingKudos', (remainingKudos -1))" href="javascript:void(0);">X {{ remainingKudos - 1 }}</a>
-                </v-card-text>
-              </v-card>
-            </v-layout>
-          </v-container>
-          <div v-if="remainingKudos <= 0" class="alert alert-info mt-5">
-            <i class="uiIconInfo"></i>
-            {{ $t('exoplatform.kudos.info.noKudosLeft', {0: remainingDaysToReset, 1: remainingDaysToReset === 1 ? $t('exoplatform.kudos.label.day') : $t('exoplatform.kudos.label.days') }) }}
+      @opened="dialog = true"
+      @closed="dialog = false"
+      :temporary="temporaryDrawer"
+      id="activityKudosDrawer"
+      allow-expand
+      right
+      disable-pull-to-refresh>
+      <template slot="title">
+        <span class="text-capitalize-first-letter">
+          {{ $t('exoplatform.kudos.title.sendAKudos') }}
+        </span>
+      </template>
+      <template slot="content">
+        <div
+          ref="activityShareFrom"
+          class="flex mx-4 pt-9">
+          <div class="d-flex flex-column flex-grow-1">
+            <div class="d-flex flex-row">
+              <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
+              <div class=" flex-grow-1 px-3 ">
+                <v-chip
+                  class="">
+                  <v-avatar left>
+                    <v-img />
+                  </v-avatar>
+                  <span class="text-truncate">
+                    {{ }}
+                  </span>
+                </v-chip>
+              </div>
+            </div>
+            <div class="d-flex flex-row pt-6">
+              <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
+            </div>
+            <div class="d-flex flex-row pt-5">
+              <exo-activity-rich-editor
+                ref="activityKudosMessage"
+                v-model="kudosMessage"
+                :template-params="templateParams"
+                :max-length="MESSAGE_MAX_LENGTH"
+                :ck-editor-type="ckEditorId"
+                :placeholder="placeholder"
+                class="flex" />
+            </div>
           </div>
-          <v-form v-else-if="kudosToSend" ref="form">
-            <v-textarea
-              id="kudosMessage"
-              v-model="kudosMessage"
-              :disabled="loading"
-              :rules="kudosMessageRules"
-              :label="$t('exoplatform.kudos.label.kudosMessage')"
-              :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
-              name="kudosMessage"
-              class="mb-0"
-              rows="3"
-              flat
-              no-resize />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <button
-            v-if="kudosToSend"
+        </div>
+      </template>
+      <template slot="footer">
+        <div class="d-flex justify-end">
+          <v-btn
+            class="btn me-2"
+            @click="$refs.activityKudosDrawer.close()">
+            {{ $t('Confirmation.label.Cancel') }}
+          </v-btn>
+          <v-btn
             :disabled="loading || error"
-            class="ignore-vuetify-classes btn btn-primary me-3"
+            class="btn btn-primary me-2"
             @click="send">
             {{ $t('exoplatform.kudos.button.send') }}
-          </button>
-          <button
-            :disabled="loading"
-            class="ignore-vuetify-classes btn"
-            @click="$refs.sendKudosModal.close()">
-            {{ $t('exoplatform.kudos.button.close') }}
-          </button>
-          <v-spacer />
-        </v-card-actions>
-      </v-card>
-    </exo-modal>
+          </v-btn>
+        </div>
+      </template>
+    </exo-drawer>
 
     <exo-modal
       ref="kudosListModal"
@@ -170,7 +133,7 @@
 </template>
 
 <script>
-import {getReceiver} from '../../js/KudosIdentity.js';
+import {getReceiver,getReceiverProfile} from '../../js/KudosIdentity.js';
 import {getEntityKudos, sendKudos, getKudosSent} from '../../js/Kudos.js';
 import {initSettings} from '../../js/KudosSettings.js';
 
@@ -179,6 +142,7 @@ export default {
     return {
       dialog: false,
       listDialog: false,
+      placeholder: 'Write a message here',
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
@@ -186,11 +150,14 @@ export default {
       remainingDaysToReset: 0,
       entityIds: [],
       parentEntityId: null,
+      receiverAvatar: null,
       entityId: null,
       entityType: null,
       receiverType: null,
       receiverId: null,
       error: null,
+      MESSAGE_MAX_LENGTH: 1300,
+      ckEditorId: 'activityContent',
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
@@ -222,6 +189,7 @@ export default {
       this.kudosMessage = null;
       this.kudosToSend = null;
       this.error = null;
+      let kudosToSend = null;
       if (this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
         if (this.remainingKudos > 0) {
@@ -232,7 +200,7 @@ export default {
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
-                  const kudosToSend = {
+                  kudosToSend = {
                     receiverId: receiverDetails.id,
                     receiverType: receiverDetails.type,
                     receiverIdentityId: receiverDetails.identityId,
@@ -268,7 +236,12 @@ export default {
             .catch(e => {
               this.error = String(e);
               console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
-            });
+            })
+            .finally(() =>
+              getReceiverProfile(kudosToSend.receiverId,true).then(receiverAvatar => {
+                this.receiverAvatar = receiverAvatar;
+              }) );
+
         }
       }
     }
@@ -281,7 +254,7 @@ export default {
         }
         this.$refs.kudosAPI.init();
 
-        document.addEventListener('exo-kudos-open-send-modal', this.openDialog);
+        document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
         document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
       });
   },
@@ -320,16 +293,16 @@ export default {
         })
         .finally(() => this.loading = false);
     },
-    openDialog(event) {
+    openDrawer(event) {
       if (!this.disabled) {
         this.error = null;
-        this.$refs.sendKudosModal.close();
+        this.$refs.activityKudosDrawer.close();
         this.$nextTick(() => {
           this.entityType = event && event.detail && event.detail.type;
           this.entityId = event && event.detail && event.detail.id;
           this.parentEntityId = event && event.detail && event.detail.parentId;
           this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-          this.$refs.sendKudosModal.open();
+          this.$refs.activityKudosDrawer.open();
         });
       }
     },

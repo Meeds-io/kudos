@@ -128,3 +128,15 @@ export function searchSpaces(filter) {
       return result;
     });
 }
+export function getReceiverProfile(id, expand) {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/users/${id}/avatar`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
+}
