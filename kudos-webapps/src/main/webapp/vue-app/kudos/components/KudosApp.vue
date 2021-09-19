@@ -8,10 +8,11 @@
     <kudos-api ref="kudosAPI" />
     <exo-drawer
       ref="activityKudosDrawer"
+      v-if="remainingKudos > 0"
       width="500px"
       hide-actions
-      @opened="dialog = true"
-      @closed="dialog = false"
+      @opened="drawer = true"
+      @closed="drawer = false"
       :temporary="temporaryDrawer"
       id="activityKudosDrawer"
       allow-expand
@@ -25,20 +26,45 @@
       <template slot="content">
         <div
           ref="activityShareFrom"
-          class="flex mx-4 pt-9">
+          class="flex mx-4 pt-6">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
               <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
-              <div class=" flex-grow-1 px-3 ">
-                <v-chip
-                  class="">
-                  <v-avatar left>
-                    <v-img />
-                  </v-avatar>
-                  <span class="text-truncate">
-                    {{ }}
-                  </span>
-                </v-chip>
+              <div class=" flex-grow-1 ">
+                <div class="d-flex flex-column flex-grow-1 pt-6 ">
+                  <div class="d-flex flex-row">
+                    <exo-user-avatar
+                      :username="kudosReceiver.receiverId"
+                      :fullname="kudosReceiver.fullName"
+                      :avatar-url="kudosReceiver.avatar"
+                      :url="kudosReceiver.profileUrl"
+                      bold-title
+                      link-style
+                      size="32"
+                      class="mx-4  my-auto" />
+                  </div>
+                  <div class="d-flex flex-row">
+                    <span class=" mx-4 grey--text" style="font-size:80%">
+                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: kudosSent}) }}
+                    </span>
+                    <div class="mx-7 ">
+                      <v-icon
+                        v-for="index in remainingKudos"
+                        :key="index"
+                        class="uiIconKudos uiIconBlue pl-1"
+                        size="20">
+                        fa-award
+                      </v-icon>
+                      <v-icon
+                        v-for="index in kudosSent"
+                        :key="index"
+                        class="uiIconKudos uiIconGrey pl-1"
+                        size="20">
+                        fa-award
+                      </v-icon>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="d-flex flex-row pt-6">
@@ -73,7 +99,10 @@
         </div>
       </template>
     </exo-drawer>
-
+    <div v-else class="alert alert-info mt-5">
+      <i class="uiIconInfo"></i>
+      {{ $t('exoplatform.kudos.info.noKudosLeft') }}
+    </div>
     <exo-modal
       ref="kudosListModal"
       v-show="listDialog"
@@ -124,7 +153,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <button class="ignore-vuetify-classes btn" @click="$refs.kudosListModal.close()">{{ $t('exoplatform.kudos.button.close') }}</button>
+          <button class="ignore-vuetify-classes btn" @click="$refs.activityKudosDrawer.close()()">{{ $t('exoplatform.kudos.button.close') }}</button>
           <v-spacer />
         </v-card-actions>
       </v-card>
@@ -133,14 +162,14 @@
 </template>
 
 <script>
-import {getReceiver,getReceiverProfile} from '../../js/KudosIdentity.js';
+import {getReceiver} from '../../js/KudosIdentity.js';
 import {getEntityKudos, sendKudos, getKudosSent} from '../../js/Kudos.js';
 import {initSettings} from '../../js/KudosSettings.js';
 
 export default {
   data() {
     return {
-      dialog: false,
+      drawer: false,
       listDialog: false,
       placeholder: 'Write a message here',
       ignoreRefresh: false,
@@ -182,8 +211,8 @@ export default {
       }
       this.kudosList = kudosList;
     },
-    dialog() {
-      if (!this.dialog) {
+    drawer() {
+      if (!this.drawer) {
         return;
       }
       this.kudosMessage = null;
@@ -200,9 +229,12 @@ export default {
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
+                  const receiverId = receiverDetails.id;
                   kudosToSend = {
-                    receiverId: receiverDetails.id,
+                    receiverId: receiverId,
                     receiverType: receiverDetails.type,
+                    avatar: `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/users/${receiverId}/avatar`,
+                    profileUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${receiverId}`,
                     receiverIdentityId: receiverDetails.identityId,
                     receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
                     receiverFullName: receiverDetails.fullname,
@@ -236,12 +268,7 @@ export default {
             .catch(e => {
               this.error = String(e);
               console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
-            })
-            .finally(() =>
-              getReceiverProfile(kudosToSend.receiverId,true).then(receiverAvatar => {
-                this.receiverAvatar = receiverAvatar;
-              }) );
-
+            });
         }
       }
     }
@@ -257,6 +284,19 @@ export default {
         document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
         document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
       });
+  },
+  computed: {
+    kudosReceiver () {
+      return {
+        receiverId: this.kudosToSend && this.kudosToSend.id,
+        avatar: this.kudosToSend && this.kudosToSend.avatar,
+        profileUrl: this.kudosToSend && this.kudosToSend.profileUrl,
+        fullName: this.kudosToSend && this.kudosToSend.receiverFullName
+      };
+    },
+    kudosSent () {
+      return 3 - this.remainingKudos;
+    }
   },
   methods: {
     init() {
@@ -319,10 +359,6 @@ export default {
     send() {
       this.error = null;
 
-      if (!this.$refs.form.validate()) {
-        return;
-      }
-
       this.loading = true;
       const kudos = {
         entityType: this.entityType,
@@ -349,7 +385,7 @@ export default {
               console.error('Error refreshing number of kudos', e);
             });
         })
-        .then(() => this.$refs.sendKudosModal.close())
+        .then(() => this.$refs.activityKudosDrawer.close())
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
