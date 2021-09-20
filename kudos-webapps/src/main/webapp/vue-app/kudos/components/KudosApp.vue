@@ -13,7 +13,6 @@
       hide-actions
       @opened="drawer = true"
       @closed="drawer = false"
-      :temporary="temporaryDrawer"
       id="activityKudosDrawer"
       allow-expand
       right
@@ -25,7 +24,7 @@
       </template>
       <template slot="content">
         <div
-          ref="activityShareFrom"
+          ref="activityKudosForm"
           class="flex mx-4 pt-6">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
@@ -41,11 +40,11 @@
                       bold-title
                       link-style
                       size="32"
-                      class="mx-4  my-auto" />
+                      class="mx-4 my-auto" />
                   </div>
                   <div class="d-flex flex-row">
-                    <span class=" mx-4 grey--text" style="font-size:80%">
-                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: kudosSent}) }}
+                    <span class="kudosText mx-4 grey--text">
+                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent}) }}
                     </span>
                     <div class="mx-7 ">
                       <v-icon
@@ -74,7 +73,6 @@
               <exo-activity-rich-editor
                 ref="activityKudosMessage"
                 v-model="kudosMessage"
-                :template-params="templateParams"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
                 :placeholder="placeholder"
@@ -91,7 +89,7 @@
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
           <v-btn
-            :disabled="loading || error"
+            :disabled="SendButtonDisabled"
             class="btn btn-primary me-2"
             @click="send">
             {{ $t('exoplatform.kudos.button.send') }}
@@ -100,9 +98,9 @@
       </template>
     </exo-drawer>
     <v-alert
-      v-if="alert"
+      v-if="noKudosAlert"
       type="warning">
-      {{ $t('exoplatform.kudos.info.noKudosLeft') }}
+      {{ $t('exoplatform.kudos.info.noKudosLeft', {0: $t('exoplatform.kudos.label.day'),1: kudosPeriodType}) }}
     </v-alert>
     <exo-modal
       ref="kudosListModal"
@@ -172,11 +170,11 @@ export default {
     return {
       drawer: false,
       listDialog: false,
-      placeholder: 'Write a message here',
+      placeholder: '$t(\'exoplatform.kudos.label.kudosMessagePlaceholder\')',
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
-      alert: false,
+      noKudosAlert: false,
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
@@ -192,7 +190,7 @@ export default {
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
-      kudosMessage: null,
+      kudosMessage: '',
       loading: false,
       kudosMessageRules: [
         (v) => !!v || this.$t('exoplatform.kudos.warning.requiredField'),
@@ -296,8 +294,19 @@ export default {
         fullName: this.kudosToSend && this.kudosToSend.receiverFullName
       };
     },
+    numberOfKudosAllowed(){
+      return Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
+    },
+    kudosPeriodType(){
+      return window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
+    },
     kudosSent () {
-      return 3 - this.remainingKudos;
+      return this.numberOfKudosAllowed - this.remainingKudos;
+    },
+    SendButtonDisabled() {
+    // we have to take in charge the length of the whole kudosmessage which includes the html tags
+
+      return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
     }
   },
   methods: {
@@ -347,9 +356,9 @@ export default {
           });
         }
         else {
-          this.alert = true;
+          this.noKudosAlert = true;
           setTimeout(() => {
-            this.alert = false;
+            this.noKudosAlert = false;
           }, 2000);
         }
       }
