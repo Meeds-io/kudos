@@ -99,10 +99,11 @@
         </div>
       </template>
     </exo-drawer>
-    <div v-else class="alert alert-info mt-5">
-      <i class="uiIconInfo"></i>
+    <v-alert
+      v-if="alert"
+      type="warning">
       {{ $t('exoplatform.kudos.info.noKudosLeft') }}
-    </div>
+    </v-alert>
     <exo-modal
       ref="kudosListModal"
       v-show="listDialog"
@@ -175,6 +176,7 @@ export default {
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
+      alert: false,
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
@@ -335,15 +337,21 @@ export default {
     },
     openDrawer(event) {
       if (!this.disabled) {
-        this.error = null;
-        this.$refs.activityKudosDrawer.close();
-        this.$nextTick(() => {
-          this.entityType = event && event.detail && event.detail.type;
-          this.entityId = event && event.detail && event.detail.id;
-          this.parentEntityId = event && event.detail && event.detail.parentId;
-          this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-          this.$refs.activityKudosDrawer.open();
-        });
+        if ( this.remainingKudos > 0 ) {
+          this.$nextTick(() => {
+            this.entityType = event && event.detail && event.detail.type;
+            this.entityId = event && event.detail && event.detail.id;
+            this.parentEntityId = event && event.detail && event.detail.parentId;
+            this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
+            this.$refs.activityKudosDrawer.open();
+          });
+        }
+        else {
+          this.alert = true;
+          setTimeout(() => {
+            this.alert = false;
+          }, 2000);
+        }
       }
     },
     openListDialog(event) {
