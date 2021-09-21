@@ -27,41 +27,44 @@
           ref="activityKudosForm"
           class="flex mx-4 pt-6">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-3">
-              <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
-              <div class=" flex-grow-1 ">
-                <exo-user-avatar
-                  :username="kudosReceiver.receiverId"
-                  :fullname="kudosReceiver.fullName"
-                  :avatar-url="kudosReceiver.avatar"
-                  :url="kudosReceiver.profileUrl"
-                  bold-title
-                  link-style
-                  size="32"
-                  class="mx-4 my-auto" />
+            <div class="d-flex flex-row pt-1">
+              <div class="d-flex flex-column flex-grow-1">
+                <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
-            </div>
-            <div class="d-flex  pl-10 flex-row ">
-              <div>
-                <span class="kudosText  grey--text">
-                  {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
-                </span>
-              </div>
-              <div class="pl-10">
-                <v-icon
-                  v-for="index in remainingKudos"
-                  :key="index"
-                  class="uiIconKudos uiIconBlue pl-1"
-                  size="20">
-                  fa-award
-                </v-icon>
-                <v-icon
-                  v-for="index in kudosSent"
-                  :key="index"
-                  class="uiIconKudos uiIconGrey pl-1"
-                  size="20">
-                  fa-award
-                </v-icon>
+              <div class="d-flex flex-column flex-grow-1 pl-2 pt-3">
+                <div class="d-flex flex-row pt-3">
+                  <exo-user-avatar
+                    :username="kudosReceiver.receiverId"
+                    :fullname="kudosReceiver.fullName"
+                    :avatar-url="kudosReceiver.avatar"
+                    :url="kudosReceiver.profileUrl"
+                    bold-title
+                    link-style
+                    size="32" />
+                </div>
+                <div class="d-flex flex-row">
+                  <div>
+                    <span class="text-sm-caption text-sub-title">
+                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
+                    </span>
+                  </div>
+                  <div class="pl-10">
+                    <v-icon
+                      v-for="index in remainingKudos"
+                      :key="index"
+                      class="uiIconKudos uiIconBlue pl-1"
+                      size="20">
+                      fa-award
+                    </v-icon>
+                    <v-icon
+                      v-for="index in kudosSent"
+                      :key="index"
+                      class="uiIconKudos uiIconGrey pl-1"
+                      size="20">
+                      fa-award
+                    </v-icon>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="d-flex flex-row pt-6">
@@ -73,7 +76,7 @@
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
-                :placeholder="placeholder"
+                :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 class="flex" />
             </div>
           </div>
@@ -98,7 +101,7 @@
     <v-alert
       v-if="noKudosLeft"
       type="warning">
-      {{ $t('exoplatform.kudos.info.noKudosLeft', {0: $t('exoplatform.kudos.label.day'),1: kudosPeriodType}) }}
+      {{ $t('exoplatform.kudos.info.noKudosLeft', {0: numberOfKudosAllowed, 1: $t('exoplatform.kudos.label.day'), 2: kudosPeriodType}) }}
     </v-alert>
     <exo-modal
       ref="kudosListModal"
@@ -168,7 +171,6 @@ export default {
     return {
       drawer: false,
       listDialog: false,
-      placeholder: '$t(\'exoplatform.kudos.label.kudosMessagePlaceholder\')',
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
