@@ -27,43 +27,41 @@
           ref="activityKudosForm"
           class="flex mx-4 pt-6">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row pt-3">
               <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
               <div class=" flex-grow-1 ">
-                <div class="d-flex flex-column flex-grow-1 pt-6 ">
-                  <div class="d-flex flex-row">
-                    <exo-user-avatar
-                      :username="kudosReceiver.receiverId"
-                      :fullname="kudosReceiver.fullName"
-                      :avatar-url="kudosReceiver.avatar"
-                      :url="kudosReceiver.profileUrl"
-                      bold-title
-                      link-style
-                      size="32"
-                      class="mx-4 my-auto" />
-                  </div>
-                  <div class="d-flex flex-row">
-                    <span class="kudosText mx-4 grey--text">
-                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent}) }}
-                    </span>
-                    <div class="mx-7 ">
-                      <v-icon
-                        v-for="index in remainingKudos"
-                        :key="index"
-                        class="uiIconKudos uiIconBlue pl-1"
-                        size="20">
-                        fa-award
-                      </v-icon>
-                      <v-icon
-                        v-for="index in kudosSent"
-                        :key="index"
-                        class="uiIconKudos uiIconGrey pl-1"
-                        size="20">
-                        fa-award
-                      </v-icon>
-                    </div>
-                  </div>
-                </div>
+                <exo-user-avatar
+                  :username="kudosReceiver.receiverId"
+                  :fullname="kudosReceiver.fullName"
+                  :avatar-url="kudosReceiver.avatar"
+                  :url="kudosReceiver.profileUrl"
+                  bold-title
+                  link-style
+                  size="32"
+                  class="mx-4 my-auto" />
+              </div>
+            </div>
+            <div class="d-flex  pl-10 flex-row ">
+              <div>
+                <span class="kudosText  grey--text">
+                  {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
+                </span>
+              </div>
+              <div class="pl-10">
+                <v-icon
+                  v-for="index in remainingKudos"
+                  :key="index"
+                  class="uiIconKudos uiIconBlue pl-1"
+                  size="20">
+                  fa-award
+                </v-icon>
+                <v-icon
+                  v-for="index in kudosSent"
+                  :key="index"
+                  class="uiIconKudos uiIconGrey pl-1"
+                  size="20">
+                  fa-award
+                </v-icon>
               </div>
             </div>
             <div class="d-flex flex-row pt-6">
@@ -98,7 +96,7 @@
       </template>
     </exo-drawer>
     <v-alert
-      v-if="noKudosAlert"
+      v-if="noKudosLeft"
       type="warning">
       {{ $t('exoplatform.kudos.info.noKudosLeft', {0: $t('exoplatform.kudos.label.day'),1: kudosPeriodType}) }}
     </v-alert>
@@ -174,7 +172,7 @@ export default {
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
-      noKudosAlert: false,
+      noKudosLeft: false,
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
@@ -356,9 +354,9 @@ export default {
           });
         }
         else {
-          this.noKudosAlert = true;
+          this.noKudosLeft = true;
           setTimeout(() => {
-            this.noKudosAlert = false;
+            this.noKudosLeft = false;
           }, 2000);
         }
       }
