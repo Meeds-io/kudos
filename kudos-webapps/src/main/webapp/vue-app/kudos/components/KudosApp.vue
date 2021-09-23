@@ -14,20 +14,19 @@
       @opened="drawer = true"
       @closed="drawer = false"
       id="activityKudosDrawer"
-      allow-expand
       right
       disable-pull-to-refresh>
       <template slot="title">
-        <span class="text-capitalize-first-letter">
+        <span class="text-header-title">
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
         </span>
       </template>
       <template slot="content">
         <div
           ref="activityKudosForm"
-          class="flex mx-4 pt-6">
+          class="flex mx-4 pt-3">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-1">
+            <div class="d-flex flex-row">
               <div class="d-flex flex-column flex-grow-1">
                 <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
@@ -44,7 +43,7 @@
                 </div>
                 <div class="d-flex flex-row">
                   <div>
-                    <span class="text-sm-caption text-sub-title">
+                    <span class="text-sm-caption grey--text">
                       {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
@@ -67,17 +66,18 @@
                 </div>
               </div>
             </div>
-            <div class="d-flex flex-row pt-6">
+            <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
-            <div class="d-flex flex-row pt-5">
+            <div class="d-flex flex-row pt-3">
               <exo-activity-rich-editor
                 ref="activityKudosMessage"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
-                class="flex" />
+                class="flex"
+                autofocus />
             </div>
           </div>
         </div>
@@ -210,67 +210,6 @@ export default {
         return;
       }
       this.kudosList = kudosList;
-    },
-    drawer() {
-      if (!this.drawer) {
-        return;
-      }
-      this.kudosMessage = null;
-      this.kudosToSend = null;
-      this.error = null;
-      let kudosToSend = null;
-      if (this.entityId && this.entityType) {
-        this.allKudos = this.allKudosSent.slice(0);
-        if (this.remainingKudos > 0) {
-          getReceiver(this.entityType, this.entityId)
-            .then(receiverDetails => {
-              if (receiverDetails && receiverDetails.id && receiverDetails.type) {
-                receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
-                if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
-                  this.receiverId = receiverDetails.id;
-                  this.receiverType = receiverDetails.type;
-                  const receiverId = receiverDetails.id;
-                  kudosToSend = {
-                    receiverId: receiverId,
-                    receiverType: receiverDetails.type,
-                    avatar: `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/users/${receiverId}/avatar`,
-                    profileUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${receiverId}`,
-                    receiverIdentityId: receiverDetails.identityId,
-                    receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
-                    receiverFullName: receiverDetails.fullname,
-                    isCurrent: true
-                  };
-                  if (receiverDetails.entityId) {
-                    this.entityId = receiverDetails.entityId;
-                  }
-                  if (receiverDetails.notAuthorized) {
-                    this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
-                  } else {
-                    this.kudosToSend = kudosToSend;
-                  }
-                  this.allKudos.push(kudosToSend);
-                  if (this.remainingKudos > 1) {
-                    this.allKudos.push({});
-                  }
-                  this.$nextTick(() => {
-                    if ($('.kudosIconContainerTop.kudosIconContainerCurrent').length) {
-                      $('.kudosIconContainerTop.kudosIconContainerCurrent')[0].scrollIntoView();
-                    }
-                  });
-                } else {
-                  throw new Error(this.$t('exoplatform.kudos.warning.cantSendKudosToYourSelf'));
-                }
-              } else {
-                console.error('Receiver not found for entity type/id', this.entityType, this.entityId, receiverDetails);
-                throw new Error(this.$t('exoplatform.kudos.error.errorGettingReceiverInformation'));
-              }
-            })
-            .catch(e => {
-              this.error = String(e);
-              console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
-            });
-        }
-      }
     }
   },
   created() {
@@ -326,10 +265,69 @@ export default {
             .then(allKudos => {
               this.allKudosSent = allKudos && allKudos.kudos || [];
             });
+
         })
         .catch(e => {
           this.error = e;
         });
+    },
+    initDrawer () {
+      this.kudosMessage = null;
+      this.kudosToSend = null;
+      this.error = null;
+      let kudosToSend = null;
+      if (this.entityId && this.entityType) {
+        this.allKudos = this.allKudosSent.slice(0);
+        if (this.remainingKudos > 0) {
+          return getReceiver(this.entityType, this.entityId)
+            .then(receiverDetails => {
+              if (receiverDetails && receiverDetails.id && receiverDetails.type) {
+                receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
+                if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
+                  this.receiverId = receiverDetails.id;
+                  this.receiverType = receiverDetails.type;
+                  const receiverId = receiverDetails.id;
+                  kudosToSend = {
+                    receiverId: receiverId,
+                    receiverType: receiverDetails.type,
+                    avatar: receiverDetails.avatar,
+                    profileUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${receiverId}`,
+                    receiverIdentityId: receiverDetails.identityId,
+                    receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
+                    receiverFullName: receiverDetails.fullname,
+                    isCurrent: true
+                  };
+                  if (receiverDetails.entityId) {
+                    this.entityId = receiverDetails.entityId;
+                  }
+                  if (receiverDetails.notAuthorized) {
+                    this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
+                  } else {
+                    this.kudosToSend = kudosToSend;
+                  }
+                  this.allKudos.push(kudosToSend);
+                  if (this.remainingKudos > 1) {
+                    this.allKudos.push({});
+                  }
+                  this.$nextTick(() => {
+                    if ($('.kudosIconContainerTop.kudosIconContainerCurrent').length) {
+                      $('.kudosIconContainerTop.kudosIconContainerCurrent')[0].scrollIntoView();
+                    }
+                  });
+                } else {
+                  throw new Error(this.$t('exoplatform.kudos.warning.cantSendKudosToYourSelf'));
+                }
+              } else {
+                console.error('Receiver not found for entity type/id', this.entityType, this.entityId, receiverDetails);
+                throw new Error(this.$t('exoplatform.kudos.error.errorGettingReceiverInformation'));
+              }
+            })
+            .catch(e => {
+              this.error = String(e);
+              console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
+            });
+        }
+      }
     },
     refreshLink(element, entityType, entityId) {
       if (this.ignoreRefresh) {
@@ -352,7 +350,9 @@ export default {
             this.entityId = event && event.detail && event.detail.id;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
+            this.$refs.activityKudosDrawer.startLoading();
             this.$refs.activityKudosDrawer.open();
+            this.initDrawer().then( () => this.$refs.activityKudosDrawer.endLoading() );
           });
         }
         else {
