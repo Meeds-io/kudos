@@ -8,11 +8,8 @@
     <kudos-api ref="kudosAPI" />
     <exo-drawer
       ref="activityKudosDrawer"
-      v-if="remainingKudos > 0"
       width="500px"
       hide-actions
-      @opened="drawer = true"
-      @closed="drawer = false"
       id="activityKudosDrawer"
       right
       disable-pull-to-refresh>
@@ -30,7 +27,7 @@
               <div class="d-flex flex-column flex-grow-1">
                 <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
-              <div class="d-flex flex-column flex-grow-1 pl-2 pt-3">
+              <div class="d-flex flex-column pr-2 pt-3">
                 <div class="d-flex flex-row pt-3">
                   <exo-user-avatar
                     :username="kudosReceiver.receiverId"
@@ -47,7 +44,9 @@
                       {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
-                  <div class="pl-10">
+                  <div
+                    v-if="kudosSent || remainingKudos"
+                    class="pl-9">
                     <v-icon
                       v-for="index in remainingKudos"
                       :key="index"
@@ -71,7 +70,7 @@
             </div>
             <div class="d-flex flex-row pt-3">
               <exo-activity-rich-editor
-                ref="activityKudosMessage"
+                :ref="ckEditorId"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
@@ -170,6 +169,7 @@ export default {
   data() {
     return {
       drawer: false,
+      numberOfKudosAllowed: 0,
       listDialog: false,
       ignoreRefresh: false,
       kudosList: false,
@@ -178,8 +178,6 @@ export default {
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
-      parentEntityId: null,
-      receiverAvatar: null,
       entityId: null,
       entityType: null,
       receiverType: null,
@@ -233,18 +231,11 @@ export default {
         fullName: this.kudosToSend && this.kudosToSend.receiverFullName
       };
     },
-    numberOfKudosAllowed(){
-      return Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
-    },
-    kudosPeriodType(){
-      return window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
-    },
     kudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     SendButtonDisabled() {
     // we have to take in charge the length of the whole kudosmessage which includes the html tags
-
       return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
     }
   },
@@ -253,7 +244,9 @@ export default {
       return initSettings()
         .then(() => {
           this.disabled = window.kudosSettings && window.kudosSettings.disabled;
+          this.numberOfKudosAllowed = Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
           this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
+          this.kudosPeriodType = window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
         })
         .then(() => {
           const remainingDaysToReset = Number(this.getRemainingDays());
@@ -265,7 +258,6 @@ export default {
             .then(allKudos => {
               this.allKudosSent = allKudos && allKudos.kudos || [];
             });
-
         })
         .catch(e => {
           this.error = e;
@@ -352,7 +344,9 @@ export default {
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
             this.$refs.activityKudosDrawer.startLoading();
             this.$refs.activityKudosDrawer.open();
-            this.initDrawer().then( () => this.$refs.activityKudosDrawer.endLoading() );
+            this.initDrawer().then( () =>
+              this.$refs[this.ckEditorId].setFocus(),
+            this.$refs.activityKudosDrawer.endLoading() );
           });
         }
         else {
