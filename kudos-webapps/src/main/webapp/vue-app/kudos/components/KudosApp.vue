@@ -152,7 +152,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <button class="ignore-vuetify-classes btn" @click="$refs.activityKudosDrawer.close()()">{{ $t('exoplatform.kudos.button.close') }}</button>
+          <button class="ignore-vuetify-classes btn" @click="$refs.kudosListModal.close()">{{ $t('exoplatform.kudos.button.close') }}</button>
           <v-spacer />
         </v-card-actions>
       </v-card>
@@ -396,7 +396,8 @@ export default {
               console.error('Error refreshing number of kudos', e);
             });
         })
-        .then(() => this.$refs.activityKudosDrawer.close())
+        .then(() => this.$refs[this.ckEditorId].unload(),
+          this.$refs.activityKudosDrawer.close())
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
