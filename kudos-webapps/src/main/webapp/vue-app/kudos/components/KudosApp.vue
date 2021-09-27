@@ -11,6 +11,8 @@
       width="500px"
       hide-actions
       id="activityKudosDrawer"
+      @opened="drawer = true"
+      @closed="drawer = false"
       right
       disable-pull-to-refresh>
       <template slot="title">
@@ -18,7 +20,7 @@
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
         </span>
       </template>
-      <template slot="content">
+      <template v-if="loading" slot="content">
         <div
           ref="activityKudosForm"
           class="flex mx-4 pt-3">
@@ -168,7 +170,6 @@ import {initSettings} from '../../js/KudosSettings.js';
 export default {
   data() {
     return {
-      drawer: false,
       numberOfKudosAllowed: 0,
       listDialog: false,
       ignoreRefresh: false,
@@ -183,8 +184,9 @@ export default {
       receiverType: null,
       receiverId: null,
       error: null,
+      drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
-      ckEditorId: 'activityContent',
+      ckEditorId: 'kudosContent',
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
@@ -208,6 +210,9 @@ export default {
         return;
       }
       this.kudosList = kudosList;
+    },
+    drawer() {
+      this.loading = false;
     }
   },
   created() {
@@ -325,14 +330,15 @@ export default {
       if (this.ignoreRefresh) {
         return Promise.resolve(null);
       }
-      this.loading = true;
+      this.$refs.activityKudosDrawer.startLoading();
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data('kudosList', kudosList);
           this.kudosList = kudosList;
         })
-        .finally(() => this.loading = false);
+        .finally(() =>  this.$refs.activityKudosDrawer.endLoading()
+        );
     },
     openDrawer(event) {
       if (!this.disabled) {
@@ -342,11 +348,13 @@ export default {
             this.entityId = event && event.detail && event.detail.id;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-            this.$refs.activityKudosDrawer.startLoading();
             this.$refs.activityKudosDrawer.open();
-            this.initDrawer().then( () =>
-              this.$refs[this.ckEditorId].setFocus(),
-            this.$refs.activityKudosDrawer.endLoading() );
+            this.$refs.activityKudosDrawer.startLoading();
+            this.initDrawer().then(() => {
+              this.loading = true;
+              this.$refs.activityKudosDrawer.endLoading();
+            }).finally( () => { this.$refs[this.ckEditorId].setFocus();
+            });
           });
         }
         else {
@@ -370,7 +378,7 @@ export default {
     send() {
       this.error = null;
 
-      this.loading = true;
+      this.$refs.activityKudosDrawer.startLoading();
       const kudos = {
         entityType: this.entityType,
         entityId: this.entityId,
@@ -397,13 +405,14 @@ export default {
             });
         })
         .then(() => this.$refs[this.ckEditorId].unload(),
-          this.$refs.activityKudosDrawer.close())
+          this.$refs.activityKudosDrawer.close(),
+          this.loading = false)
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
         })
         .finally(() => {
-          this.loading = false;
+          this.$refs.activityKudosDrawer.endLoading();
         });
     },
     getRemainingDays() {
