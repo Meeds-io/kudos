@@ -42,11 +42,11 @@
                 <div class="d-flex flex-row">
                   <div>
                     <span class="text-sm-caption grey--text">
-                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
+                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: numberOfkudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
                   <div
-                    v-if="kudosSent || remainingKudos"
+                    v-if="numberOfkudosSent || remainingKudos"
                     class="pl-9">
                     <v-icon
                       v-for="index in remainingKudos"
@@ -56,7 +56,7 @@
                       fa-award
                     </v-icon>
                     <v-icon
-                      v-for="index in kudosSent"
+                      v-for="index in numberOfkudosSent"
                       :key="index"
                       class="uiIconKudos uiIconGrey pl-1"
                       size="20">
@@ -102,6 +102,12 @@
       v-if="noKudosLeft"
       type="warning">
       {{ $t('exoplatform.kudos.info.noKudosLeft', {0: numberOfKudosAllowed, 1: $t('exoplatform.kudos.label.day'), 2: kudosPeriodType}) }}
+    </v-alert>
+    <v-alert
+      v-if="kudosSent"
+      dismissible
+      type="success">
+      {{ $t('exoplatform.kudos.success.kudosSent') }}
     </v-alert>
     <exo-modal
       ref="kudosListModal"
@@ -187,6 +193,7 @@ export default {
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
       ckEditorId: 'kudosContent',
+      kudosSent: null,
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
@@ -233,7 +240,7 @@ export default {
         fullName: this.kudosToSend && this.kudosToSend.receiverFullName
       };
     },
-    kudosSent () {
+    numberOfkudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     SendButtonDisabled() {
@@ -392,6 +399,12 @@ export default {
             throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
           }
           document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudosSent}));
+          if (this.entityType === 'COMMENT') {
+            this.kudosSent = kudosSent;
+            setTimeout(() => {
+              this.kudosSent = null;
+            }, 2000);
+          }
           return this.init()
             .catch(e => {
               console.error('Error refreshing allowed number of kudos for current user', e);
