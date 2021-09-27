@@ -18,8 +18,9 @@
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
         </span>
       </template>
-      <template v-if="!loading" slot="content">
+      <template slot="content">
         <div
+          v-show="!loading"
           ref="activityKudosForm"
           class="flex mx-4 pt-3">
           <div class="d-flex flex-column flex-grow-1">
@@ -347,9 +348,10 @@ export default {
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer().then(() => {
+              this.$refs[this.ckEditorId].setFocus();
+            }).finally( () => {
               this.loading = false;
               this.$refs.activityKudosDrawer.endLoading();
-            }).finally( () => { this.$refs[this.ckEditorId].setFocus();
             });
           });
         }
