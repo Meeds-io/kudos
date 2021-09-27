@@ -11,8 +11,6 @@
       width="500px"
       hide-actions
       id="activityKudosDrawer"
-      @opened="drawer = true"
-      @closed="drawer = false"
       right
       disable-pull-to-refresh>
       <template slot="title">
@@ -20,7 +18,7 @@
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
         </span>
       </template>
-      <template v-if="loading" slot="content">
+      <template v-if="!loading" slot="content">
         <div
           ref="activityKudosForm"
           class="flex mx-4 pt-3">
@@ -210,9 +208,6 @@ export default {
         return;
       }
       this.kudosList = kudosList;
-    },
-    drawer() {
-      this.loading = false;
     }
   },
   created() {
@@ -343,6 +338,7 @@ export default {
     openDrawer(event) {
       if (!this.disabled) {
         if ( this.remainingKudos > 0 ) {
+          this.loading = true;
           this.$nextTick(() => {
             this.entityType = event && event.detail && event.detail.type;
             this.entityId = event && event.detail && event.detail.id;
@@ -351,7 +347,7 @@ export default {
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer().then(() => {
-              this.loading = true;
+              this.loading = false;
               this.$refs.activityKudosDrawer.endLoading();
             }).finally( () => { this.$refs[this.ckEditorId].setFocus();
             });
@@ -404,9 +400,10 @@ export default {
               console.error('Error refreshing number of kudos', e);
             });
         })
-        .then(() => this.$refs[this.ckEditorId].unload(),
-          this.$refs.activityKudosDrawer.close(),
-          this.loading = false)
+        .then(() => {
+          this.$refs[this.ckEditorId].unload();
+          this.$refs.activityKudosDrawer.close();
+        })
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
