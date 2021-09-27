@@ -178,6 +178,7 @@ export default {
       remainingKudos: 0,
       remainingDaysToReset: 0,
       entityIds: [],
+      parentEntityId: null,
       entityId: null,
       entityType: null,
       receiverType: null,
