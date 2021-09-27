@@ -8,30 +8,27 @@
     <kudos-api ref="kudosAPI" />
     <exo-drawer
       ref="activityKudosDrawer"
-      v-if="remainingKudos > 0"
       width="500px"
       hide-actions
-      @opened="drawer = true"
-      @closed="drawer = false"
       id="activityKudosDrawer"
-      allow-expand
       right
       disable-pull-to-refresh>
       <template slot="title">
-        <span class="text-capitalize-first-letter">
+        <span class="text-header-title">
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
         </span>
       </template>
       <template slot="content">
         <div
+          v-show="!loading"
           ref="activityKudosForm"
-          class="flex mx-4 pt-6">
+          class="flex mx-4 pt-3">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-1">
+            <div class="d-flex flex-row">
               <div class="d-flex flex-column flex-grow-1">
                 <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
-              <div class="d-flex flex-column flex-grow-1 pl-2 pt-3">
+              <div class="d-flex flex-column pr-2 pt-3">
                 <div class="d-flex flex-row pt-3">
                   <exo-user-avatar
                     :username="kudosReceiver.receiverId"
@@ -44,11 +41,13 @@
                 </div>
                 <div class="d-flex flex-row">
                   <div>
-                    <span class="text-sm-caption text-sub-title">
+                    <span class="text-sm-caption grey--text">
                       {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
-                  <div class="pl-10">
+                  <div
+                    v-if="kudosSent || remainingKudos"
+                    class="pl-9">
                     <v-icon
                       v-for="index in remainingKudos"
                       :key="index"
@@ -67,17 +66,18 @@
                 </div>
               </div>
             </div>
-            <div class="d-flex flex-row pt-6">
+            <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
-            <div class="d-flex flex-row pt-5">
+            <div class="d-flex flex-row pt-3">
               <exo-activity-rich-editor
-                ref="activityKudosMessage"
+                :ref="ckEditorId"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
-                class="flex" />
+                class="flex"
+                autofocus />
             </div>
           </div>
         </div>
@@ -153,7 +153,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <button class="ignore-vuetify-classes btn" @click="$refs.activityKudosDrawer.close()()">{{ $t('exoplatform.kudos.button.close') }}</button>
+          <button class="ignore-vuetify-classes btn" @click="$refs.kudosListModal.close()">{{ $t('exoplatform.kudos.button.close') }}</button>
           <v-spacer />
         </v-card-actions>
       </v-card>
@@ -169,7 +169,7 @@ import {initSettings} from '../../js/KudosSettings.js';
 export default {
   data() {
     return {
-      drawer: false,
+      numberOfKudosAllowed: 0,
       listDialog: false,
       ignoreRefresh: false,
       kudosList: false,
@@ -179,14 +179,14 @@ export default {
       remainingDaysToReset: 0,
       entityIds: [],
       parentEntityId: null,
-      receiverAvatar: null,
       entityId: null,
       entityType: null,
       receiverType: null,
       receiverId: null,
       error: null,
+      drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
-      ckEditorId: 'activityContent',
+      ckEditorId: 'kudosContent',
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
@@ -210,11 +210,62 @@ export default {
         return;
       }
       this.kudosList = kudosList;
+    }
+  },
+  created() {
+    this.init()
+      .then(() => {
+        if (this.disabled) {
+          return;
+        }
+        this.$refs.kudosAPI.init();
+
+        document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
+        document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
+      });
+  },
+  computed: {
+    kudosReceiver () {
+      return {
+        receiverId: this.kudosToSend && this.kudosToSend.id,
+        avatar: this.kudosToSend && this.kudosToSend.avatar,
+        profileUrl: this.kudosToSend && this.kudosToSend.profileUrl,
+        fullName: this.kudosToSend && this.kudosToSend.receiverFullName
+      };
     },
-    drawer() {
-      if (!this.drawer) {
-        return;
-      }
+    kudosSent () {
+      return this.numberOfKudosAllowed - this.remainingKudos;
+    },
+    SendButtonDisabled() {
+    // we have to take in charge the length of the whole kudosmessage which includes the html tags
+      return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
+    }
+  },
+  methods: {
+    init() {
+      return initSettings()
+        .then(() => {
+          this.disabled = window.kudosSettings && window.kudosSettings.disabled;
+          this.numberOfKudosAllowed = Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
+          this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
+          this.kudosPeriodType = window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
+        })
+        .then(() => {
+          const remainingDaysToReset = Number(this.getRemainingDays());
+          this.remainingDaysToReset = remainingDaysToReset ? remainingDaysToReset : 0;
+
+          // Get Kudos in an async way
+          const limit = Math.max(20, window.kudosSettings.kudosPerPeriod);
+          getKudosSent(eXo.env.portal.userIdentityId, limit)
+            .then(allKudos => {
+              this.allKudosSent = allKudos && allKudos.kudos || [];
+            });
+        })
+        .catch(e => {
+          this.error = e;
+        });
+    },
+    initDrawer () {
       this.kudosMessage = null;
       this.kudosToSend = null;
       this.error = null;
@@ -222,7 +273,7 @@ export default {
       if (this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
         if (this.remainingKudos > 0) {
-          getReceiver(this.entityType, this.entityId)
+          return getReceiver(this.entityType, this.entityId)
             .then(receiverDetails => {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
@@ -233,7 +284,7 @@ export default {
                   kudosToSend = {
                     receiverId: receiverId,
                     receiverType: receiverDetails.type,
-                    avatar: `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/users/${receiverId}/avatar`,
+                    avatar: receiverDetails.avatar,
                     profileUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${receiverId}`,
                     receiverIdentityId: receiverDetails.identityId,
                     receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
@@ -271,88 +322,38 @@ export default {
             });
         }
       }
-    }
-  },
-  created() {
-    this.init()
-      .then(() => {
-        if (this.disabled) {
-          return;
-        }
-        this.$refs.kudosAPI.init();
-
-        document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
-        document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
-      });
-  },
-  computed: {
-    kudosReceiver () {
-      return {
-        receiverId: this.kudosToSend && this.kudosToSend.id,
-        avatar: this.kudosToSend && this.kudosToSend.avatar,
-        profileUrl: this.kudosToSend && this.kudosToSend.profileUrl,
-        fullName: this.kudosToSend && this.kudosToSend.receiverFullName
-      };
-    },
-    numberOfKudosAllowed(){
-      return Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
-    },
-    kudosPeriodType(){
-      return window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
-    },
-    kudosSent () {
-      return this.numberOfKudosAllowed - this.remainingKudos;
-    },
-    SendButtonDisabled() {
-    // we have to take in charge the length of the whole kudosmessage which includes the html tags
-
-      return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
-    }
-  },
-  methods: {
-    init() {
-      return initSettings()
-        .then(() => {
-          this.disabled = window.kudosSettings && window.kudosSettings.disabled;
-          this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
-        })
-        .then(() => {
-          const remainingDaysToReset = Number(this.getRemainingDays());
-          this.remainingDaysToReset = remainingDaysToReset ? remainingDaysToReset : 0;
-
-          // Get Kudos in an async way
-          const limit = Math.max(20, window.kudosSettings.kudosPerPeriod);
-          getKudosSent(eXo.env.portal.userIdentityId, limit)
-            .then(allKudos => {
-              this.allKudosSent = allKudos && allKudos.kudos || [];
-            });
-        })
-        .catch(e => {
-          this.error = e;
-        });
     },
     refreshLink(element, entityType, entityId) {
       if (this.ignoreRefresh) {
         return Promise.resolve(null);
       }
-      this.loading = true;
+      this.$refs.activityKudosDrawer.startLoading();
       return getEntityKudos(entityType, entityId)
         .then(kudosList => {
           const $sendKudosLink = $(window.parentToWatch).find(`#SendKudosButton${entityType}${entityId}`);
           $sendKudosLink.data('kudosList', kudosList);
           this.kudosList = kudosList;
         })
-        .finally(() => this.loading = false);
+        .finally(() =>  this.$refs.activityKudosDrawer.endLoading()
+        );
     },
     openDrawer(event) {
       if (!this.disabled) {
         if ( this.remainingKudos > 0 ) {
+          this.loading = true;
           this.$nextTick(() => {
             this.entityType = event && event.detail && event.detail.type;
             this.entityId = event && event.detail && event.detail.id;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
             this.$refs.activityKudosDrawer.open();
+            this.$refs.activityKudosDrawer.startLoading();
+            this.initDrawer().then(() => {
+              this.$refs[this.ckEditorId].setFocus();
+            }).finally( () => {
+              this.loading = false;
+              this.$refs.activityKudosDrawer.endLoading();
+            });
           });
         }
         else {
@@ -376,7 +377,7 @@ export default {
     send() {
       this.error = null;
 
-      this.loading = true;
+      this.$refs.activityKudosDrawer.startLoading();
       const kudos = {
         entityType: this.entityType,
         entityId: this.entityId,
@@ -402,13 +403,16 @@ export default {
               console.error('Error refreshing number of kudos', e);
             });
         })
-        .then(() => this.$refs.activityKudosDrawer.close())
+        .then(() => {
+          this.$refs[this.ckEditorId].unload();
+          this.$refs.activityKudosDrawer.close();
+        })
         .catch(e => {
           console.error('Error refreshing UI', e);
           this.error = String(e);
         })
         .finally(() => {
-          this.loading = false;
+          this.$refs.activityKudosDrawer.endLoading();
         });
     },
     getRemainingDays() {

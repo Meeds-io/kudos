@@ -63,6 +63,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
               ownerDetails.id = identityDetails.username;
               ownerDetails.identityId = identityDetails.id;
               ownerDetails.fullname = identityDetails.fullname;
+              ownerDetails.avatar = identityDetails.avatar;
             } else {
               ownerDetails.notAuthorized = true;
             }
@@ -75,6 +76,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
             if (identityDetails) {
               ownerDetails.identityId = identityDetails.id;
               ownerDetails.fullname = identityDetails.displayName;
+              ownerDetails.avatar = identityDetails.avatar;
             } else {
               ownerDetails.notAuthorized = true;
             }
