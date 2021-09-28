@@ -6,6 +6,8 @@
     class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
+    <kudos-notification-alert />
+
     <exo-drawer
       ref="activityKudosDrawer"
       width="500px"
@@ -184,6 +186,7 @@ export default {
       receiverType: null,
       receiverId: null,
       error: null,
+      alert: this.$t('exoplatform.kudos.success.kudosSent'),
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
       ckEditorId: 'kudosContent',
@@ -406,6 +409,12 @@ export default {
         .then(() => {
           this.$refs[this.ckEditorId].unload();
           this.$refs.activityKudosDrawer.close();
+          if (this.entityType === 'COMMENT') {
+            this.$root.$emit('kudos-notification-alert', {
+              message: this.alert,
+              type: 'success',
+            });
+          }
         })
         .catch(e => {
           console.error('Error refreshing UI', e);
