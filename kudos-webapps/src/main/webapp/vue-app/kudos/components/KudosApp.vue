@@ -41,7 +41,7 @@
                 </div>
                 <div class="d-flex flex-row">
                   <div>
-                    <span class="text-sm-caption grey--text">
+                    <span class="text-sm-caption text-sub-title">
                       {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
