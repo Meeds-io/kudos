@@ -100,11 +100,7 @@
         </div>
       </template>
     </exo-drawer>
-    <v-alert
-      v-if="noKudosLeft"
-      type="warning">
-      {{ $t('exoplatform.kudos.info.noKudosLeft', {0: numberOfKudosAllowed, 1: $t('exoplatform.kudos.label.day'), 2: kudosPeriodType}) }}
-    </v-alert>
+
     <exo-modal
       ref="kudosListModal"
       v-show="listDialog"
@@ -241,6 +237,9 @@ export default {
     SendButtonDisabled() {
     // we have to take in charge the length of the whole kudosmessage which includes the html tags
       return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
+    },
+    remainingPeriodLabel() {
+      return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
     }
   },
   methods: {
@@ -359,10 +358,10 @@ export default {
           });
         }
         else {
-          this.noKudosLeft = true;
-          setTimeout(() => {
-            this.noKudosLeft = false;
-          }, 2000);
+          this.$root.$emit('kudos-notification-alert', {
+            message: this.$t('exoplatform.kudos.info.noKudosLeft', {0: this.remainingDaysToReset, 1: this.remainingPeriodLabel}),
+            type: 'warning',
+          });
         }
       }
     },
