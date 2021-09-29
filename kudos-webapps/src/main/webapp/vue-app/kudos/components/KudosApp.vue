@@ -186,7 +186,6 @@ export default {
       receiverType: null,
       receiverId: null,
       error: null,
-      alert: this.$t('exoplatform.kudos.success.kudosSent'),
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
       ckEditorId: 'kudosContent',
@@ -410,8 +409,9 @@ export default {
           this.$refs[this.ckEditorId].unload();
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
-            this.$root.$emit('kudos-notification-alert', {
-              message: this.alert,
+            const alertMessage = this.$t('exoplatform.kudos.success.kudosSent');
+                this.$root.$emit('kudos-notification-alert', {
+              message: alertMessage,
               type: 'success',
             });
           }
