@@ -409,9 +409,8 @@ export default {
           this.$refs[this.ckEditorId].unload();
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
-            const alertMessage = this.$t('exoplatform.kudos.success.kudosSent');
-                this.$root.$emit('kudos-notification-alert', {
-              message: alertMessage,
+            this.$root.$emit('kudos-notification-alert', {
+              message: this.$t('exoplatform.kudos.success.kudosSent'),
               type: 'success',
             });
           }
