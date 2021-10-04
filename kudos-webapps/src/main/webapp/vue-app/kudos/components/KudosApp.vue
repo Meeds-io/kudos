@@ -14,7 +14,8 @@
       hide-actions
       id="activityKudosDrawer"
       right
-      disable-pull-to-refresh>
+      disable-pull-to-refresh
+      @closed="resetEditor">
       <template slot="title">
         <span class="text-header-title">
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
@@ -266,6 +267,9 @@ export default {
           this.error = e;
         });
     },
+    resetEditor() {
+      this.$refs[this.ckEditorId].destroyCKEditor();
+    },
     initDrawer () {
       this.kudosMessage = null;
       this.kudosToSend = null;
@@ -350,7 +354,7 @@ export default {
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer().then(() => {
-              this.$refs[this.ckEditorId].setFocus();
+              this.$refs[this.ckEditorId].initCKEditor();
             }).finally( () => {
               this.loading = false;
               this.$refs.activityKudosDrawer.endLoading();
@@ -405,7 +409,7 @@ export default {
             });
         })
         .then(() => {
-          this.$refs[this.ckEditorId].unload();
+          this.resetEditor();
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
             this.$root.$emit('kudos-notification-alert', {
