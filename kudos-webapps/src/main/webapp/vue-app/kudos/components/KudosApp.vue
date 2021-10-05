@@ -185,6 +185,7 @@ export default {
       error: null,
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
+      MESSAGE_MIN_LENGTH: 3,
       ckEditorId: 'kudosContent',
       allKudosSent: [],
       allKudos: [],
@@ -237,10 +238,14 @@ export default {
     },
     SendButtonDisabled() {
     // we have to take in charge the length of the whole kudosmessage which includes the html tags
-      return this.kudosMessage == null ? true : this.kudosMessage && this.kudosMessage.length < 15;
+      return  !this.kudosMessage || this.textLength > this.MESSAGE_MAX_LENGTH || this.textLength < this.MESSAGE_MIN_LENGTH ;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
+    },
+    textLength() {
+      const pureText = this.$utils.htmlToText(this.kudosMessage);
+      return pureText && pureText.length || 0;
     }
   },
   methods: {
