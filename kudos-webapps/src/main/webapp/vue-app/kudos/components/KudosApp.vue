@@ -409,7 +409,6 @@ export default {
             });
         })
         .then(() => {
-          this.resetEditor();
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
             this.$root.$emit('kudos-notification-alert', {
