@@ -29,7 +29,7 @@
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
               <div class="d-flex flex-column flex-grow-1">
-                <span class="text-header-title my-auto">{{ $t('exoplatform.kudos.content.to') }} </span>
+                <span class="text-header-title my-auto mt-7 text-no-wrap">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
               <div class="d-flex flex-column pr-2 pt-3">
                 <div class="d-flex flex-row pt-3">
