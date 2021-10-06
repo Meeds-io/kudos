@@ -237,16 +237,16 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     SendButtonDisabled() {
-      return  !this.kudosMessage || !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageTextLength < this.MESSAGE_MIN_LENGTH ;
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageTextLength < this.MESSAGE_MIN_LENGTH ;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
     },
     kudosMessageText() {
-      return this.$utils.htmlToText(this.kudosMessage);
+      return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
     },
     kudosMessageTextLength() {
-      return this.kudosMessageText.length;
+      return this.kudosMessageText && this.kudosMessageText.length;
     }
   },
   methods: {
