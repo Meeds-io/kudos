@@ -82,6 +82,11 @@
                 class="flex"
                 autofocus />
             </div>
+            <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
+              <span class="text-sm-caption error--text">
+                {{ kudosMessageValidityLabel }}
+              </span>
+            </div>
           </div>
         </div>
       </template>
@@ -93,7 +98,7 @@
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
           <v-btn
-            :disabled="SendButtonDisabled"
+            :disabled="sendButtonDisabled"
             class="btn btn-primary me-2"
             @click="send">
             {{ $t('exoplatform.kudos.button.send') }}
@@ -185,18 +190,12 @@ export default {
       error: null,
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
-      MESSAGE_MIN_LENGTH: 3,
       ckEditorId: 'kudosContent',
       allKudosSent: [],
       allKudos: [],
       kudosToSend: null,
       kudosMessage: '',
       loading: false,
-      kudosMessageRules: [
-        (v) => !!v || this.$t('exoplatform.kudos.warning.requiredField'),
-        (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
-        (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
-      ],
     };
   },
   watch: {
@@ -236,8 +235,8 @@ export default {
     kudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
-    SendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageTextLength < this.MESSAGE_MIN_LENGTH ;
+    sendButtonDisabled() {
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageAlert ;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -245,8 +244,20 @@ export default {
     kudosMessageText() {
       return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
     },
+    isKudosMessageTextValid() {
+      return this.kudosMessageText.split(' ').length > 2 ;
+    },
     kudosMessageTextLength() {
       return this.kudosMessageText && this.kudosMessageText.length;
+    },
+    requiredFieldLabel() {
+      return this.kudosMessageText === '' && this.$t('exoplatform.kudos.warning.requiredField');
+    },
+    atLeastThreeWordsLabel() {
+      return this.kudosMessageText && (!this.isKudosMessageTextValid && this.$t('exoplatform.kudos.warning.atLeastThreeWords'));
+    },
+    kudosMessageValidityLabel() {
+      return this.requiredFieldLabel  || this.atLeastThreeWordsLabel ;
     }
   },
   methods: {
