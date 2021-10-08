@@ -196,6 +196,7 @@ export default {
       kudosToSend: null,
       kudosMessage: '',
       loading: false,
+      requiredField: false,
     };
   },
   watch: {
@@ -209,6 +210,9 @@ export default {
         return;
       }
       this.kudosList = kudosList;
+    },
+    kudosMessageText(newVal, oldVal) {
+      this.requiredField = oldVal && oldVal !== '' && newVal === '';
     }
   },
   created() {
@@ -236,7 +240,7 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     sendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageAlert ;
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel ;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -244,21 +248,24 @@ export default {
     kudosMessageText() {
       return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
     },
-    isKudosMessageTextValid() {
-      return this.kudosMessageText.split(' ').length > 2 ;
+    kudosMessageHasThreeWords() {
+      return this.kudosMessageText && this.kudosMessageText.split(' ').length > 2 ;
+    },
+    isEmptyKudosMessage() {
+      return this.kudosMessageText === '';
     },
     kudosMessageTextLength() {
       return this.kudosMessageText && this.kudosMessageText.length;
     },
-    requiredFieldLabel() {
-      return this.kudosMessageText === '' && this.$t('exoplatform.kudos.warning.requiredField');
-    },
     atLeastThreeWordsLabel() {
-      return this.kudosMessageText && (!this.isKudosMessageTextValid && this.$t('exoplatform.kudos.warning.atLeastThreeWords'));
+      return !this.isEmptyKudosMessage && !this.kudosMessageHasThreeWords && this.$t('exoplatform.kudos.warning.atLeastThreeWords');
+    },
+    requiredFieldLabel() {
+      return this.requiredField && this.$t('exoplatform.kudos.warning.requiredField');
     },
     kudosMessageValidityLabel() {
-      return this.requiredFieldLabel  || this.atLeastThreeWordsLabel ;
-    }
+      return this.requiredFieldLabel || this.atLeastThreeWordsLabel;
+    },
   },
   methods: {
     init() {
@@ -288,9 +295,10 @@ export default {
       this.$refs[this.ckEditorId].destroyCKEditor();
     },
     initDrawer () {
-      this.kudosMessage = null;
+      this.kudosMessage = '';
       this.kudosToSend = null;
       this.error = null;
+      this.requiredField = false;
       let kudosToSend = null;
       if (this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
