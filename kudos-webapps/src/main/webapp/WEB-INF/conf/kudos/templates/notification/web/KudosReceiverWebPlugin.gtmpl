@@ -36,7 +36,7 @@
         <% } %>
         <% if(org.apache.commons.lang3.StringUtils.isNotBlank(KUDOS_MESSAGE)) { %>
           <div class="content">
-          <% String kudosMessage = KUDOS_MESSAGE.replaceAll("\\&lt;.+?&gt;","") %>
+          <% String kudosMessage = KUDOS_MESSAGE.replaceAll("\\<.+?>","") %>
             <i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>
             <%= kudosMessage %>
           </div>

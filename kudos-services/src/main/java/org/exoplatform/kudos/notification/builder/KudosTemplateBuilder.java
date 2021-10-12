@@ -96,7 +96,7 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     if (StringUtils.isBlank(message)) {
       message = "";
     }
-    templateContext.put("KUDOS_MESSAGE", StringEscapeUtils.escapeHtml(message));
+    templateContext.put("KUDOS_MESSAGE", StringEscapeUtils.unescapeHtml(message));
     String title = "";
     String notificationURL = CommonsUtils.getCurrentDomain();
 
