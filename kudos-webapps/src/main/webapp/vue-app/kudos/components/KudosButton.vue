@@ -2,15 +2,17 @@
   <div
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
-    <v-tooltip bottom>
+    <v-tooltip bottom :disabled="isHiddenActivity">
       <template v-slot:activator="{ on, attrs }">
         <div
+          id="kudosButton"
           class="d-flex"
+          :class="kudosDisabledStyle"
           v-bind="attrs"
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :disabled="buttonDisabled"
+            :disabled="buttonDisabled || isHiddenActivity"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
@@ -78,6 +80,7 @@ export default {
   data: () => ({
     linkedKudosList: [],
     limit: 100,
+    isHiddenActivity: false,
   }),
   computed: {
     entityType() {
@@ -120,11 +123,17 @@ export default {
       }
       return false;
     },
+    kudosDisabledStyle() {
+      return this.isHiddenActivity ? 'kudosDisabledStyle':'';
+    }
   },
   created() {
     this.$root.$on('activity-comment-created', this.resetActivity);
     this.$root.$on('kudos-refresh-comment', this.resetActivityComments);
     this.init();
+    if (this.activity && this.activity.type === 'news' && this.activity.templateParams && this.activity.templateParams.newsId) {
+      this.getNewsById(this.activity.templateParams.newsId);
+    }
   },
   beforeDestroy() {
     this.$root.$off('activity-comment-created', this.resetActivity);
@@ -174,6 +183,12 @@ export default {
         type: this.entityType,
       }}));
     },
+    getNewsById(newsId) {
+      this.$newsServices.getNewsById(newsId, false)
+        .then(news => {
+          this.isHiddenActivity = news.hiddenActivity;
+        });
+    }
   },
 };
 </script>

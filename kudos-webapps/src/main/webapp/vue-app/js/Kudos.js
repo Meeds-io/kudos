@@ -34,7 +34,7 @@ export function computeCommentKudosList(activity, comment) {
 
 export function sendKudos(kudo) {
   if (kudo) {
-    return fetch(`/portal/rest/kudos/api/kudos`, {
+    return fetch('/portal/rest/kudos/api/kudos', {
       credentials: 'include',
       method: 'POST',
       headers: {
