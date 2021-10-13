@@ -19,6 +19,8 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.social.common.xmlprocessor.XMLProcessor;
+import org.exoplatform.social.common.xmlprocessor.XMLProcessorImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -93,10 +95,12 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
                                                                            : LinkProvider.PROFILE_DEFAULT_AVATAR_URL);
     templateContext.put("KUDOS_ID", notification.getValueOwnerParameter("KUDOS_ID"));
     String message = notification.getValueOwnerParameter("KUDOS_MESSAGE");
+    XMLProcessor xmlProcessor = new XMLProcessorImpl();
+    message = (String)xmlProcessor.process(message);
     if (StringUtils.isBlank(message)) {
       message = "";
     }
-    templateContext.put("KUDOS_MESSAGE", StringEscapeUtils.unescapeHtml(message));
+    templateContext.put("KUDOS_MESSAGE", message);
     String title = "";
     String notificationURL = CommonsUtils.getCurrentDomain();
 
