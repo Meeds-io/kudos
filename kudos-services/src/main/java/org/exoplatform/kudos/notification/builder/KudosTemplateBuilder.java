@@ -37,9 +37,12 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
 
   private boolean          pushNotification;
 
-  public KudosTemplateBuilder(TemplateProvider templateProvider, boolean pushNotification) {
+  private XMLProcessor     xmlProcessor;
+
+  public KudosTemplateBuilder(TemplateProvider templateProvider, boolean pushNotification , XMLProcessor xmlProcessor) {
     this.templateProvider = templateProvider;
     this.pushNotification = pushNotification;
+    this.xmlProcessor = xmlProcessor;
   }
 
   @Override
@@ -95,7 +98,6 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
                                                                            : LinkProvider.PROFILE_DEFAULT_AVATAR_URL);
     templateContext.put("KUDOS_ID", notification.getValueOwnerParameter("KUDOS_ID"));
     String message = notification.getValueOwnerParameter("KUDOS_MESSAGE");
-    XMLProcessor xmlProcessor = new XMLProcessorImpl();
     message = (String)xmlProcessor.process(message);
     if (StringUtils.isBlank(message)) {
       message = "";
