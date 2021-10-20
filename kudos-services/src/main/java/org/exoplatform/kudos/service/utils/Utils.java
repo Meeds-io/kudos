@@ -249,7 +249,7 @@ public class Utils {
             .put(BaseActivityProcessorPlugin.TEMPLATE_PARAM_TO_PROCESS,
                  I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM + BaseActivityProcessorPlugin.TEMPLATE_PARAM_LIST_DELIM
                      + KUDOS_MESSAGE_PARAM);
-    activity.getTemplateParams().put(KUDOS_MESSAGE_PARAM, kudosMessage);
+    activity.getTemplateParams().put(KUDOS_MESSAGE_PARAM, activity.getTitle());
   }
 
   private static String getIdentityIdByType(Identity receiverIdentity) {
