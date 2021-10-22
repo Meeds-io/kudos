@@ -191,6 +191,7 @@ export default {
       allKudos: [],
       kudosToSend: null,
       kudosMessage: '',
+      kudosPeriodType: '',
       loading: false,
       kudosMessageRules: [
         (v) => !!v || this.$t('exoplatform.kudos.warning.requiredField'),
