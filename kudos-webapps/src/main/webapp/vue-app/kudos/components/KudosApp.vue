@@ -195,6 +195,7 @@ export default {
       allKudos: [],
       kudosToSend: null,
       kudosMessage: '',
+      kudosPeriodType: '',
       loading: false,
       requiredField: false,
     };
