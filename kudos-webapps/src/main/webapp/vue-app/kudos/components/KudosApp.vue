@@ -246,7 +246,7 @@ export default {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
     },
     kudosPeriodLabel () {
-      return this.$t('exoplatform.kudos.label.'.concat(this.kudosPeriodType));
+      return this.$t(`exoplatform.kudos.label.${this.kudosPeriodType}`);
     },
     kudosMessageText() {
       return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
