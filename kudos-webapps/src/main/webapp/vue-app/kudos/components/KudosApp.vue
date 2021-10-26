@@ -28,11 +28,11 @@
           class="flex mx-4 pt-3">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
-              <div class="d-flex flex-column flex-grow-1">
+              <div class="d-flex flex-column flex-grow">
                 <span class="text-header-title my-auto mt-7 text-no-wrap">{{ $t('exoplatform.kudos.content.to') }} </span>
               </div>
-              <div class="d-flex flex-column pr-2 pt-3">
-                <div class="d-flex flex-row pt-3">
+              <div class="d-flex flex-column pr-2 pl-5 pt-3">
+                <div class="pt-3">
                   <exo-user-avatar
                     :username="kudosReceiver.receiverId"
                     :fullname="kudosReceiver.fullName"
@@ -43,28 +43,44 @@
                     size="32" />
                 </div>
                 <div class="d-flex flex-row">
-                  <div>
+                  <div class="d-flex flex-column">
+                    <div class="d-flex flex-row">
+                      <span class="text-sm-caption text-sub-title">
+                        {{ $t('exooplatform.kudos.label.numberOfKudosAllowed', {0: numberOfKudosAllowed , 1: kudosPeriodLabel}) }}
+                      </span>
+                      <div
+                        v-if="kudosSent || remainingKudos"
+                        class=" mx-2 pl-15">
+                        <div v-if="numberOfKudosAllowed <= numberOfKudosToDisplay">
+                          <v-icon
+                            v-for="index in remainingKudos"
+                            :key="index"
+                            class="uiIconKudos uiIconGrey pl-1"
+                            size="20">
+                            fa-award
+                          </v-icon>
+                          <v-icon
+                            v-for="index in kudosSent"
+                            :key="index"
+                            class="uiIconKudos uiIconBlue pl-1"
+                            size="20">
+                            fa-award
+                          </v-icon>
+                        </div>
+                        <div v-else>
+                          <v-icon
+                            v-for="index in numberOfKudosToDisplay"
+                            :key="index"
+                            class="uiIconKudos uiIconBlue pl-1"
+                            size="20">
+                            fa-award
+                          </v-icon>
+                        </div>
+                      </div>
+                    </div>
                     <span class="text-sm-caption text-sub-title">
-                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodLabel, 2: kudosSent , 3: numberOfKudosAllowed}) }}
+                      {{ $t('exooplatform.kudos.label.numberOfKudosSent', {0: kudosSent , 1: numberOfKudosAllowed}) }}
                     </span>
-                  </div>
-                  <div
-                    v-if="kudosSent || remainingKudos"
-                    class="pl-9">
-                    <v-icon
-                      v-for="index in remainingKudos"
-                      :key="index"
-                      class="uiIconKudos uiIconBlue pl-1"
-                      size="20">
-                      fa-award
-                    </v-icon>
-                    <v-icon
-                      v-for="index in kudosSent"
-                      :key="index"
-                      class="uiIconKudos uiIconGrey pl-1"
-                      size="20">
-                      fa-award
-                    </v-icon>
                   </div>
                 </div>
               </div>
@@ -174,6 +190,7 @@ export default {
   data() {
     return {
       numberOfKudosAllowed: 0,
+      numberOfKudosToDisplay: 3,
       listDialog: false,
       ignoreRefresh: false,
       kudosList: false,
