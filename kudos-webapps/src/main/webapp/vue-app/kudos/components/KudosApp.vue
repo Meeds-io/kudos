@@ -45,7 +45,7 @@
                 <div class="d-flex flex-row">
                   <div>
                     <span class="text-sm-caption text-sub-title">
-                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodType, 2: kudosSent , 3: numberOfKudosAllowed}) }}
+                      {{ $t('exooplatform.kudos.label.numberOfKudos', {0: numberOfKudosAllowed , 1: kudosPeriodLabel, 2: kudosSent , 3: numberOfKudosAllowed}) }}
                     </span>
                   </div>
                   <div
@@ -195,6 +195,7 @@ export default {
       allKudos: [],
       kudosToSend: null,
       kudosMessage: '',
+      kudosPeriodType: '',
       loading: false,
       requiredField: false,
     };
@@ -244,6 +245,9 @@ export default {
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
+    },
+    kudosPeriodLabel () {
+      return this.$t(`exoplatform.kudos.label.${this.kudosPeriodType}`);
     },
     kudosMessageText() {
       return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
