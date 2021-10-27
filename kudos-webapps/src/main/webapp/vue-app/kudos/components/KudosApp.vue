@@ -82,6 +82,11 @@
                 class="flex"
                 autofocus />
             </div>
+            <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
+              <span class="text-sm-caption error--text">
+                {{ kudosMessageValidityLabel }}
+              </span>
+            </div>
           </div>
         </div>
       </template>
@@ -93,7 +98,7 @@
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
           <v-btn
-            :disabled="SendButtonDisabled"
+            :disabled="sendButtonDisabled"
             class="btn btn-primary me-2"
             @click="send">
             {{ $t('exoplatform.kudos.button.send') }}
@@ -185,7 +190,6 @@ export default {
       error: null,
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
-      MESSAGE_MIN_LENGTH: 3,
       ckEditorId: 'kudosContent',
       allKudosSent: [],
       allKudos: [],
@@ -193,11 +197,7 @@ export default {
       kudosMessage: '',
       kudosPeriodType: '',
       loading: false,
-      kudosMessageRules: [
-        (v) => !!v || this.$t('exoplatform.kudos.warning.requiredField'),
-        (v) => (v && this.escapeCharacters(v).replace(/ /g, '').length > 9) || this.$t('exoplatform.kudos.warning.atLeastTenCharacters'),
-        (v) => (v && this.escapeCharacters(v).split(' ').length > 2) || this.$t('exoplatform.kudos.warning.atLeastThreeWords'),
-      ],
+      requiredField: false,
     };
   },
   watch: {
@@ -211,6 +211,9 @@ export default {
         return;
       }
       this.kudosList = kudosList;
+    },
+    kudosMessageText(newVal, oldVal) {
+      this.requiredField = oldVal && oldVal !== '' && newVal === '';
     }
   },
   created() {
@@ -237,8 +240,8 @@ export default {
     kudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
-    SendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageTextLength < this.MESSAGE_MIN_LENGTH ;
+    sendButtonDisabled() {
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel ;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -249,9 +252,24 @@ export default {
     kudosMessageText() {
       return this.kudosMessage && this.$utils.htmlToText(this.kudosMessage);
     },
+    kudosMessageHasThreeWords() {
+      return this.kudosMessageText && this.kudosMessageText.split(' ').length > 2 ;
+    },
+    isEmptyKudosMessage() {
+      return this.kudosMessageText === '';
+    },
     kudosMessageTextLength() {
       return this.kudosMessageText && this.kudosMessageText.length;
-    }
+    },
+    atLeastThreeWordsLabel() {
+      return !this.isEmptyKudosMessage && !this.kudosMessageHasThreeWords && this.$t('exoplatform.kudos.warning.atLeastThreeWords');
+    },
+    requiredFieldLabel() {
+      return this.requiredField && this.$t('exoplatform.kudos.warning.requiredField');
+    },
+    kudosMessageValidityLabel() {
+      return this.requiredFieldLabel || this.atLeastThreeWordsLabel;
+    },
   },
   methods: {
     init() {
@@ -281,9 +299,10 @@ export default {
       this.$refs[this.ckEditorId].destroyCKEditor();
     },
     initDrawer () {
-      this.kudosMessage = null;
+      this.kudosMessage = '';
       this.kudosToSend = null;
       this.error = null;
+      this.requiredField = false;
       let kudosToSend = null;
       if (this.entityId && this.entityType) {
         this.allKudos = this.allKudosSent.slice(0);
