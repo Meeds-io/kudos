@@ -12,6 +12,7 @@ import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.service.utils.Utils;
+import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -27,8 +28,11 @@ public class KudosStorage {
 
   private IdentityManager  identityManager;
 
-  public KudosStorage(KudosDAO kudosDAO) {
+  private String           defaultPortal;
+
+  public KudosStorage(KudosDAO kudosDAO, UserPortalConfigService userPortalConfigService) {
     this.kudosDAO = kudosDAO;
+    this.defaultPortal = userPortalConfigService.getDefaultPortal();
   }
 
   public Kudos getKudoById(long id) {
@@ -37,7 +41,7 @@ public class KudosStorage {
       LOG.warn("Can't find Kudos with id {}", id);
       return null;
     } else {
-      return fromEntity(kudosEntity);
+      return fromEntity(kudosEntity, defaultPortal);
     }
   }
 
@@ -45,7 +49,7 @@ public class KudosStorage {
     KudosEntity kudosEntity = toEntity(kudos);
     kudosEntity.setId(null);
     kudosEntity = kudosDAO.create(kudosEntity);
-    return fromEntity(kudosEntity);
+    return fromEntity(kudosEntity, defaultPortal);
   }
 
   public void saveKudosActivityId(long kudosId, long activityId) {
@@ -64,7 +68,7 @@ public class KudosStorage {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity));
+          kudosList.add(fromEntity(kudosEntity, defaultPortal));
         }
       }
     }
@@ -79,7 +83,7 @@ public class KudosStorage {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity));
+          kudosList.add(fromEntity(kudosEntity, defaultPortal));
         }
       }
     }
@@ -89,9 +93,11 @@ public class KudosStorage {
   public long countKudosByEntity(String entityType, String entityId) {
     return kudosDAO.countKudosByEntity(KudosEntityType.valueOf(entityType).ordinal(), Long.parseLong(entityId));
   }
-  
+
   public long countKudosByEntityAndSender(String entityType, String entityId, String senderIdentityId) {
-    return kudosDAO.countKudosByEntityAndSender(KudosEntityType.valueOf(entityType).ordinal(), Long.parseLong(entityId), Long.parseLong(senderIdentityId));
+    return kudosDAO.countKudosByEntityAndSender(KudosEntityType.valueOf(entityType).ordinal(),
+                                                Long.parseLong(entityId),
+                                                Long.parseLong(senderIdentityId));
   }
 
   public long countKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId) {
@@ -118,7 +124,7 @@ public class KudosStorage {
       List<Kudos> kudosList = new ArrayList<>();
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity));
+          kudosList.add(fromEntity(kudosEntity, defaultPortal));
         }
       }
       return kudosList;
@@ -132,7 +138,7 @@ public class KudosStorage {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity));
+          kudosList.add(fromEntity(kudosEntity, defaultPortal));
         }
       }
     }
@@ -168,21 +174,23 @@ public class KudosStorage {
     return identityManager;
   }
 
-  public Kudos getKudosByActivityId(Long  activityId){
+  public Kudos getKudosByActivityId(Long activityId) {
     KudosEntity kudosEntity = kudosDAO.getKudosByActivityId(activityId);
-    return fromEntity(kudosEntity);
+    return fromEntity(kudosEntity, defaultPortal);
   }
 
   public List<Kudos> getKudosListOfActivity(Long activityId) {
     List<KudosEntity> kudosEntities = kudosDAO.getKudosListOfActivity(activityId);
     return CollectionUtils.isEmpty(kudosEntities) ? Collections.emptyList()
-                                                  : kudosEntities.stream().map(Utils::fromEntity).collect(Collectors.toList());
+                                                  : kudosEntities.stream()
+                                                                 .map(entity -> Utils.fromEntity(entity, defaultPortal))
+                                                                 .collect(Collectors.toList());
   }
 
   public Kudos updateKudos(Kudos kudos) {
     KudosEntity kudosEntity = toEntity(kudos);
     kudosEntity = kudosDAO.update(kudosEntity);
-    return fromEntity(kudosEntity);
+    return fromEntity(kudosEntity, defaultPortal);
   }
 
 }

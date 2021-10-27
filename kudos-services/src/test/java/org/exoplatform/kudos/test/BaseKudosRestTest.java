@@ -7,6 +7,8 @@ import org.exoplatform.social.service.test.AbstractResourceTest;
 
 public abstract class BaseKudosRestTest extends BaseKudosTest {
 
+  protected static final String      DEFAULT_PORTAL = "meeds";
+
   protected static KudosResourceTest resourceTest = new KudosResourceTest();
 
   @BeforeClass

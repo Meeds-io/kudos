@@ -126,7 +126,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     KudosService kudosService = getService(KudosService.class);
 
     KudosEntity kudosEntity = newKudosInstance();
-    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), "root4");
+    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), "root4");
     long activityId = 5;
 
     kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), activityId);
@@ -189,8 +189,8 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     ActivityManager activityManager = getService(ActivityManager.class);
     new NewKudosSentActivityGeneratorListener(activityManager, null).onEvent(new Event<KudosService, Kudos>(null,
-                                                                                                      kudosService,
-                                                                                                      kudos));
+                                                                                                            kudosService,
+                                                                                                            kudos));
     List<Kudos> kudosList = kudosService.getKudosByEntity(kudos.getEntityType(), kudos.getEntityId(), 1);
     assertEquals(1, kudosList.size());
     kudos = kudosList.get(0);
@@ -236,7 +236,7 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     KudosEntity kudosEntity = newKudosInstance();
     kudosEntity.setEntityType(KudosEntityType.SPACE_PROFILE.ordinal());
-    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), senderUsername);
+    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), senderUsername);
 
     ActivityManager activityManager = getService(ActivityManager.class);
     ExoSocialActivity activity = new ExoSocialActivityImpl();
@@ -250,7 +250,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     childKudosEntity.setEntityType(KudosEntityType.ACTIVITY.ordinal());
     childKudosEntity.setEntityId(250l);
     childKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity), senderUsername);
+    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity, DEFAULT_PORTAL), senderUsername);
 
     getKudosListOfActivity("%20", senderUsername, 400);
     getKudosListOfActivity(activityId, "root3", 404);
@@ -275,7 +275,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     subCommentKudosEntity.setEntityType(KudosEntityType.COMMENT.ordinal());
     subCommentKudosEntity.setEntityId(255l);
     subCommentKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity), senderUsername);
+    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity, DEFAULT_PORTAL), senderUsername);
 
     kudosList = getKudosListOfActivity(activityId, senderUsername, 200);
 
@@ -303,7 +303,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertEquals("0", count);
 
     newKudos();
-    
+
     response = resourceTest.service("GET",
                                     url,
                                     "",
