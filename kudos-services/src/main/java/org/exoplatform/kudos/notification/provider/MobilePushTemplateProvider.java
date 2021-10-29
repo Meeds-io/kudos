@@ -24,14 +24,18 @@ import org.exoplatform.commons.api.notification.channel.template.TemplateProvide
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.notification.builder.KudosTemplateBuilder;
+import org.exoplatform.social.common.xmlprocessor.XMLProcessor;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = KUDOS_RECEIVER_NOTIFICATION_ID, template = "war:/conf/kudos/templates/notification/push/KudosReceiverPushPlugin.gtmpl") })
 public class MobilePushTemplateProvider extends TemplateProvider {
 
-  public MobilePushTemplateProvider(InitParams initParams) {
+  private XMLProcessor xmlProcessor;
+
+  public MobilePushTemplateProvider(InitParams initParams , XMLProcessor xmlProcessor) {
     super(initParams);
-    this.templateBuilders.put(PluginKey.key(KUDOS_RECEIVER_NOTIFICATION_ID), new KudosTemplateBuilder(this, true));
+    this.xmlProcessor = xmlProcessor;
+    this.templateBuilders.put(PluginKey.key(KUDOS_RECEIVER_NOTIFICATION_ID), new KudosTemplateBuilder(this, true , this.xmlProcessor));
   }
 
 }
