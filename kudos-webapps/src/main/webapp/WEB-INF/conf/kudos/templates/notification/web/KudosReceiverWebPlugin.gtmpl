@@ -36,9 +36,8 @@
         <% } %>
         <% if(org.apache.commons.lang3.StringUtils.isNotBlank(KUDOS_MESSAGE)) { %>
           <div class="content">
-          <% String kudosMessage = KUDOS_MESSAGE.replaceAll("\\&lt;.+?&gt;","") %>
             <i class="uiIcon fa fa-award uiIconKudos uiIconBlue"></i>
-            <%= kudosMessage %>
+            <%= KUDOS_MESSAGE %>
           </div>
         <% } %>
         <div class="lastUpdatedTime">$LAST_UPDATED_TIME</div>
