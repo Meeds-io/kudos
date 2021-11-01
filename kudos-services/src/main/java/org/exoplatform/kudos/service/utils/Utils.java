@@ -27,6 +27,7 @@ import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.core.utils.MentionUtils;
 
 public class Utils {
   private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
@@ -127,13 +128,17 @@ public class Utils {
     return SPACE_ACCOUNT_TYPE.equals(receiverType) ? SPACE_ACCOUNT_TYPE : USER_ACCOUNT_TYPE;
   }
 
-  public static Kudos fromEntity(KudosEntity kudosEntity) {
+  public static Kudos fromEntity(KudosEntity kudosEntity, String defaultPortal) {
     if (kudosEntity == null) {
       return null;
     }
     Kudos kudos = new Kudos();
     kudos.setTechnicalId(kudosEntity.getId());
-    kudos.setMessage(kudosEntity.getMessage());
+    if (defaultPortal == null) {
+      kudos.setMessage(kudosEntity.getMessage());
+    } else {
+      kudos.setMessage(MentionUtils.substituteUsernames(defaultPortal, kudosEntity.getMessage()));
+    }
     kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
     kudos.setActivityId(kudosEntity.getActivityId());
     if (kudosEntity.getParentEntityId() != null && kudosEntity.getParentEntityId() != 0) {

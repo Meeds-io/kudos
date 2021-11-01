@@ -17,6 +17,8 @@ import org.exoplatform.kudos.service.utils.Utils;
 
 public abstract class BaseKudosTest {
 
+  protected static final String    DEFAULT_PORTAL   = "meeds";
+
   protected static PortalContainer container;
 
   protected KudosEntityType        kudosEntityType  = KudosEntityType.USER_TIPTIP;
@@ -71,7 +73,7 @@ public abstract class BaseKudosTest {
 
   protected Kudos newKudosDTO() {
     KudosEntity entity = newKudosInstance(parentEntityId, entityId, entityType, receiverId, senderId, createdTimestamp, message);
-    return Utils.fromEntity(entity);
+    return Utils.fromEntity(entity, DEFAULT_PORTAL);
   }
 
   protected KudosEntity newKudos() {

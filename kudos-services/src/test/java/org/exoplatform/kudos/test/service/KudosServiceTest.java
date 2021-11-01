@@ -26,6 +26,9 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 public class KudosServiceTest extends BaseKudosTest {
+
+  private static final String DEFAULT_PORTAL     = "meeds";
+
   private static final String ENTITY_TYPE        = KudosEntityType.USER_TIPTIP.name();
 
   private static final String ENTITY_ID          = "1";
@@ -531,7 +534,7 @@ public class KudosServiceTest extends BaseKudosTest {
     KudosStorage kudosStorage = getService(KudosStorage.class);
     KudosEntity kudosEntity = newKudos();
     kudosEntity.setEntityType(KudosEntityType.USER_PROFILE.ordinal());
-    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), SENDER_REMOTE_ID);
+    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), SENDER_REMOTE_ID);
     Kudos storedKudos = kudosStorage.getKudoById(kudos.getTechnicalId());
     Kudos newKudos = kudosService.getKudosByActivityId(storedKudos.getActivityId());
     compareResults(Utils.toEntity(storedKudos), newKudos);
@@ -545,7 +548,7 @@ public class KudosServiceTest extends BaseKudosTest {
 
     KudosEntity kudosEntity = newKudosInstance();
     kudosEntity.setEntityType(KudosEntityType.SPACE_PROFILE.ordinal());
-    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), SENDER_REMOTE_ID);
+    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), SENDER_REMOTE_ID);
 
     ActivityManager activityManager = getService(ActivityManager.class);
     ExoSocialActivity activity = new ExoSocialActivityImpl();
@@ -558,7 +561,7 @@ public class KudosServiceTest extends BaseKudosTest {
     childKudosEntity.setEntityType(KudosEntityType.ACTIVITY.ordinal());
     childKudosEntity.setEntityId(250l);
     childKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity), SENDER_REMOTE_ID);
+    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity, DEFAULT_PORTAL), SENDER_REMOTE_ID);
 
     try { // NOSONAR Test expected exception
       kudosService.getKudosListOfActivity(activity.getId(), null);
@@ -598,7 +601,7 @@ public class KudosServiceTest extends BaseKudosTest {
     subCommentKudosEntity.setEntityType(KudosEntityType.COMMENT.ordinal());
     subCommentKudosEntity.setEntityId(255l);
     subCommentKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity), SENDER_REMOTE_ID);
+    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity, DEFAULT_PORTAL), SENDER_REMOTE_ID);
 
     kudosList = kudosService.getKudosListOfActivity(activity.getId(),
                                                     new org.exoplatform.services.security.Identity("root"));
