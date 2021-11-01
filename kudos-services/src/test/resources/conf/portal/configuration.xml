@@ -54,6 +54,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.portal.config.UserPortalConfigService</key>
+    <type>org.exoplatform.kudos.test.mock.MockUserPortalConfigService</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.commons.api.persistence.DataInitializer</key>
     <type>org.exoplatform.commons.persistence.impl.LiquibaseDataInitializer</type>
     <init-params>
