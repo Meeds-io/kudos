@@ -260,8 +260,6 @@ export function registerActivityActionExtension() {
       getSummary: activityOrComment => {
         const summary = (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage)
                         || (activityOrComment.kudos && activityOrComment.kudos.message)
-                        || activityOrComment.title
-                        || activityOrComment.body
                         || '';
         return summary.includes('<oembed>') && summary.split('<oembed>')[0] || summary;
       },
