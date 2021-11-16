@@ -34,6 +34,9 @@
         <module>customEventPolyfill</module>
       </depends>
       <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
         <module>iePolyfills</module>
       </depends>
       <depends>
