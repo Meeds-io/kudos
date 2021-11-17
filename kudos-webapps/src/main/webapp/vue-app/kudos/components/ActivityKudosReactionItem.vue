@@ -51,10 +51,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    boldTitle: {
-      type: Boolean,
-      default: () => false,
-    },
     avatarClass: {
       type: String,
       default: () => '',
