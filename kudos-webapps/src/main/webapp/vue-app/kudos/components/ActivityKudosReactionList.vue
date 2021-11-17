@@ -1,6 +1,6 @@
 <template>
   <div v-if="kudosList.length" class="kudos-list">
-    <activity-kudos-item
+    <activity-kudos-reaction-item
       v-for="(kudos , i) in kudosList"
       :key="i"
       :kudos="kudos"

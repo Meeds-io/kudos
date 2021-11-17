@@ -122,62 +122,6 @@
         </div>
       </template>
     </exo-drawer>
-
-    <exo-modal
-      ref="kudosListModal"
-      v-show="listDialog"
-      :title="$t('exoplatform.kudos.label.kudosList')"
-      width="500px"
-      hide-actions
-      @dialog-opened="listDialog = true"
-      @dialog-closed="listDialog = false">
-      <v-card flat>
-        <div v-if="error && !loading" class="alert alert-error v-content">
-          <i class="uiIconError"></i>{{ error }}
-        </div>
-        <v-card-text>
-          <v-container
-            v-if="kudosList && kudosList.length"
-            flat
-            fluid
-            grid-list-lg
-            class="pa-0">
-            <v-layout
-              row
-              wrap
-              class="kudosIconsContainer">
-              <v-card
-                v-for="(kudos, index) in kudosList"
-                :key="index"
-                :class="kudos.isCurrent && 'kudosIconContainerCurrent'"
-                flat
-                class="text-center kudosIconContainerTop">
-                <v-card-text v-if="kudos.senderFullName" class="kudosIconContainer">
-                  <v-icon class="uiIconKudos uiIconBlue" size="64">fa-award</v-icon>
-                  <v-icon class="uiIconKudosCheck uiIconBlue" size="16">fa-check-circle</v-icon>
-                </v-card-text>
-                <v-card-text v-if="kudos.senderFullName" class="kudosIconLink">
-                  <kudos-identity-link
-                    :id="kudos.senderId"
-                    :technical-id="kudos.senderIdentityId"
-                    :type="kudos.senderType"
-                    :name="kudos.senderFullName" />
-                </v-card-text>
-              </v-card>
-            </v-layout>
-          </v-container>
-          <div v-else-if="!loading" class="alert alert-info">
-            <i class="uiIconInfo"></i>
-            {{ $t('exoplatform.kudos.info.noKudosOnActivity') }}
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <button class="ignore-vuetify-classes btn" @click="$refs.kudosListModal.close()">{{ $t('exoplatform.kudos.button.close') }}</button>
-          <v-spacer />
-        </v-card-actions>
-      </v-card>
-    </exo-modal>
   </v-app>
 </template>
 

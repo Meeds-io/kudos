@@ -197,7 +197,7 @@ export function registerActivityReactionTabs() {
     id: 'kudos',
     reactionLabel: 'exoplatform.kudos.label.kudos',
     numberOfReactions: 0,
-    vueComponent: Vue.options.components['activity-kudos-list'],
+    vueComponent: Vue.options.components['activity-kudos-reaction-list'],
     rank: 2,
   });
 }

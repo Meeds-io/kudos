@@ -2,7 +2,7 @@
   <div v-if="kudos" class="activityKudosItem">
     <div class="flex-nowrap d-flex flex-shrink-0 align-center">
       <a
-        :id="id"
+        :id="senderId"
         :href="profileUrl"
         class="flex-nowrap flex-grow-1 d-flex text-truncate container--fluid">
         <v-avatar
@@ -14,27 +14,26 @@
             class="object-fit-cover ma-auto"
             loading="lazy">
         </v-avatar>
-        <div v-if="fullname || $slots.subTitle" class="pull-left ms-2 d-flex flex-column align-start text-truncate">
+        <div class="pull-left ms-2 d-flex flex-column align-start text-truncate">
           <span
-            v-if="fullname">
+            v-if="KudosSenderFullName">
             <span
-              :class="fullnameStyle"
-              class="text-truncate subtitle-2 my-auto">{{ fullname }}</span>
+              :class="fullNameStyle"
+              class="text-truncate subtitle-2 my-auto">{{ KudosSenderFullName }}</span>
             <span v-if="isExternal" class="muted">{{ externalTag }} </span>
             <v-icon size="15" class="pl-2">fa-angle-right</v-icon>
-            <span
-              v-if="kudosReceiverFullName"
-              :class="receiverNameStyle"
-              class="text-truncate subtitle-2 my-auto pl-2">{{ kudosReceiverFullName }} </span>
+            <a :id="receiverId">
+              <span
+                v-if="kudosReceiverFullName"
+                :class="receiverNameStyle"
+                class="text-truncate subtitle-2 my-auto pl-1">{{ kudosReceiverFullName }} </span>
+            </a>
           </span>
           <relative-date-format
-            class="text-capitalize-first-letter text-sm-caption text-sub-title text-truncate"
+            class="text-sm-caption text-sub-title"
             :value="kudosElapsedTime" />
         </div>
       </a>
-      <template v-if="$slots.actions">
-        <slot name="actions"></slot>
-      </template>
     </div>
     <v-divider />
   </div>
@@ -86,27 +85,21 @@ export default {
   },
   data () {
     return {
-      userInformations: null,
-      id: `userAvatar${parseInt(Math.random() * randomMax)
+      senderId: `userAvatar${parseInt(Math.random() * randomMax)
+        .toString()
+        .toString()}`,
+      receiverId: `userAvatar${parseInt(Math.random() * randomMax)
         .toString()
         .toString()}`,
       isExternal: false,
+
     };
   },
   computed: {
-    inCommonConnections() {
-      return this.userInformations && this.userInformations.connectionsInCommonCount || 0;
-    },
-    sameUser() {
-      return this.userInformations && this.userInformations.username === eXo.env.portal.userName;
-    },
-    notConnected() {
-      return this.userInformations && !this.userInformations.relationshipStatus && !this.sameUser;
-    },
     externalTag() {
       return `( ${this.$t('userAvatar.external.label')} )`;
     },
-    fullnameStyle() {
+    fullNameStyle() {
       return `${this.boldTitle && 'font-weight-bold ' || ''}${!this.linkStyle && 'text-color' || ''}`;
     },
     receiverNameStyle() {
@@ -115,7 +108,7 @@ export default {
     username() {
       return this.kudos && this.kudos.senderId;
     },
-    fullname() {
+    KudosSenderFullName() {
       return this.kudos && this.kudos.senderFullName;
     },
     avatarUrl() {
@@ -130,6 +123,12 @@ export default {
     kudosTimeInMilliseconds() {
       return Number(this.kudos.timeInSeconds) * 1000;
     },
+    KudosSenderUsername() {
+      return this.kudos && this.kudos.senderId;
+    },
+    kudosReceiverUsername () {
+      return this.kudos && this.kudos.receiverId;
+    },
     kudosReceiverFullName() {
       return this.kudos && this.kudos.receiverFullName;
     }
@@ -137,9 +136,36 @@ export default {
   created() {
     this.retrieveUserInformations();
   },
+  mounted() {
+    if (this.KudosSenderUsername && this.kudosReceiverUsername && this.tiptip) {
+      // TODO disable tiptip because of high CPU usage using its code
+      this.initTiptip();
+    }
+  },
   methods: {
+    initTiptip() {
+      const users = [
+        {
+          id: this.senderId,
+          username: this.username
+        },
+        {
+          id: this.receiverId ,
+          username: this.kudosReceiverUsername
+        }
+      ];
+      users.forEach(user => {
+        this.$nextTick(() => {
+          $(`#${user.id}`).userPopup({
+            restURL: '/portal/rest/social/people/getPeopleInfo/{0}.json',
+            userId: user.username,
+            keepAlive: true,
+          });
+        });
+      });
+    },
     retrieveUserInformations() {
-      if (this.retrieveExtraInformation && this.fullname) {
+      if (this.retrieveExtraInformation && this.KudosSenderFullName) {
         this.$userService.getUser(this.username)
           .then(user => {
             this.isExternal = user.external === 'true';
@@ -147,13 +173,6 @@ export default {
       } else {
         this.isExternal = this.external;
       }
-    },
-    connect() {
-      this.$userService.connect(this.kudos.username)
-        .then(this.retrieveUserInformations())
-        .catch((e) => {
-          console.error('Error while connecting to user', e);
-        });
     },
   },
 };
