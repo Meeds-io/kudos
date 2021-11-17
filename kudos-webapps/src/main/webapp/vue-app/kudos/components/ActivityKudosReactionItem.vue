@@ -9,7 +9,7 @@
           :size="42"
           class="ma-0 me-2 pull-left">
           <img
-            :src="avatarUrl"
+            :src="senderAvatarUrl"
             class="object-fit-cover ma-auto"
             loading="lazy">
         </v-avatar>
@@ -65,7 +65,7 @@ export default {
     KudosSenderFullName() {
       return this.kudos && this.kudos.senderFullName;
     },
-    avatarUrl() {
+    senderAvatarUrl() {
       return this.kudos && this.kudos.senderAvatar;
     },
     senderProfileUrl() {
