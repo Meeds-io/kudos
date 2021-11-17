@@ -4,10 +4,7 @@
       v-for="(kudos , i) in kudosList"
       :key="i"
       :kudos="kudos"
-      avatar-class="me-2"
-      size="42"
-      class="pl-3 pt-2 pb-1"
-      bold-title />
+      class="pl-3 pt-2 pb-1" />
   </div>
 </template>
 <script>
