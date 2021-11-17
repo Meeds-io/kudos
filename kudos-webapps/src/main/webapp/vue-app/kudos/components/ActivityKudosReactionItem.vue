@@ -6,9 +6,8 @@
         :href="senderProfileUrl"
         class="flex-nowrap flex-grow-1 d-flex text-truncate container--fluid">
         <v-avatar
-          :size="size"
-          :class="avatarClass"
-          class="ma-0 pull-left">
+          :size="42"
+          class="ma-0 me-2 pull-left">
           <img
             :src="avatarUrl"
             class="object-fit-cover ma-auto"
@@ -47,33 +46,6 @@ export default {
       type: Object,
       default: null
     },
-    retrieveExtraInformation: {
-      type: Boolean,
-      default: true,
-    },
-    avatarClass: {
-      type: String,
-      default: () => '',
-    },
-    tiptip: {
-      type: Boolean,
-      default: () => true,
-    },
-    tiptipPosition: {
-      type: String,
-      default: () => null,
-    },
-    title: {
-      type: String,
-      default: function() {
-        return `${this.title}`;
-      }
-    },
-    size: {
-      type: Number,
-      // eslint-disable-next-line no-magic-numbers
-      default: () => 37,
-    },
   },
   data () {
     return {
@@ -84,7 +56,6 @@ export default {
         .toString()
         .toString()}`,
       isExternal: false,
-
     };
   },
   computed: {
@@ -123,23 +94,24 @@ export default {
     this.retrieveUserInformations();
   },
   mounted() {
-    if (this.KudosSenderUsername && this.kudosReceiverUsername && this.tiptip) {
-      // TODO disable tiptip because of high CPU usage using its code
-      this.initTiptip();
-    }
+    // TODO disable tiptip because of high CPU usage using its code
+    this.initTiptip();
   },
   methods: {
     initTiptip() {
-      const users = [
-        {
+      const users = [];
+      if ( this.KudosSenderUsername) {
+        users.push( {
           id: this.senderId,
-          username: this.username
-        },
-        {
-          id: this.receiverId ,
+          username: this.KudosSenderUsername
+        });
+      }
+      if ( this.kudosReceiverUsername) {
+        users.push( {
+          id: this.receiverId,
           username: this.kudosReceiverUsername
-        }
-      ];
+        });
+      }
       users.forEach(user => {
         this.$nextTick(() => {
           $(`#${user.id}`).userPopup({
@@ -151,7 +123,7 @@ export default {
       });
     },
     retrieveUserInformations() {
-      if (this.retrieveExtraInformation && this.KudosSenderFullName) {
+      if ( this.KudosSenderFullName) {
         this.$userService.getUser(this.KudosSenderUsername)
           .then(user => {
             this.isExternal = user.external === 'true';
