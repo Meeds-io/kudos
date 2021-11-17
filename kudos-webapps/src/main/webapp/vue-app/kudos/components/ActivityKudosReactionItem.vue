@@ -3,7 +3,7 @@
     <div class="flex-nowrap d-flex flex-shrink-0 align-center">
       <a
         :id="senderId"
-        :href="profileUrl"
+        :href="senderProfileUrl"
         class="flex-nowrap flex-grow-1 d-flex text-truncate container--fluid">
         <v-avatar
           :size="size"
@@ -18,15 +18,15 @@
           <span
             v-if="KudosSenderFullName">
             <span
-              :class="fullNameStyle"
-              class="text-truncate subtitle-2 my-auto">{{ KudosSenderFullName }}</span>
+              class="font-weight-bold text-color text-truncate subtitle-2 my-auto">{{ KudosSenderFullName }}</span>
             <span v-if="isExternal" class="muted">{{ externalTag }} </span>
             <v-icon size="15" class="pl-2">fa-angle-right</v-icon>
-            <a :id="receiverId">
+            <a
+              :id="receiverId"
+              :href="receiverProfileUrl">
               <span
                 v-if="kudosReceiverFullName"
-                :class="receiverNameStyle"
-                class="text-truncate subtitle-2 my-auto pl-1">{{ kudosReceiverFullName }} </span>
+                class="font-weight-bold text-truncate subtitle-2 my-auto pl-1">{{ kudosReceiverFullName }} </span>
             </a>
           </span>
           <relative-date-format
@@ -52,10 +52,6 @@ export default {
       default: true,
     },
     boldTitle: {
-      type: Boolean,
-      default: () => false,
-    },
-    linkStyle: {
       type: Boolean,
       default: () => false,
     },
@@ -99,22 +95,16 @@ export default {
     externalTag() {
       return `( ${this.$t('userAvatar.external.label')} )`;
     },
-    fullNameStyle() {
-      return `${this.boldTitle && 'font-weight-bold ' || ''}${!this.linkStyle && 'text-color' || ''}`;
-    },
-    receiverNameStyle() {
-      return `${this.boldTitle && 'font-weight-bold ' || ''}${this.linkStyle && 'text-color' || ''}`;
-    },
-    username() {
-      return this.kudos && this.kudos.senderId;
-    },
     KudosSenderFullName() {
       return this.kudos && this.kudos.senderFullName;
     },
     avatarUrl() {
       return this.kudos && this.kudos.senderAvatar;
     },
-    profileUrl() {
+    senderProfileUrl() {
+      return this.kudos && this.userName && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.userName}`;
+    },
+    receiverProfileUrl() {
       return this.kudos && this.userName && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.userName}`;
     },
     kudosElapsedTime() {
@@ -166,7 +156,7 @@ export default {
     },
     retrieveUserInformations() {
       if (this.retrieveExtraInformation && this.KudosSenderFullName) {
-        this.$userService.getUser(this.username)
+        this.$userService.getUser(this.KudosSenderUsername)
           .then(user => {
             this.isExternal = user.external === 'true';
           });
