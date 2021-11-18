@@ -168,10 +168,9 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
-      document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-list', {detail: {
-        id: this.entityId,
-        parentId: this.parentId,
-        type: this.entityType,
+      document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-drawer', {detail: {
+        id: this.activityId,
+        tab: 'kudos',
       }}));
     },
   },
