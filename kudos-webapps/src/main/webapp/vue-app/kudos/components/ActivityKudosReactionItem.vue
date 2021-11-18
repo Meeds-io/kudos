@@ -29,7 +29,7 @@
             </a>
           </span>
           <relative-date-format
-            class="text-sm-caption text-sub-title"
+            class="text-sm-caption text-sub-title text-light-color"
             :value="kudosElapsedTime" />
         </div>
       </a>
@@ -69,10 +69,10 @@ export default {
       return this.kudos && this.kudos.senderAvatar;
     },
     senderProfileUrl() {
-      return this.kudos && this.userName && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.userName}`;
+      return this.kudos && this.KudosSenderUsername && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.KudosSenderUsername}`;
     },
     receiverProfileUrl() {
-      return this.kudos && this.userName && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.userName}`;
+      return this.kudos && this.kudosReceiverUsername && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.kudosReceiverUsername}`;
     },
     kudosElapsedTime() {
       return this.$dateUtil.getDateObjectFromString(this.kudosTimeInMilliseconds);
