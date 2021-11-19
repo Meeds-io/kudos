@@ -242,7 +242,6 @@ export default {
         this.$refs.kudosAPI.init();
 
         document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
-        document.addEventListener('exo-kudos-open-kudos-list', this.openListDialog);
       });
   },
   computed: {
@@ -413,16 +412,6 @@ export default {
             type: 'warning',
           });
         }
-      }
-    },
-    openListDialog(event) {
-      if (!this.disabled) {
-        this.error = null;
-        this.kudosList = [];
-        this.entityType = event && event.detail && event.detail.type;
-        this.entityId = event && event.detail && event.detail.id;
-        this.refreshLink(null, this.entityType, this.entityId, '');
-        this.$refs.kudosListModal.open();
       }
     },
     send() {
