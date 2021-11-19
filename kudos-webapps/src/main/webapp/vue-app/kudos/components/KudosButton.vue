@@ -168,8 +168,8 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
-      document.dispatchEvent(new CustomEvent('exo-kudos-open-kudos-drawer', {detail: {
-        id: this.activityId,
+      document.dispatchEvent(new CustomEvent('open-reaction-drawer-selected-tab', {detail: {
+        activityId: this.activityId,
         tab: 'kudos',
       }}));
     },
