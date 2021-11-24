@@ -5,7 +5,7 @@ import KudosButton from '../kudos/components/KudosButton.vue';
 import KudosNotificationsAlert from './components/common/KudosNotificationsAlert.vue';
 import ActivityKudosReactionItem from './components/ActivityKudosReactionItem.vue';
 import ActivityKudosReactionList from './components/ActivityKudosReactionList.vue';
-import NoKudosYet from './components/common/NoKudosYet.vue';
+import ActivityKudosReactionEmptyList from './components/common/ActivityKudosReactionEmptyList.vue';
 
 const components = {
   'kudos-api': KudosAPI,
@@ -15,7 +15,7 @@ const components = {
   'kudos-notification-alert': KudosNotificationsAlert,
   'activity-kudos-reaction-item': ActivityKudosReactionItem,
   'activity-kudos-reaction-list': ActivityKudosReactionList,
-  'no-kudos-yet': NoKudosYet
+  'no-kudos-yet': ActivityKudosReactionEmptyList
 };
 
 for (const key in components) {
