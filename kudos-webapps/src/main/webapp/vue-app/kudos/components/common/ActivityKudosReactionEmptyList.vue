@@ -21,6 +21,10 @@ export default {
     activityPosterId: {
       type: String ,
       default: () => ''
+    },
+    activityId: {
+      type: String ,
+      default: () => ''
     }
   },
   computed: {

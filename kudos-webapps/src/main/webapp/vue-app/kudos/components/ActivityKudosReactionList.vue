@@ -6,7 +6,10 @@
       :kudos="kudos"
       class="pl-3 pt-2 pb-1" />
   </div>
-  <no-kudos-yet v-else :activity-poster-id="activityPosterId" />
+  <activity-kudos-reaction-empty-list
+    v-else
+    :activity-poster-id="activityPosterId"
+    :activity-id="activityId" />
 </template>
 <script>
 export default {
