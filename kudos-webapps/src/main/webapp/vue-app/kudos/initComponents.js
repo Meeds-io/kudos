@@ -15,7 +15,7 @@ const components = {
   'kudos-notification-alert': KudosNotificationsAlert,
   'activity-kudos-reaction-item': ActivityKudosReactionItem,
   'activity-kudos-reaction-list': ActivityKudosReactionList,
-  'no-kudos-yet': ActivityKudosReactionEmptyList
+  'activity-kudos-reaction-empty-list': ActivityKudosReactionEmptyList
 };
 
 for (const key in components) {
