@@ -1,7 +1,7 @@
 <template>
   <div class="no-kudos-block flex flex-column align-center text-sub-title pt-12">
     <v-icon
-      color="#a8b3c5"
+      class="text-sub-title"
       size="64">
       fa-award
     </v-icon>
