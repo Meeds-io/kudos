@@ -1,14 +1,14 @@
 <template>
   <div class="no-kudos-block flex flex-column align-center text-sub-title pt-12">
     <v-icon
-      class="disabled--text"
+      color="#a8b3c5"
       size="64">
       fa-award
     </v-icon>
     <span class="no-kudos-yet-label pt-5">
       {{ $t('exoplatform.kudos.info.noKudosYet') }}
       <a
-        class="pl-1"
+        class="text-decoration-underline pl-1"
         v-if="!sameUser"
         @click="openKudosDrawer"> {{ $t('exoplatform.kudos.info.sendAKudos') }} </a>
     </span>
