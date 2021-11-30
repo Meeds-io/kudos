@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     retrieveKudos() {
-      return this.$kudosService.getEntityKudos(this.activityType,this.activityId).then(data => {
+      return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
         document.dispatchEvent(new CustomEvent('update-reaction-extension', {
           detail: {
