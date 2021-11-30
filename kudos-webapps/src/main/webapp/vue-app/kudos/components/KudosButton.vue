@@ -169,8 +169,9 @@ export default {
         event.stopPropagation();
       }
       document.dispatchEvent(new CustomEvent(`open-reaction-drawer-selected-tab-${this.activityId}`, {detail: {
-        activityId: this.activityId,
+        activityId: this.isComment ? this.entityId : this.activityId,
         tab: 'kudos',
+        activityType: this.entityType
       }}));
     },
   },
