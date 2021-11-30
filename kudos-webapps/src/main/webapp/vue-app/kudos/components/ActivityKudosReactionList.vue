@@ -18,6 +18,10 @@ export default {
       type: String,
       default: () => ''
     },
+    activityType: {
+      type: String,
+      default: () => ''
+    },
     activityPosterId: {
       type: String,
       default: () => ''
@@ -32,9 +36,14 @@ export default {
   created() {
     this.retrieveKudos();
   },
+  watch: {
+    activityId() {
+      this.retrieveKudos();
+    }
+  },
   methods: {
     retrieveKudos() {
-      return this.$kudosService.getEntityKudos('ACTIVITY',this.activityId).then(data => {
+      return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
         document.dispatchEvent(new CustomEvent('update-reaction-extension', {
           detail: {
