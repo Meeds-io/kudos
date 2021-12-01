@@ -9,6 +9,8 @@
   <activity-kudos-reaction-empty-list
     v-else
     :activity-poster-id="activityPosterId"
+    :activity-type="activityType"
+    :parent-id="parentId"
     :activity-id="activityId" />
 </template>
 <script>
@@ -19,6 +21,10 @@ export default {
       default: () => ''
     },
     activityType: {
+      type: String,
+      default: () => ''
+    },
+    parentId: {
       type: String,
       default: () => ''
     },
@@ -56,13 +62,6 @@ export default {
           console.error('error retrieving activity kudos' , e) ;
         }));
     },
-    openKudosDrawer() {
-      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        id: this.activityId,
-        parentId: '',
-        type: 'ACTIVITY',
-      }}));
-    }
   },
 };
 </script>
