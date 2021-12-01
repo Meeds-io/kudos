@@ -110,11 +110,13 @@
         <div class="d-flex justify-end">
           <v-btn
             class="btn me-2"
+            :aria-label="$t('Confirmation.label.Cancel')"
             @click="$refs.activityKudosDrawer.close()">
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
           <v-btn
             :disabled="sendButtonDisabled"
+            :aria-label="$t('exoplatform.kudos.button.send')"
             class="btn btn-primary me-2"
             @click="send">
             {{ $t('exoplatform.kudos.button.send') }}
