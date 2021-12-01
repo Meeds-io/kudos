@@ -62,13 +62,6 @@ export default {
           console.error('error retrieving activity kudos' , e) ;
         }));
     },
-    openKudosDrawer() {
-      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        id: this.activityId,
-        parentId: '',
-        type: 'ACTIVITY',
-      }}));
-    }
   },
 };
 </script>
