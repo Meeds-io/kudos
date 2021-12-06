@@ -1,7 +1,7 @@
 <template>
-  <div v-if="kudosList.length" class="kudos-list">
+  <div v-if="sortedKudosList.length" class="kudos-list">
     <activity-kudos-reaction-item
-      v-for="(kudos , i) in kudosList"
+      v-for="(kudos , i) in sortedKudosList"
       :key="i"
       :kudos="kudos"
       class="pl-3 pt-2 pb-1" />
@@ -41,6 +41,13 @@ export default {
   },
   created() {
     this.retrieveKudos();
+  },
+  computed: {
+    sortedKudosList() {
+      return this.kudosList.slice().sort((kudos1, kudos2) => {
+        return kudos1.timeInSeconds - kudos2.timeInSeconds;
+      });
+    }
   },
   watch: {
     activityId() {
