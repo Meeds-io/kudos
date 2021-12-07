@@ -9,12 +9,22 @@
   <activity-kudos-reaction-empty-list
     v-else
     :activity-poster-id="activityPosterId"
+    :activity-type="activityType"
+    :parent-id="parentId"
     :activity-id="activityId" />
 </template>
 <script>
 export default {
   props: {
     activityId: {
+      type: String,
+      default: () => ''
+    },
+    activityType: {
+      type: String,
+      default: () => ''
+    },
+    parentId: {
       type: String,
       default: () => ''
     },
@@ -32,9 +42,14 @@ export default {
   created() {
     this.retrieveKudos();
   },
+  watch: {
+    activityId() {
+      this.retrieveKudos();
+    }
+  },
   methods: {
     retrieveKudos() {
-      return this.$kudosService.getEntityKudos('ACTIVITY',this.activityId).then(data => {
+      return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
         document.dispatchEvent(new CustomEvent('update-reaction-extension', {
           detail: {
@@ -47,13 +62,6 @@ export default {
           console.error('error retrieving activity kudos' , e) ;
         }));
     },
-    openKudosDrawer() {
-      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        id: this.activityId,
-        parentId: '',
-        type: 'ACTIVITY',
-      }}));
-    }
   },
 };
 </script>

@@ -25,19 +25,30 @@ export default {
     activityId: {
       type: String ,
       default: () => ''
+    },
+    parentId: {
+      type: String,
+      default: () => ''
+    },
+    activityType: {
+      type: String ,
+      default: () => ''
     }
   },
   computed: {
     sameUser() {
       return this.activityPosterId && this.activityPosterId === eXo.env.portal.userName;
+    },
+    isComment() {
+      return this.activityType === 'COMMENT';
     }
   },
   methods: {
     openKudosDrawer() {
       document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        id: this.activityId,
-        parentId: '',
-        type: 'ACTIVITY',
+        id: this.isComment ? this.activityId.replace('comment','') : this.activityId,
+        parentId: this.parentId,
+        type: this.activityType,
       }}));
     }
   }
