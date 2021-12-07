@@ -45,7 +45,7 @@ export default {
   computed: {
     sortedKudosList() {
       return this.kudosList.slice().sort((kudos1, kudos2) => {
-        return kudos1.timeInSeconds - kudos2.timeInSeconds;
+        return kudos2.timeInSeconds - kudos2.timeInSeconds;
       });
     }
   },
