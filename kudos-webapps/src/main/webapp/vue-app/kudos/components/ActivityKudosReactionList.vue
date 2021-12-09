@@ -42,9 +42,7 @@ export default {
   created() {
     this.retrieveKudos();
     document.addEventListener('exo-kudos-sent',(event) => {
-      if (event && event.detail) {
-        this.retrieveKudos();
-      }
+      this.updateKudosList(event);
     });
   },
   computed: {
@@ -63,17 +61,27 @@ export default {
     retrieveKudos() {
       return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
-        document.dispatchEvent(new CustomEvent('update-reaction-extension', {
-          detail: {
-            numberOfReactions: this.kudosList.length,
-            type: 'kudos'
-          }
-        }));
+        this.updateExtension();
       })
         .catch((e => {
           console.error('error retrieving activity kudos' , e) ;
         }));
     },
+    updateKudosList(event) {
+      if (event && event.detail) {
+        const kudosReceived = event.detail;
+        this.kudosList.push(kudosReceived);
+        this.updateExtension();
+      }
+    },
+    updateExtension() {
+      document.dispatchEvent(new CustomEvent('update-reaction-extension', {
+        detail: {
+          numberOfReactions: this.kudosList.length,
+          type: 'kudos'
+        }
+      }));
+    }
   },
 };
 </script>
