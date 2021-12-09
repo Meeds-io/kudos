@@ -390,6 +390,7 @@ export default {
             });
         })
         .then(() => {
+          document.dispatchEvent(new CustomEvent(`refresh-kudos-${this.entityId}`));
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
             this.$root.$emit('kudos-notification-alert', {

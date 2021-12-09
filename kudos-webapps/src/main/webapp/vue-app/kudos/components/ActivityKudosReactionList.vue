@@ -41,6 +41,7 @@ export default {
   },
   created() {
     this.retrieveKudos();
+    document.addEventListener(`refresh-kudos-${this.activityId}`, this.retrieveKudos);
   },
   computed: {
     sortedKudosList() {
