@@ -61,7 +61,7 @@ export default {
     retrieveKudos() {
       return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
-        this.updateExtension();
+        this.updateReaction();
       })
         .catch((e => {
           console.error('error retrieving activity kudos' , e) ;
@@ -71,10 +71,10 @@ export default {
       if (event && event.detail) {
         const kudosReceived = event.detail;
         this.kudosList.push(kudosReceived);
-        this.updateExtension();
+        this.updateReaction();
       }
     },
-    updateExtension() {
+    updateReaction() {
       document.dispatchEvent(new CustomEvent('update-reaction-extension', {
         detail: {
           numberOfReactions: this.kudosList.length,
