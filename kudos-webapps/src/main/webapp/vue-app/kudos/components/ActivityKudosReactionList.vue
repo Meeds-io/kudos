@@ -1,7 +1,7 @@
 <template>
-  <div v-if="kudosList.length" class="kudos-list">
+  <div v-if="sortedKudosList.length" class="kudos-list">
     <activity-kudos-reaction-item
-      v-for="(kudos , i) in kudosList"
+      v-for="(kudos , i) in sortedKudosList"
       :key="i"
       :kudos="kudos"
       class="pl-3 pt-2 pb-1" />
@@ -41,6 +41,16 @@ export default {
   },
   created() {
     this.retrieveKudos();
+    document.addEventListener('exo-kudos-sent',(event) => {
+      this.updateKudosList(event);
+    });
+  },
+  computed: {
+    sortedKudosList() {
+      return this.kudosList.slice().sort((kudos1, kudos2) => {
+        return kudos2.timeInSeconds - kudos2.timeInSeconds;
+      });
+    }
   },
   watch: {
     activityId() {
@@ -51,17 +61,27 @@ export default {
     retrieveKudos() {
       return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
-        document.dispatchEvent(new CustomEvent('update-reaction-extension', {
-          detail: {
-            numberOfReactions: this.kudosList.length,
-            type: 'kudos'
-          }
-        }));
+        this.updateReaction();
       })
         .catch((e => {
           console.error('error retrieving activity kudos' , e) ;
         }));
     },
+    updateKudosList(event) {
+      if (event && event.detail) {
+        const kudosReceived = event.detail;
+        this.kudosList.push(kudosReceived);
+        this.updateReaction();
+      }
+    },
+    updateReaction() {
+      document.dispatchEvent(new CustomEvent('update-reaction-extension', {
+        detail: {
+          numberOfReactions: this.kudosList.length,
+          type: 'kudos'
+        }
+      }));
+    }
   },
 };
 </script>
