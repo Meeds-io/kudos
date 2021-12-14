@@ -44,6 +44,7 @@ export default {
     document.addEventListener('exo-kudos-sent',(event) => {
       this.updateKudosList(event);
     });
+    document.addEventListener(`check-reactions-${this.activityId}`, this.updateKudos);
   },
   computed: {
     sortedKudosList() {
@@ -52,16 +53,11 @@ export default {
       });
     }
   },
-  watch: {
-    activityId() {
-      this.retrieveKudos();
-    }
-  },
   methods: {
     retrieveKudos() {
       return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
-        this.updateReaction();
+        this.updateKudos();
       })
         .catch((e => {
           console.error('error retrieving activity kudos' , e) ;
@@ -69,13 +65,15 @@ export default {
     },
     updateKudosList(event) {
       if (event && event.detail) {
-        const kudosReceived = event.detail;
-        this.kudosList.push(kudosReceived);
-        this.updateReaction();
+        if (this.activityId === event.detail.entityId) {
+          const kudosReceived = event.detail;
+          this.kudosList.push(kudosReceived);
+          this.updateKudos();
+        }
       }
     },
-    updateReaction() {
-      document.dispatchEvent(new CustomEvent('update-reaction-extension', {
+    updateKudos() {
+      document.dispatchEvent(new CustomEvent(`update-reaction-extension-${this.activityId}`, {
         detail: {
           numberOfReactions: this.kudosList.length,
           type: 'kudos'
