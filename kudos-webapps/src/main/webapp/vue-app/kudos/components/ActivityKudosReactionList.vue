@@ -44,24 +44,30 @@ export default {
     document.addEventListener('exo-kudos-sent',(event) => {
       this.updateKudosList(event);
     });
-  },
-  computed: {
-    sortedKudosList() {
-      return this.kudosList.slice().sort((kudos1, kudos2) => {
-        return kudos2.timeInSeconds - kudos2.timeInSeconds;
-      });
-    }
+    document.addEventListener('check-reactions', event => {
+      this.updateKudos(event);
+    });
   },
   watch: {
     activityId() {
       this.retrieveKudos();
     }
   },
+  computed: {
+    sortedKudosList() {
+      return this.kudosList.slice().sort((kudos1, kudos2) => {
+        return kudos2.timeInSeconds - kudos2.timeInSeconds;
+      });
+    },
+  },
   methods: {
     retrieveKudos() {
+      if (this.activityType === 'COMMENT') {
+        this.activityId = this.activityId.replace('comment','');
+      }
       return this.$kudosService.getEntityKudos(this.activityType, this.activityId).then(data => {
         this.kudosList = data;
-        this.updateReaction();
+        this.updateKudosReactionNumber();
       })
         .catch((e => {
           console.error('error retrieving activity kudos' , e) ;
@@ -69,13 +75,23 @@ export default {
     },
     updateKudosList(event) {
       if (event && event.detail) {
-        const kudosReceived = event.detail;
-        this.kudosList.push(kudosReceived);
-        this.updateReaction();
+        if (this.activityId === event.detail.entityId) {
+          const kudosReceived = event.detail;
+          this.kudosList.push(kudosReceived);
+          this.updateKudosReactionNumber();
+        }
       }
     },
-    updateReaction() {
-      document.dispatchEvent(new CustomEvent('update-reaction-extension', {
+    updateKudos(event) {
+      if (event && event.detail) {
+        const activityId = event.detail.replace('comment','');
+        if (activityId === this.activityId) {
+          this.updateKudosReactionNumber();
+        }
+      }
+    },
+    updateKudosReactionNumber () {
+      document.dispatchEvent(new CustomEvent(`update-reaction-extension-${this.parentId}`, {
         detail: {
           numberOfReactions: this.kudosList.length,
           type: 'kudos'
