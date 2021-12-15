@@ -46,11 +46,22 @@ export default {
     });
     document.addEventListener(`check-reactions-${this.activityId}`, this.updateKudos);
   },
+  watch: {
+    activityType() {
+      if (this.activityType === 'COMMENT') {
+        this.activityId = this.activityId.replace('comment','');
+      }
+      this.retrieveKudos();
+    }
+  },
   computed: {
     sortedKudosList() {
       return this.kudosList.slice().sort((kudos1, kudos2) => {
         return kudos2.timeInSeconds - kudos2.timeInSeconds;
       });
+    },
+    kudosActivityId() {
+      return this.activityType === 'COMMENT' ? this.activityId.replace('comment','') : this.activityId;
     }
   },
   methods: {
@@ -73,7 +84,7 @@ export default {
       }
     },
     updateKudos() {
-      document.dispatchEvent(new CustomEvent(`update-reaction-extension-${this.activityId}`, {
+      document.dispatchEvent(new CustomEvent(`update-reaction-extension-${this.parentId}`, {
         detail: {
           numberOfReactions: this.kudosList.length,
           type: 'kudos'
