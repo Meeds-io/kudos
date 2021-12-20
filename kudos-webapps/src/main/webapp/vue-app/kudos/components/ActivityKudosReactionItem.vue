@@ -34,7 +34,6 @@
         </div>
       </a>
     </div>
-    <v-divider />
   </div>
 </template>
 <script>
