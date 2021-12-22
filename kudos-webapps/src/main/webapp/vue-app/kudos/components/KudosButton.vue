@@ -92,8 +92,8 @@ export default {
     activityId() {
       return (this.comment && this.comment.activityId) || (this.activity && this.activity.id) || '';
     },
-    parentCommentId() {
-      return this.comment && (this.comment.parentCommentId || this.comment.id) || '';
+    commentId() {
+      return this.comment &&  this.comment.id || '';
     },
     isComment() {
       return !!this.comment;
@@ -169,7 +169,7 @@ export default {
         event.stopPropagation();
       }
       document.dispatchEvent(new CustomEvent(`open-reaction-drawer-selected-tab-${this.activityId}`, {detail: {
-        activityId: this.isComment ? this.entityId : this.activityId,
+        activityId: this.isComment ? this.commentId : this.activityId,
         tab: 'kudos',
         activityType: this.entityType
       }}));
