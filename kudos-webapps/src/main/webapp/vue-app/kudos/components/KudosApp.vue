@@ -58,7 +58,6 @@
               <div
                 v-if="kudosSent || remainingKudos"
                 class="flex d-flex justify-end pt-15">
-                <div v-if="numberOfKudosAllowed <= numberOfKudosToDisplay">
                   <v-icon
                     v-for="index in remainingKudos"
                     :key="index"
@@ -73,16 +72,6 @@
                     size="20">
                     fa-award
                   </v-icon>
-                </div>
-                <div v-else>
-                  <v-icon
-                    v-for="index in numberOfKudosToDisplay"
-                    :key="index"
-                    class="uiIconKudos uiIconBlue pl-1"
-                    size="20">
-                    fa-award
-                  </v-icon>
-                </div>
               </div>
             </div>
             <div class="d-flex flex-row pt-5">
@@ -136,7 +125,6 @@ export default {
   data() {
     return {
       numberOfKudosAllowed: 0,
-      numberOfKudosToDisplay: 3,
       listDialog: false,
       ignoreRefresh: false,
       kudosList: false,
