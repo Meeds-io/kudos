@@ -97,4 +97,8 @@
     </createIndex>
   </changeSet>
 
+  <changeSet author="kudos" id="1.0.0-9" dbms="hsqldb">
+    <createSequence sequenceName="SEQ_ADDONS_KUDOS_ID" startValue="1"/>
+  </changeSet>
+
 </databaseChangeLog>

@@ -51,7 +51,7 @@ public class KudosEntity implements Serializable {
   private static final long serialVersionUID = -8272292325540761902L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_ADDONS_KUDOS_ID", sequenceName = "SEQ_ADDONS_KUDOS_ID")
+  @SequenceGenerator(name = "SEQ_ADDONS_KUDOS_ID", sequenceName = "SEQ_ADDONS_KUDOS_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_ADDONS_KUDOS_ID")
   @Column(name = "KUDOS_ID")
   private Long              id;
