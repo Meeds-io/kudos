@@ -29,6 +29,7 @@
     <!-- 3rd party libraries versions -->
     <org.exoplatform.social.version>6.3.x-SNAPSHOT</org.exoplatform.social.version>
     <org.exoplatform.platform-ui.version>6.3.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <addon.exo.analytics.version>1.2.x-SNAPSHOT</addon.exo.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
@@ -57,6 +58,13 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.exoplatform.addons.analytics</groupId>
+        <artifactId>analytics-parent</artifactId>
+        <version>${addon.exo.analytics.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
       <!-- Current project artifacts -->
       <dependency>

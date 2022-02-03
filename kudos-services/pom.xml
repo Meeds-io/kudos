@@ -8,9 +8,14 @@
   <artifactId>kudos-services</artifactId>
   <name>eXo Add-on:: eXo Kudos - Services</name>
   <properties>
-    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.62</exo.test.coverage.ratio>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.exoplatform.addons.analytics</groupId>
+      <artifactId>analytics-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
