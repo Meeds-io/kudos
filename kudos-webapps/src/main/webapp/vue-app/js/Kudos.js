@@ -174,7 +174,6 @@ export function registerExternalExtensions(title) {
     id: 'profile-kudos',
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
-    icon2: 'fas fa-award',
     class: 'fas fa-award',
     additionalClass: 'mt-1',
     order: 20,
