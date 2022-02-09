@@ -174,6 +174,8 @@ export function registerExternalExtensions(title) {
     id: 'profile-kudos',
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
+    class: 'fas fa-award',
+    additionalClass: 'mt-1',
     order: 20,
     enabled: (profile) => profile.enabled && !profile.deleted,
     click: (profile) => {
@@ -212,6 +214,12 @@ export function registerActivityActionExtension() {
     id: 'kudos',
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
+  });
+
+  extensionRegistry.registerComponent('UserPopover', 'user-popover-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['popover-kudos-button'],
+    rank: 30,
   });
 
   // Register predefined activity types
