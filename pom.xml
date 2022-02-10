@@ -10,7 +10,7 @@
   </parent>
   <groupId>io.meeds.kudos</groupId>
   <artifactId>kudos</artifactId>
-  <version>7.0.x-meed-SNAPSHOT</version>
+  <version>7.0.x-meedsv2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Meeds:: Add-on:: Kudos - Parent POM</name>
   <description>Meeds Kudos Addon</description>
@@ -27,9 +27,9 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <io.meeds.social.version>7.0.x-meed-SNAPSHOT</io.meeds.social.version>
-    <io.meeds.platform-ui.version>7.0.x-meed-SNAPSHOT</io.meeds.platform-ui.version>
-    <addon.meeds.analytics.version>7.0.x-meed-SNAPSHOT</addon.meeds.analytics.version>
+    <io.meeds.social.version>7.0.x-meedsv2-SNAPSHOT</io.meeds.social.version>
+    <io.meeds.platform-ui.version>7.0.x-meedsv2-SNAPSHOT</io.meeds.platform-ui.version>
+    <addon.meeds.analytics.version>7.0.x-meedsv2-SNAPSHOT</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
