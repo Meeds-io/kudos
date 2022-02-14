@@ -216,6 +216,12 @@ export function registerActivityActionExtension() {
     rank: 50,
   });
 
+  extensionRegistry.registerComponent('UserPopover', 'user-popover-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['popover-kudos-button'],
+    rank: 30,
+  });
+
   // Register predefined activity types
   extensionRegistry.registerExtension('activity', 'type', {
     type: 'exokudos:activity',
