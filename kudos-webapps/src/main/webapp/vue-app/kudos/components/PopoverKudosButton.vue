@@ -6,12 +6,10 @@
         v-on="on">
         <v-btn
           :ripple="false"
-          x-small
           icon
           color="primary"
-          class="pa-2"
           @click="sendKudos($event)">
-          <v-icon>fas fa-award</v-icon>
+          <v-icon size="18">fas fa-award</v-icon>
         </v-btn>
       </div>
     </template>
