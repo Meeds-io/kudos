@@ -240,15 +240,14 @@ export function registerActivityActionExtension() {
         kudosListByActivity[activityId] = null;
       },
       getSourceLink: () => '#',
+      getActivityType: () => 'kudos',
       getTitle: activityOrComment => {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: `<a href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}">
-                    ${kudos.receiverFullName}
-                  </a>`
+              0: kudos.receiverId
             },
           };
         }
