@@ -9,9 +9,6 @@ export default {
     document.addEventListener('display-activity-details', this.getActivityInformations);
   },
   methods: {
-    init() {
-      this.initTiptip();
-    },
     getActivityInformations(event) {
       const entityType = event && event.detail && event.detail.type;
       const entityId = event && event.detail && event.detail.id;
@@ -80,49 +77,6 @@ export default {
         return this.$kudosService.getKudosByPeriod(detail.startDate, detail.endDate);
       }
     },
-    initTiptip() {
-      window.eXo = window.eXo ? window.eXo : {};
-      eXo.social = eXo.social ? eXo.social : {};
-      eXo.social.tiptip = eXo.social.tiptip ? eXo.social.tiptip : {};
-      eXo.social.tiptip.extraActions = eXo.social.tiptip.extraActions ? eXo.social.tiptip.extraActions : [];
-      const sendKudosLabel = this.$t('exoplatform.kudos.button.sendKudos');
-      if (eXo.social.tiptip.extraActions.find(action => action.id === 'profile-kudos')) {
-        return;
-      }
-      eXo.social.tiptip.extraActions.push({
-        id: 'profile-kudos',
-        appendContentTo(divUIAction, ownerId, type) {
-          if (!type || type === 'username' || type === 'user' || type === 'organization') {
-            type = 'USER';
-          } else {
-            type = 'SPACE';
-          }
-          // FIXME disable TIPTIP button to send Kudos to a space because of a limitation
-          // in eXo Platform REST Services that couldn't retrieve Space details by prettyName
-          if (type === 'USER') {
-            divUIAction.append(`<a title="${sendKudosLabel}" 
-                class="sendKudosTipTipButton"
-                href="javascript:void(0);"
-                onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
-                    {'detail' : {'id' : '${ownerId}', 'type': '${type}_TIPTIP', ignoreRefresh: true}}))">
-                  <i class="uiIcon fa fa-award uiIconKudosTipTip"></i>
-              </a>`);
-          }
-        }
-      });
-      if (!$('.SendKudosButtonBanner').length) {
-        if ($('.profileMenuNav .profileMenuNavHeader .profileMenuApps').length && eXo && eXo.env && eXo.env.portal && eXo.env.portal.profileOwner && eXo.env.portal.profileOwner !== eXo.env.portal.userName) {
-          $('.profileMenuNav .profileMenuNavHeader .profileMenuApps').append(`<li class="SendKudosButtonBanner">
-              <a onclick="document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal',
-               {'detail' : {'id' : '${eXo.env.portal.profileOwner}', 'type': 'USER_PROFILE', ignoreRefresh: true}}));"
-               class="btn" href="javascript:void(0);">
-                <i class="uiIcon fa fa-award uiIconKudos"></i>
-                <span> ${sendKudosLabel}</span>
-              </a>
-            </li>`);
-        }
-      }
-    }
   }
 };
 </script>

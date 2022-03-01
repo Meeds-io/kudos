@@ -40,12 +40,6 @@
         <module>iePolyfills</module>
       </depends>
       <depends>
-        <module>userPopupPlugin</module>
-      </depends>
-      <depends>
-        <module>spacePopupPlugin</module>
-      </depends>
-      <depends>
         <module>extensionRegistry</module>
       </depends>
     </module>
@@ -84,12 +78,6 @@
         <module>iePolyfills</module>
       </depends>
       <depends>
-        <module>userPopupPlugin</module>
-      </depends>
-      <depends>
-        <module>spacePopupPlugin</module>
-      </depends>
-      <depends>
         <module>extensionRegistry</module>
       </depends>
     </module>
@@ -126,9 +114,6 @@
       </depends>
       <depends>
         <module>vuetify</module>
-      </depends>
-      <depends>
-        <module>spacePopupPlugin</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>

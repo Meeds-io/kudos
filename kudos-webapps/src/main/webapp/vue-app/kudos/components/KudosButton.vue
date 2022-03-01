@@ -86,6 +86,9 @@ export default {
     entityId() {
       return (this.comment && this.comment.id && this.comment.id.replace('comment','')) || (this.activity && this.activity.id) || '';
     },
+    entityOwner() {
+      return (this.comment && this.comment.identity && this.comment.identity.remoteId) || (this.activity && this.activity.identity && this.activity.identity.remoteId) || '';
+    },
     parentId() {
       return this.comment && this.comment.activityId || '';
     },
@@ -161,6 +164,7 @@ export default {
         id: this.entityId,
         parentId: this.parentId,
         type: this.entityType,
+        owner: this.entityOwner,
       }}));
     },
     openKudosList(event) {

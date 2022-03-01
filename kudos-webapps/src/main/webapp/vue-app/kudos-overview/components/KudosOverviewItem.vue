@@ -88,41 +88,5 @@ export default {
       return this.kudosItem && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activityId}${commentId && '#comment-comment' || ''}${commentId || ''}`;
     },
   },
-  mounted() {
-    if (this.identityId) {
-      // TODO disable tiptip because of high CPU usage using its code
-      this.initTiptip();
-    }
-  },
-  methods: {
-    initTiptip() {
-      if (this.isSpace) {
-        this.$nextTick(() => {
-          $(`#${this.id}`).spacePopup({
-            userName: eXo.env.portal.userName,
-            spaceID: this.identityId,
-            restURL: '/portal/rest/v1/social/spaces/{0}',
-            membersRestURL: '/portal/rest/v1/social/spaces/{0}/users?returnSize=true',
-            managerRestUrl: '/portal/rest/v1/social/spaces/{0}/users?role=manager&returnSize=true',
-            membershipRestUrl: '/portal/rest/v1/social/spacesMemberships?space={0}&returnSize=true',
-            defaultAvatarUrl: this.avatar,
-            deleteMembershipRestUrl: '/portal/rest/v1/social/spacesMemberships/{0}:{1}:{2}',
-            content: false,
-            keepAlive: true,
-            defaultPosition: 'left_bottom',
-            maxWidth: '420px',
-          });
-        });
-      } else {
-        this.$nextTick(() => {
-          $(`#${this.id}`).userPopup({
-            restURL: '/portal/rest/social/people/getPeopleInfo/{0}.json',
-            userId: this.remoteId,
-            keepAlive: true,
-          });
-        });
-      }
-    },
-  }
 };
 </script>

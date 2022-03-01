@@ -34,10 +34,7 @@
               <div class="d-flex flex-column pr-2 pl-5 pt-3">
                 <div class="pt-3">
                   <exo-user-avatar
-                    :username="kudosReceiver.receiverId"
-                    :fullname="kudosReceiver.fullName"
-                    :avatar-url="kudosReceiver.avatar"
-                    :url="kudosReceiver.profileUrl"
+                    :profile-id="entityOwner"
                     bold-title
                     link-style
                     size="32" />
@@ -148,6 +145,7 @@ export default {
       parentEntityId: null,
       entityId: null,
       entityType: null,
+      entityOwner: '',
       receiverType: null,
       receiverId: null,
       error: null,
@@ -160,7 +158,7 @@ export default {
       kudosMessage: '',
       kudosPeriodType: '',
       loading: false,
-      requiredField: false,
+      requiredField: false
     };
   },
   watch: {
@@ -177,7 +175,7 @@ export default {
     },
     kudosMessageText(newVal, oldVal) {
       this.requiredField = oldVal && oldVal !== '' && newVal === '';
-    }
+    },
   },
   created() {
     this.init()
@@ -191,14 +189,6 @@ export default {
       });
   },
   computed: {
-    kudosReceiver () {
-      return {
-        receiverId: this.kudosToSend && this.kudosToSend.id,
-        avatar: this.kudosToSend && this.kudosToSend.avatar,
-        profileUrl: this.kudosToSend && this.kudosToSend.profileUrl,
-        fullName: this.kudosToSend && this.kudosToSend.receiverFullName
-      };
-    },
     kudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
@@ -338,8 +328,10 @@ export default {
         if ( this.remainingKudos > 0 ) {
           this.loading = true;
           this.$nextTick(() => {
+            
             this.entityType = event && event.detail && event.detail.type;
             this.entityId = event && event.detail && event.detail.id;
+            this.entityOwner = event && event.detail && event.detail.owner;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
             this.$refs.activityKudosDrawer.open();

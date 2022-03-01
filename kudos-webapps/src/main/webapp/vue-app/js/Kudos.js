@@ -174,6 +174,8 @@ export function registerExternalExtensions(title) {
     id: 'profile-kudos',
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
+    class: 'fas fa-award',
+    additionalClass: 'mt-1',
     order: 20,
     enabled: (profile) => profile.enabled && !profile.deleted,
     click: (profile) => {
@@ -214,6 +216,12 @@ export function registerActivityActionExtension() {
     rank: 50,
   });
 
+  extensionRegistry.registerComponent('UserPopover', 'user-popover-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['popover-kudos-button'],
+    rank: 30,
+  });
+
   // Register predefined activity types
   extensionRegistry.registerExtension('activity', 'type', {
     type: 'exokudos:activity',
@@ -232,15 +240,14 @@ export function registerActivityActionExtension() {
         kudosListByActivity[activityId] = null;
       },
       getSourceLink: () => '#',
+      getActivityType: () => 'kudos',
       getTitle: activityOrComment => {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: `<a href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}">
-                    ${kudos.receiverFullName}
-                  </a>`
+              0: kudos.receiverId
             },
           };
         }
