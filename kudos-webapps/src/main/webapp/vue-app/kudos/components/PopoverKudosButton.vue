@@ -21,22 +21,21 @@
 <script>
 export default {
   props: {
-    identity: {
-      type: Object,
-      default: null,
-    }
-  },
-  computed: {
-    identityId() {
-      return this.identity && this.identity.id;
+    identityType: {
+      type: String,
+      default: '',
+    },
+    identityId: {
+      type: String,
+      default: ''
     }
   },
   methods: {
     sendKudos(event) {
       event.preventDefault();
       event.stopPropagation();
-      const type = this.identity && this.identity.prettyName ? 'SPACE_PROFILE' : 'USER_PROFILE';
-      const id = this.identity && this.identity.prettyName ? this.identity.id : this.identity.username;
+      const type = this.identityType === 'space' ? 'SPACE_PROFILE' : 'USER_PROFILE';
+      const id = this.identityId;
       if (id) {
         document.dispatchEvent(
           new CustomEvent('exo-kudos-open-send-modal', { detail: {
