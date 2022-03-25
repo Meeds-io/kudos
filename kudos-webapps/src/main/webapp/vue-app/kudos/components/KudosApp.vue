@@ -34,7 +34,7 @@
               <div class="d-flex flex-column pr-2 pl-5 pt-3">
                 <div class="pt-3">
                   <exo-user-avatar
-                    :profile-id="entityId"
+                    :profile-id="entityOwner"
                     bold-title
                     link-style
                     size="32" />
