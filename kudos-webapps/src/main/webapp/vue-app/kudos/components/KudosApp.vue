@@ -34,7 +34,7 @@
               <div class="d-flex flex-column pr-2 pl-5 pt-3">
                 <div class="pt-3">
                   <exo-user-avatar
-                    :profile-id="receiverId"
+                    :identity="identity"
                     bold-title
                     link-style
                     size="32" />
@@ -158,7 +158,8 @@ export default {
       kudosMessage: '',
       kudosPeriodType: '',
       loading: false,
-      requiredField: false
+      requiredField: false,
+      identity: null
     };
   },
   watch: {
@@ -264,6 +265,7 @@ export default {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
+                  this.identity = receiverDetails;
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
                   const receiverId = receiverDetails.id;
