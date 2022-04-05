@@ -9,5 +9,6 @@
   <import>war:/conf/kudos/notification-configuration.xml</import>
   <import>war:/conf/kudos/gamification-configuration.xml</import>
   <import>war:/conf/kudos/activity-configuration.xml</import>
+  <import>war:/conf/kudos/navigation-categories-configuration.xml</import>
 
 </configuration>
