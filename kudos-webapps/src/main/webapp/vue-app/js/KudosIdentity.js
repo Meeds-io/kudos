@@ -64,6 +64,9 @@ export function getIdentityDetails(urlId, type, remoteId) {
               ownerDetails.identityId = identityDetails.id;
               ownerDetails.fullname = identityDetails.fullname;
               ownerDetails.avatar = identityDetails.avatar;
+              ownerDetails.username = identityDetails.username;
+              ownerDetails.position = identityDetails.position;
+              ownerDetails.external = identityDetails.external;
             } else {
               ownerDetails.notAuthorized = true;
             }
