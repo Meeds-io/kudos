@@ -3,7 +3,7 @@
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
     <v-tooltip bottom>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <div
           class="d-flex"
           v-bind="attrs"
@@ -42,7 +42,7 @@
       </span>
     </v-tooltip>
     <v-tooltip bottom>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-btn
           v-show="kudosCount"
           :id="`KudusCountLink${commentId}`"
