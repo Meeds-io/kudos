@@ -39,6 +39,10 @@ public class Kudos implements Serializable {
 
   private String            receiverAvatar;
 
+  private String            receiverPosition;
+
+  private boolean           externalReceiver;
+
   private String            message;
 
   private long              timeInSeconds;
