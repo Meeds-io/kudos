@@ -152,6 +152,8 @@ public class Utils {
       kudos.setReceiverId(receiverIdentity.getRemoteId());
       kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
       kudos.setReceiverType(USER_ACCOUNT_TYPE);
+      kudos.setReceiverPosition(StringEscapeUtils.unescapeHtml(receiverIdentity.getProfile().getPosition()));
+      kudos.setExternalReceiver(receiverIdentity.getProfile() != null && receiverIdentity.getProfile().getProperty("external") != null && receiverIdentity.getProfile().getProperty("external").equals("true"));
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
       kudos.setReceiverURL(LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));
