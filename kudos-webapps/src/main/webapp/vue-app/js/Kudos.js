@@ -244,10 +244,16 @@ export function registerActivityActionExtension() {
       getTitle: activityOrComment => {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
+          const receiverIdentity = {
+            'username': kudos.receiverId,
+            'fullname': kudos.receiverFullName,
+            'position': kudos.receiverPosition,
+            'external': kudos.externalReceiver,
+          };
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: kudos.receiverId
+              0: receiverIdentity
             },
           };
         }
