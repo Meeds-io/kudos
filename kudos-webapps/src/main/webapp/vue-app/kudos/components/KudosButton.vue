@@ -4,10 +4,7 @@
     class="d-inline-flex">
     <v-tooltip bottom>
       <template #activator="{ on, attrs }">
-        <div
-          class="d-flex"
-          v-bind="attrs"
-          v-on="on">
+        <div class="d-flex">
           <v-btn
             :id="`KudosActivity${entityId}`"
             :disabled="buttonDisabled"
@@ -17,7 +14,9 @@
             class="pa-0 mt-0"
             text
             link
-            @click="openKudosForm">
+            @click="openKudosForm"
+            v-bind="attrs"
+            v-on="on">
             <template v-if="isComment">
               {{ $t('exoplatform.kudos.label.kudos') }}
             </template>
