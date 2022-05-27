@@ -2,7 +2,9 @@
   <div
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
-    <v-tooltip bottom>
+    <v-tooltip 
+    v-model="show"
+    bottom>
       <template #activator="{ on, attrs }">
         <div class="d-flex">
           <v-btn
@@ -77,6 +79,7 @@ export default {
   data: () => ({
     linkedKudosList: [],
     limit: 100,
+    show: false,
   }),
   computed: {
     entityType() {
@@ -155,6 +158,7 @@ export default {
       }
     },
     openKudosForm(event) {
+      this.show = false;
       if (event) {
         event.preventDefault();
         event.stopPropagation();
