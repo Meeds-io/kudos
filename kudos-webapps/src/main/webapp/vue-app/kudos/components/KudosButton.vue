@@ -3,8 +3,8 @@
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
     <v-tooltip 
-    v-model="show"
-    bottom>
+      :disabled="isMobile"
+      bottom>
       <template #activator="{ on, attrs }">
         <div class="d-flex">
           <v-btn
@@ -42,7 +42,9 @@
         {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
-    <v-tooltip bottom>
+    <v-tooltip 
+    :disabled="isMobile"
+    bottom>
       <template #activator="{ on, attrs }">
         <v-btn
           v-show="kudosCount"
@@ -125,6 +127,9 @@ export default {
       }
       return false;
     },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'sm' || this.$vuetify.breakpoint.name === 'xs';
+    },
   },
   created() {
     this.$root.$on('activity-comment-created', this.resetActivity);
@@ -158,7 +163,6 @@ export default {
       }
     },
     openKudosForm(event) {
-      this.show = false;
       if (event) {
         event.preventDefault();
         event.stopPropagation();
