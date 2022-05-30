@@ -2,9 +2,7 @@
   <div
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
-    <v-tooltip 
-      :disabled="isMobile"
-      bottom>
+    <v-tooltip :disabled="isMobile" bottom>
       <template #activator="{ on, attrs }">
         <div class="d-flex">
           <v-btn
@@ -42,9 +40,7 @@
         {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
-    <v-tooltip 
-    :disabled="isMobile"
-    bottom>
+    <v-tooltip :disabled="isMobile" bottom>
       <template #activator="{ on, attrs }">
         <v-btn
           v-show="kudosCount"
