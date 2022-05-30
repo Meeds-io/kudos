@@ -2,12 +2,9 @@
   <div
     :class="!isComment && 'ms-lg-4'"
     class="d-inline-flex">
-    <v-tooltip 
-    v-model="show"
-    bottom>
-      <template #activator="{ on, attrs }">
         <div class="d-flex">
           <v-btn
+            :title="buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos')"
             :id="`KudosActivity${entityId}`"
             :disabled="buttonDisabled"
             :class="textColorClass"
@@ -37,14 +34,8 @@
             </template>
           </v-btn>
         </div>
-      </template>
-      <span>
-        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
-      </span>
-    </v-tooltip>
-    <v-tooltip bottom>
-      <template #activator="{ on, attrs }">
         <v-btn
+          :title="$t('exoplatform.kudos.button.displayKudosList')"
           v-show="kudosCount"
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
@@ -56,11 +47,6 @@
           @click="openKudosList">
           ({{ kudosCount }})
         </v-btn>
-      </template>
-      <span>
-        {{ $t('exoplatform.kudos.button.displayKudosList') }}
-      </span>
-    </v-tooltip>
   </div>
 </template>
 
@@ -79,7 +65,6 @@ export default {
   data: () => ({
     linkedKudosList: [],
     limit: 100,
-    show: false,
   }),
   computed: {
     entityType() {
@@ -158,7 +143,6 @@ export default {
       }
     },
     openKudosForm(event) {
-      this.show = false;
       if (event) {
         event.preventDefault();
         event.stopPropagation();
