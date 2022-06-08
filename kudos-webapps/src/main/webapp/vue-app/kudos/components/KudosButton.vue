@@ -48,7 +48,7 @@
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
           :x-small="isComment"
-          class="primary--text font-weight-bold baseline-vertical-align mt-0"
+          class="primary--text font-weight-bold baseline-vertical-align mt-0 d-none d-lg-block"
           icon
           v-bind="attrs"
           v-on="on"
