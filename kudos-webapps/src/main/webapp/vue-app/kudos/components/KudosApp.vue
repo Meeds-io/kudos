@@ -399,10 +399,8 @@ export default {
       }
     },
     handler(evt) {
-      if (evt.target) {
-        if (evt.target.closest('a')) {
-          this.openSentKudos();
-        }
+      if (evt.target && evt.target.closest('a')) {
+        this.openSentKudos();
       }
     },
   }
