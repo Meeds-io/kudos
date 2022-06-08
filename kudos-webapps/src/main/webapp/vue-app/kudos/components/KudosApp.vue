@@ -60,11 +60,10 @@
               </span>
             </div>
             <div class="d-flex flex-row pt-3">
-              <span class="text-subtitle" v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosAllowed', $t(KudosAllowedInfo))"></span>
+              <span v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosAllowed', $t(KudosAllowedInfo))"></span>
             </div>
-            <div class="d-flex flex-row pt-3">
+            <div v-if="kudosSent" class="d-flex flex-row pt-3">
               <span
-                  class="text-subtitle"
                 @click="handler($event)"
                 v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosSent', $t(KudosSentInfo))"></span>
             </div>
@@ -90,7 +89,7 @@
       </template>
     </exo-drawer>
     <kudos-overview-drawer
-        ref="kudosOverviewDrawer" />
+      ref="kudosOverviewDrawer" />
   </v-app>
 </template>
 
