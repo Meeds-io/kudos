@@ -25,7 +25,7 @@
         <div
           v-show="!loading"
           ref="activityKudosForm"
-          class="flex mx-4 pt-3">
+          class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
               <div class="d-flex flex-column flex-grow">
@@ -60,11 +60,11 @@
               </span>
             </div>
             <div class="d-flex flex-row pt-3">
-              <span class="text-subtitle-1 font-weight-regular" v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosAllowed', $t(KudosAllowedInfo))"></span>
+              <span class="text-subtitle" v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosAllowed', $t(KudosAllowedInfo))"></span>
             </div>
             <div class="d-flex flex-row pt-3">
               <span
-                class="text-subtitle-1 font-weight-regular"
+                  class="text-subtitle"
                 @click="handler($event)"
                 v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosSent', $t(KudosSentInfo))"></span>
             </div>
@@ -90,8 +90,7 @@
       </template>
     </exo-drawer>
     <kudos-overview-drawer
-      v-if="currentUserId"
-      ref="kudosOverviewDrawer" />
+        ref="kudosOverviewDrawer" />
   </v-app>
 </template>
 
@@ -164,14 +163,14 @@ export default {
   computed: {
     KudosAllowedInfo() {
       return {
-        0: `<span class="primary--text">${this.numberOfKudosAllowed} ${this.$t('exoplatform.kudos.label.kudos')}</span>`,
-        1: `<span class="primary--text">${this.kudosPeriodLabel}</span>`,
+        0: `<span class="font-weight-bold">${this.numberOfKudosAllowed} ${this.$t('exoplatform.kudos.label.kudos')}</span>`,
+        1: `<span class="font-weight-bold">${this.kudosPeriodLabel}</span>`,
       };
     },
     KudosSentInfo() {
       return {
-        0: `<a class="primary--text">${this.kudosSent} ${this.$t('exoplatform.kudos.label.kudos')}</a>`,
-        1: `<span class="primary--text">${this.kudosPeriodLabel}</span>`,
+        0: `<a class="font-weight-bold primary--text">${this.kudosSent} ${this.$t('exoplatform.kudos.label.kudos')}</a>`,
+        1: `<span class="font-weight-bold">${this.kudosPeriodLabel}</span>`,
       };
     },
     kudosSent () {
