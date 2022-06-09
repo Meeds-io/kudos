@@ -25,7 +25,7 @@
         <div
           v-show="!loading"
           ref="activityKudosForm"
-          class="flex mx-4 pt-3">
+          class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row">
               <div class="d-flex flex-column flex-grow">
@@ -38,47 +38,6 @@
                     bold-title
                     link-style
                     size="32" />
-                </div>
-                <div class="d-flex flex-row">
-                  <div class="d-flex flex-column">
-                    <div class="d-flex flex-row">
-                      <span class="text-sm-caption text-sub-title">
-                        {{ $t('exooplatform.kudos.label.numberOfKudosAllowed', {0: numberOfKudosAllowed , 1: kudosPeriodLabel}) }}
-                      </span>
-                    </div>
-                    <span class="text-sm-caption text-sub-title">
-                      {{ $t('exooplatform.kudos.label.numberOfKudosSent', {0: kudosSent , 1: numberOfKudosAllowed}) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="kudosSent || remainingKudos"
-                class="flex d-flex justify-end pt-15">
-                <div v-if="numberOfKudosAllowed <= numberOfKudosToDisplay">
-                  <v-icon
-                    v-for="index in remainingKudos"
-                    :key="index"
-                    class="uiIconKudos uiIconGrey pl-1"
-                    size="20">
-                    fa-award
-                  </v-icon>
-                  <v-icon
-                    v-for="index in kudosSent"
-                    :key="index"
-                    class="uiIconKudos uiIconBlue pl-1"
-                    size="20">
-                    fa-award
-                  </v-icon>
-                </div>
-                <div v-else>
-                  <v-icon
-                    v-for="index in numberOfKudosToDisplay"
-                    :key="index"
-                    class="uiIconKudos uiIconBlue pl-1"
-                    size="20">
-                    fa-award
-                  </v-icon>
                 </div>
               </div>
             </div>
@@ -99,6 +58,14 @@
               <span class="text-sm-caption error--text">
                 {{ kudosMessageValidityLabel }}
               </span>
+            </div>
+            <div class="d-flex flex-row pt-3">
+              <span v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosAllowed', $t(KudosAllowedInfo))"></span>
+            </div>
+            <div v-if="kudosSent" class="d-flex flex-row pt-3">
+              <span
+                @click="handler($event)"
+                v-sanitized-html="$t('exooplatform.kudos.label.numberOfKudosSent', $t(KudosSentInfo))"></span>
             </div>
           </div>
         </div>
@@ -121,6 +88,8 @@
         </div>
       </template>
     </exo-drawer>
+    <kudos-overview-drawer
+      ref="kudosOverviewDrawer" />
   </v-app>
 </template>
 
@@ -159,7 +128,8 @@ export default {
       kudosPeriodType: '',
       loading: false,
       requiredField: false,
-      identity: null
+      identity: null,
+      currentUserId: eXo.env.portal.userIdentityId,
     };
   },
   watch: {
@@ -190,6 +160,18 @@ export default {
       });
   },
   computed: {
+    KudosAllowedInfo() {
+      return {
+        0: `<span class="font-weight-bold">${this.numberOfKudosAllowed} ${this.$t('exoplatform.kudos.label.kudos')}</span>`,
+        1: `<span class="font-weight-bold">${this.kudosPeriodLabel}</span>`,
+      };
+    },
+    KudosSentInfo() {
+      return {
+        0: `<a class="font-weight-bold primary--text">${this.kudosSent} ${this.$t('exoplatform.kudos.label.kudos')}</a>`,
+        1: `<span class="font-weight-bold">${this.kudosPeriodLabel}</span>`,
+      };
+    },
     kudosSent () {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
@@ -239,7 +221,7 @@ export default {
 
           // Get Kudos in an async way
           const limit = Math.max(20, window.kudosSettings.kudosPerPeriod);
-          getKudosSent(eXo.env.portal.userIdentityId, limit)
+          getKudosSent(this.currentUserId, limit)
             .then(allKudos => {
               this.allKudosSent = allKudos && allKudos.kudos || [];
             });
@@ -409,6 +391,16 @@ export default {
     },
     escapeCharacters(value) {
       return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();
+    },
+    openSentKudos() {
+      if (this.currentUserId) {
+        this.$refs.kudosOverviewDrawer.open(this.$t('exoplatform.kudos.button.sentKudos'), 'sent', this.currentUserId, this.kudosPeriodType);
+      }
+    },
+    handler(evt) {
+      if (evt.target && evt.target.closest('a')) {
+        this.openSentKudos();
+      }
     },
   }
 };
