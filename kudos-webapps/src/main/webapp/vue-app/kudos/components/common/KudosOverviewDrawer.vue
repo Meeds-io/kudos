@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {getKudosSent, getKudosReceived} from '../../js/Kudos.js'; 
+import {getKudosSent, getKudosReceived} from '../../../js/Kudos.js';
 
 export default {
   data: () => ({
