@@ -202,6 +202,11 @@ export function registerActivityReactionTabs() {
     vueComponent: Vue.options.components['activity-kudos-reaction-list'],
     rank: 2,
   });
+  extensionRegistry.registerComponent('ActivityReactionsCount', 'activity-reaction-count', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['activity-kudos-reaction-count'],
+    rank: 1,
+  });
 }
 
 export function registerActivityActionExtension() {
