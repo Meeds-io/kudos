@@ -21,7 +21,7 @@
     v-if="kudosNumber>0"
     class="my-1 me-2 KudosNumber"
     @click="openKudosList">
-    {{ kudosNumber }} Kudos</a>
+    {{ kudosNumber }} {{ $t('exoplatform.kudos.label.kudos') }}</a>
 </template>
 
 <script>
