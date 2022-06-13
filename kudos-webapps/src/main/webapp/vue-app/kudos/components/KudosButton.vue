@@ -101,6 +101,9 @@ export default {
     isComment() {
       return !!this.comment;
     },
+    spaceURL() {
+      return this.activity && this.activity.activityStream && this.activity.activityStream.space && this.activity.activityStream.space.prettyName;
+    },
     kudosCount() {
       return this.linkedKudosList.length;
     },
@@ -168,6 +171,7 @@ export default {
         parentId: this.parentId,
         type: this.entityType,
         owner: this.entityOwner,
+        spaceURL: this.spaceURL
       }}));
     },
     openKudosList(event) {
