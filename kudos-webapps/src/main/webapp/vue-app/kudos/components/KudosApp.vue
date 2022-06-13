@@ -27,12 +27,12 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row">
-              <div class="d-flex flex-column flex-grow">
-                <span class="text-header-title my-auto mt-7 text-no-wrap">{{ $t('exoplatform.kudos.content.to') }} </span>
-              </div>
-              <div class="d-flex flex-column pr-2 pl-5 pt-3">
-                <div class="pt-3">
+            <div class="d-flex flex-row pt-5">
+              <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
+            </div>
+            <div v-if="!isEditReceiver" @click="openSuggester">
+              <div class="d-flex flex-column pr-2 pl-5 mt-2 outlined">
+                <div class="py-2">
                   <exo-user-avatar
                     :identity="identity"
                     bold-title
@@ -41,6 +41,17 @@
                 </div>
               </div>
             </div>
+            <div v-else class="d-flex flex-row pt-3">
+              <exo-identity-suggester
+                ref="invitedAttendeeAutoComplete"
+                id="invitedAttendeeAutoComplete"
+                v-model="selectedReceiver"
+                :search-options="searchOptions"
+                type-of-relations="member_of_space"
+                name="inviteAttendee"
+                include-users />
+            </div>
+
             <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
@@ -130,6 +141,9 @@ export default {
       requiredField: false,
       identity: null,
       currentUserId: eXo.env.portal.userIdentityId,
+      selectedReceiver: {},
+      isEditReceiver: false,
+      spaceURL: null
     };
   },
   watch: {
@@ -147,6 +161,21 @@ export default {
     kudosMessageText(newVal, oldVal) {
       this.requiredField = oldVal && oldVal !== '' && newVal === '';
     },
+    selectedReceiver(selectedReceiver) {
+      if (selectedReceiver) {
+        this.isEditReceiver = false;
+        this.receiverId = selectedReceiver.remoteId;
+        this.identity = {
+          avatar: selectedReceiver.profile.avatarUrl,
+          external: selectedReceiver.profile.external,
+          fullname: selectedReceiver.profile.fullName,
+          id: selectedReceiver.remoteId,
+          identityId: selectedReceiver.identityId,
+          isUserType: true,
+          type: 'user',
+          username: selectedReceiver.remoteId};
+      }
+    }
   },
   created() {
     this.init()
@@ -158,8 +187,20 @@ export default {
 
         document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
       });
+    // Close user suggester list when clicking outside
+    $(document).on('click', (e) => {
+      if (e.target && !$(e.target).parents(`.${this.invitedAttendeeAutoComplete}`).length && this.selectedReceiver) {
+        this.isEditReceiver = false;
+      }
+    });
   },
   computed: {
+    searchOptions() {
+      return {
+        currentUser: eXo.env.portal.userName,
+        spaceURL: this.spaceURL
+      };
+    },
     KudosAllowedInfo() {
       return {
         0: `<span class="font-weight-bold">${this.numberOfKudosAllowed} ${this.$t('exoplatform.kudos.label.kudos')}</span>`,
@@ -205,6 +246,9 @@ export default {
     kudosMessageValidityLabel() {
       return this.requiredFieldLabel || this.atLeastThreeWordsLabel;
     },
+    canChangeReceiver() {
+      return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
+    }
   },
   methods: {
     init() {
@@ -247,7 +291,18 @@ export default {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
-                  this.identity = receiverDetails;
+                  this.selectedReceiver = {
+                    receiverId: receiverDetails.id,
+                    id: `organization:${receiverDetails.id}`,
+                    identityId: receiverDetails.identityId,
+                    profile: {
+                      fullName: receiverDetails.fullname,
+                      avatarUrl: receiverDetails.avatar,
+                      external: receiverDetails.external === 'true',
+                    },
+                    providerId: 'organization',
+                    remoteId: receiverDetails.id
+                  };
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
                   const receiverId = receiverDetails.id;
@@ -318,6 +373,7 @@ export default {
             this.entityOwner = event && event.detail && event.detail.owner;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
+            this.spaceURL = event && event.detail && event.detail.spaceURL;
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer().then(() => {
@@ -400,6 +456,15 @@ export default {
     handler(evt) {
       if (evt.target && evt.target.closest('a')) {
         this.openSentKudos();
+      }
+    },
+    openSuggester(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (this.canChangeReceiver) {
+        this.isEditReceiver = true;
       }
     },
   }
