@@ -202,11 +202,12 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     }
 
     kudos.setTimeInSeconds(timeToSeconds(LocalDateTime.now()));
-    kudos = kudosStorage.createKudos(kudos);
+    Kudos createdKudos = kudosStorage.createKudos(kudos);
+    createdKudos.setSpacePrettyName(kudos.getSpacePrettyName());
 
-    listenerService.broadcast(KUDOS_SENT_EVENT, this, kudos);
+    listenerService.broadcast(KUDOS_SENT_EVENT, this, createdKudos);
 
-    return kudos;
+    return createdKudos;
   }
 
   /**
