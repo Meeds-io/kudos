@@ -83,6 +83,9 @@ public class KudosEntity implements Serializable {
   @Column(name = "CREATED_DATE", nullable = false)
   public long               createdDate;
 
+  @Column(name = "SPACE_PRETTY_NAME")
+  private String            spacePrettyName;
+
   public Long getId() {
     return id;
   }
@@ -163,4 +166,11 @@ public class KudosEntity implements Serializable {
     this.activityId = activityId;
   }
 
+  public String getSpacePrettyName() {
+    return spacePrettyName;
+  }
+
+  public void setSpacePrettyName(String spacePrettyName) {
+    this.spacePrettyName = spacePrettyName;
+  }
 }

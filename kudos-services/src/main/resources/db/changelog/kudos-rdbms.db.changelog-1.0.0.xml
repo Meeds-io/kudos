@@ -101,4 +101,10 @@
     <createSequence sequenceName="SEQ_ADDONS_KUDOS_ID" startValue="1"/>
   </changeSet>
 
+  <changeSet author="kudos" id="1.3.0-10">
+    <addColumn tableName="ADDONS_KUDOS">
+      <column name="SPACE_PRETTY_NAME" type="NVARCHAR(200)" />
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

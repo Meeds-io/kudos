@@ -159,8 +159,19 @@
   .clickable {
     cursor: pointer;
   }
-  .outlined {
-    border: 1px solid @borderColor;
+
+  .kudosReceiverAttendeeItem {
+    width: 100%;
+
+    .identitySuggesterInputStyle {
+      width: inherit;
+    }
+  }
+  .identitySuggesterItem {
+    background-color: @primaryColorLight ;
+    border: 1px solid @primaryDarkerColorGradientEnd ;
+    color: @btnPrimaryColor ;
+    width: max-content;
   }
 }
 
