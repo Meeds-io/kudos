@@ -246,15 +246,6 @@ export function registerActivityActionExtension() {
       },
       getSourceLink: () => '#',
       getActivityType: () => 'kudos',
-      getReceiver: activityOrComment =>{
-        const kudos = activityOrComment && activityOrComment.kudos;
-        return {
-          'username': kudos.receiverId,
-          'fullname': kudos.receiverFullName,
-          'position': kudos.receiverPosition,
-          'external': kudos.externalReceiver,
-        };
-      },
       getTitle: activityOrComment => {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
