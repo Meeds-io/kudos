@@ -258,7 +258,7 @@ export function registerActivityActionExtension() {
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: receiverIdentity
+              0: receiverIdentity.fullname
             },
           };
         }
