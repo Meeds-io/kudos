@@ -250,15 +250,17 @@ export function registerActivityActionExtension() {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
           const receiverIdentity = {
+            'id': kudos.receiverIdentityId,
             'username': kudos.receiverId,
-            'fullname': kudos.receiverFullName,
+            'fullName': kudos.receiverFullName,
+            'avatar': kudos.receiverAvatar,
             'position': kudos.receiverPosition,
-            'external': kudos.externalReceiver,
+            'external': String(kudos.externalReceiver),
           };
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: receiverIdentity.fullname
+              0: `<a href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}" v-identity-popover="${JSON.stringify(receiverIdentity).replace(/"/g, '\'')}">${kudos.receiverFullName}</a>`
             },
           };
         }
