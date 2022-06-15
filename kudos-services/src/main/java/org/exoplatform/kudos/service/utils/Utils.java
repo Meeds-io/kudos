@@ -146,7 +146,6 @@ public class Utils {
     }
     kudos.setEntityType(KudosEntityType.values()[kudosEntity.getEntityType()].name());
     kudos.setTimeInSeconds(kudosEntity.getCreatedDate());
-    kudos.setSpacePrettyName(kudosEntity.getSpacePrettyName());
 
     if (kudosEntity.isReceiverUser()) {
       Identity receiverIdentity = getIdentityById(kudosEntity.getReceiverId());
@@ -186,7 +185,6 @@ public class Utils {
     kudosEntity.setMessage(kudos.getMessage());
     kudosEntity.setEntityId(Long.parseLong(kudos.getEntityId()));
     kudosEntity.setActivityId(kudos.getActivityId());
-    kudosEntity.setSpacePrettyName(kudos.getSpacePrettyName());
     if (StringUtils.isNoneBlank(kudos.getParentEntityId())) {
       kudosEntity.setParentEntityId(Long.parseLong(kudos.getParentEntityId()));
     }
