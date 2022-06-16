@@ -27,31 +27,41 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-5">
+            <div class="d-flex flex-row pt-5 align-center">
               <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
-            </div>
-            <div v-if="!isEditReceiver" @click="openSuggester">
-              <div class="d-flex flex-column pr-2 pl-5 mt-2 outlined">
-                <div class="py-2">
-                  <exo-user-avatar
-                    :identity="identity"
-                    bold-title
-                    link-style
-                    size="32" />
-                </div>
+              <div
+                class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
+                <exo-identity-suggester
+                  ref="kudosReceiverAutoComplete"
+                  id="kudosReceiverAutoComplete"
+                  v-model="selectedReceiver"
+                  width="220"
+                  class="user-suggester"
+                  :search-options="searchOptions"
+                  :disabled="!isLinkedKudos"
+                  type-of-relations="member_of_space"
+                  name="kudosReceiver"
+                  include-users />
               </div>
             </div>
-            <div v-else class="d-flex flex-row pt-3">
-              <exo-identity-suggester
-                ref="invitedAttendeeAutoComplete"
-                id="invitedAttendeeAutoComplete"
-                v-model="selectedReceiver"
-                :search-options="searchOptions"
-                type-of-relations="member_of_space"
-                name="inviteAttendee"
-                include-users />
+            <div v-if="!isLinkedKudos">
+              <div class="d-flex flex-row pt-5">
+                <span class="text-header-title">{{ $t('exoplatform.kudos.choose.audience') }} </span>
+              </div>
+              <div class="d-flex flex-row pt-3">
+                <exo-identity-suggester
+                  ref="audienceSuggester"
+                  v-model="audience"
+                  :labels="spaceSuggesterLabels"
+                  :include-users="false"
+                  :width="220"
+                  name="audienceAutocomplete"
+                  class="user-suggester"
+                  include-spaces
+                  only-redactor
+                  required />
+              </div>
             </div>
-
             <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
@@ -141,9 +151,10 @@ export default {
       requiredField: false,
       identity: null,
       currentUserId: eXo.env.portal.userIdentityId,
-      selectedReceiver: {},
+      selectedReceiver: null,
       isEditReceiver: false,
-      spaceURL: null
+      spaceURL: null,
+      audience: ''
     };
   },
   watch: {
@@ -201,6 +212,13 @@ export default {
         spaceURL: this.spaceURL
       };
     },
+    spaceSuggesterLabels() {
+      return {
+        searchPlaceholder: this.$t('exoplatform.kudos.audience.searchPlaceholder'),
+        placeholder: this.$t('exoplatform.kudos.audience.placeholder'),
+        noDataLabel: this.$t('exoplatform.kudos.audience.noDataLabel'),
+      };
+    },
     KudosAllowedInfo() {
       return {
         0: `<span class="font-weight-bold">${this.numberOfKudosAllowed} ${this.$t('exoplatform.kudos.label.kudos')}</span>`,
@@ -246,7 +264,7 @@ export default {
     kudosMessageValidityLabel() {
       return this.requiredFieldLabel || this.atLeastThreeWordsLabel;
     },
-    canChangeReceiver() {
+    isLinkedKudos() {
       return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
     }
   },
@@ -402,7 +420,8 @@ export default {
         parentEntityId: this.parentEntityId,
         receiverType: this.receiverType,
         receiverId: this.receiverId,
-        message: this.kudosMessage
+        message: this.kudosMessage,
+        spacePrettyName: this.audience?.remoteId
       };
       sendKudos(kudos)
         .then(kudosSent => {
@@ -445,9 +464,6 @@ export default {
       }
       return parseInt(remainingDateInMillis / 86400000) + 1;
     },
-    escapeCharacters(value) {
-      return value.replace(/((\r\n)|\n|\r)/g, '').replace(/(\.|,|\?|!)/g, ' ').replace(/( )+/g, ' ').trim();
-    },
     openSentKudos() {
       if (this.currentUserId) {
         this.$refs.kudosOverviewDrawer.open(this.$t('exoplatform.kudos.button.sentKudos'), 'sent', this.currentUserId, this.kudosPeriodType);
@@ -456,15 +472,6 @@ export default {
     handler(evt) {
       if (evt.target && evt.target.closest('a')) {
         this.openSentKudos();
-      }
-    },
-    openSuggester(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      if (this.canChangeReceiver) {
-        this.isEditReceiver = true;
       }
     },
   }

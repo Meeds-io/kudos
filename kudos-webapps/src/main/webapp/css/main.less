@@ -159,8 +159,29 @@
   .clickable {
     cursor: pointer;
   }
-  .outlined {
-    border: 1px solid @borderColor;
+
+  .v-autocomplete.identitySuggester {
+    width: 100%;
+
+    &.identitySuggester {
+      margin-bottom: 0 !important;
+    }
+
+    .v-input__slot {
+      margin: auto !important;
+    }
+
+    .v-select__selections {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      overflow: hidden;
+      margin: auto;
+      display: flex !important;
+    }
+
+    input {
+      padding: 0;
+    }
   }
 }
 

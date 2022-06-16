@@ -48,6 +48,9 @@ public class Kudos implements Serializable {
   private long              timeInSeconds;
 
   @Exclude
+  private String            spacePrettyName;
+
+  @Exclude
   private long              activityId;
 
 }
