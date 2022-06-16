@@ -2,6 +2,7 @@ package org.exoplatform.kudos.listener;
 
 import static org.exoplatform.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.service.KudosService;
@@ -77,13 +78,18 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     } else {
       ExoSocialActivity activity = createActivity(kudos, null);
       String providerId = OrganizationIdentityProvider.NAME;
-      if (SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType())) {
+      String remoteId = kudos.getReceiverId();
+      boolean isSpaceActivity = StringUtils.isNotBlank(kudos.getSpacePrettyName());
+      if (SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType()) || isSpaceActivity) {
         providerId = SpaceIdentityProvider.NAME;
+        if (isSpaceActivity) {
+          remoteId = kudos.getSpacePrettyName();
+        }
       }
 
-      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, kudos.getReceiverId());
+      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, remoteId);
       if (owner == null) {
-        LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), kudos.getReceiverId());
+        LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), remoteId);
       } else {
         activityManager.saveActivityNoReturn(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(),
