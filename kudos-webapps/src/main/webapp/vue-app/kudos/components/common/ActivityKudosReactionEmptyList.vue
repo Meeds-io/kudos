@@ -1,5 +1,5 @@
 <template>
-  <div class="no-kudos-block flex flex-column align-center text-sub-title pt-12">
+  <div class="no-kudos-block flex d-flex flex-column align-center text-sub-title pt-12">
     <v-icon
       class="text-sub-title"
       size="64">
