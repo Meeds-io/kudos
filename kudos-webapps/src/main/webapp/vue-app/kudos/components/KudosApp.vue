@@ -421,7 +421,7 @@ export default {
         receiverType: this.receiverType,
         receiverId: this.receiverId,
         message: this.kudosMessage,
-        spacePrettyName: this.audience?.spaceId
+        spacePrettyName: this.audience?.remoteId
       };
       sendKudos(kudos)
         .then(kudosSent => {
