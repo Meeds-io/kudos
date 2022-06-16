@@ -85,6 +85,17 @@
                   required />
               </div>
             </div>
+            <div v-else class="d-flex flex-row pt-3">
+              <exo-identity-suggester
+                ref="invitedAttendeeAutoComplete"
+                id="invitedAttendeeAutoComplete"
+                v-model="selectedReceiver"
+                :search-options="searchOptions"
+                type-of-relations="member_of_space"
+                name="inviteAttendee"
+                include-users />
+            </div>
+
             <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
@@ -511,6 +522,15 @@ export default {
         }
       }, 200);
     }
+    openSuggester(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (this.canChangeReceiver) {
+        this.isEditReceiver = true;
+      }
+    },
   }
 };
 </script>
