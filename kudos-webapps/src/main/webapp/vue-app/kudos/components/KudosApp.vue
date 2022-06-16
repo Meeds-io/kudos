@@ -29,41 +29,18 @@
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row pt-5 align-center">
               <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
-              <div v-if="!isLinkedKudos" class="d-flex pr-2 pl-5">
-                <v-chip
-                  class="identitySuggesterItem me-4">
-                  <v-avatar left>
-                    <v-img :src="receiverAvatarUrl" />
-                  </v-avatar>
-                  <span class="text-truncate">
-                    {{ receiverFullName }}
-                  </span>
-                </v-chip>
-              </div>
               <div
-                v-else
-                class="d-flex flex-row pl-4 kudosReceiverAttendeeItem">
-                <div v-if="selectedReceiver" class="d-flex pr-2 pl-2 my-3 identitySuggesterInputStyle">
-                  <v-chip
-                    close
-                    @click:close="removeReceiver"
-                    class="identitySuggesterItem me-4 mt-2 mb-1">
-                    <v-avatar left>
-                      <v-img :src="receiverAvatarUrl" />
-                    </v-avatar>
-                    <span class="text-truncate">
-                      {{ receiverFullName }}
-                    </span>
-                  </v-chip>
-                </div>
+                class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
                 <exo-identity-suggester
-                  v-else
-                  ref="invitedAttendeeAutoComplete"
-                  id="invitedAttendeeAutoComplete"
+                  ref="kudosReceiverAutoComplete"
+                  id="kudosReceiverAutoComplete"
                   v-model="selectedReceiver"
+                  width="220"
+                  class="user-suggester"
                   :search-options="searchOptions"
+                  :disabled="!isLinkedKudos"
                   type-of-relations="member_of_space"
-                  name="inviteAttendee"
+                  name="kudosReceiver"
                   include-users />
               </div>
             </div>
@@ -73,29 +50,18 @@
               </div>
               <div class="d-flex flex-row pt-3">
                 <exo-identity-suggester
-                  ref="calendarOwnerSuggester"
+                  ref="audienceSuggester"
                   v-model="audience"
                   :labels="spaceSuggesterLabels"
                   :include-users="false"
                   :width="220"
-                  name="calendarOwnerAutocomplete"
-                  class="user-suggester calendarOwnerAutocomplete"
+                  name="audienceAutocomplete"
+                  class="user-suggester"
                   include-spaces
                   only-redactor
                   required />
               </div>
             </div>
-            <div v-else class="d-flex flex-row pt-3">
-              <exo-identity-suggester
-                ref="invitedAttendeeAutoComplete"
-                id="invitedAttendeeAutoComplete"
-                v-model="selectedReceiver"
-                :search-options="searchOptions"
-                type-of-relations="member_of_space"
-                name="inviteAttendee"
-                include-users />
-            </div>
-
             <div class="d-flex flex-row pt-5">
               <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
@@ -240,12 +206,6 @@ export default {
     });
   },
   computed: {
-    receiverFullName() {
-      return this.selectedReceiver?.profile?.fullName;
-    },
-    receiverAvatarUrl() {
-      return this.selectedReceiver?.profile?.avatarUrl;
-    },
     searchOptions() {
       return {
         currentUser: eXo.env.portal.userName,
@@ -512,23 +472,6 @@ export default {
     handler(evt) {
       if (evt.target && evt.target.closest('a')) {
         this.openSentKudos();
-      }
-    },
-    removeReceiver() {
-      this.selectedReceiver = null;
-      window.setTimeout(() => {
-        if (this.$refs.invitedAttendeeAutoComplete){
-          this.$refs.invitedAttendeeAutoComplete.focus();
-        }
-      }, 200);
-    }
-    openSuggester(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      if (this.canChangeReceiver) {
-        this.isEditReceiver = true;
       }
     },
   }
