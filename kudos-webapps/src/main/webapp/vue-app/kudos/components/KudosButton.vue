@@ -179,7 +179,7 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
-      document.dispatchEvent(new CustomEvent(`open-reaction-drawer-selected-tab-${this.activityId}`, {detail: {
+      document.dispatchEvent(new CustomEvent('open-reaction-drawer-selected-tab', {detail: {
         activityId: this.isComment ? this.commentId : this.activityId,
         tab: 'kudos',
         activityType: this.entityType
