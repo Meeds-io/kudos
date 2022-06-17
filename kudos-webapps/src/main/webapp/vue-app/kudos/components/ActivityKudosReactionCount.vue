@@ -49,7 +49,7 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
-      document.dispatchEvent(new CustomEvent(`open-reaction-drawer-selected-tab-${this.activity.id}`, {detail: {
+      document.dispatchEvent(new CustomEvent('open-reaction-drawer-selected-tab', {detail: {
         activityId: this.activity.id,
         tab: 'kudos',
         activityType: 'ACTIVITY'
