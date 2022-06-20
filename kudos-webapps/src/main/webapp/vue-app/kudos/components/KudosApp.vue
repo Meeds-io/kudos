@@ -158,7 +158,6 @@ export default {
       identity: null,
       currentUserId: eXo.env.portal.userIdentityId,
       selectedReceiver: null,
-      isEditReceiver: false,
       spaceURL: null,
       audience: ''
     };
@@ -180,7 +179,6 @@ export default {
     },
     selectedReceiver(selectedReceiver) {
       if (selectedReceiver) {
-        this.isEditReceiver = false;
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
           this.$root.$emit('kudos-notification-alert', {
@@ -201,12 +199,6 @@ export default {
 
         document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
       });
-    // Close user suggester list when clicking outside
-    $(document).on('click', (e) => {
-      if (e.target && !$(e.target).parents(`.${this.invitedAttendeeAutoComplete}`).length && this.selectedReceiver) {
-        this.isEditReceiver = false;
-      }
-    });
   },
   computed: {
     searchOptions() {
