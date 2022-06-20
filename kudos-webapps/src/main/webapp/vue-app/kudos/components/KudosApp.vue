@@ -6,7 +6,6 @@
     class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
-    <kudos-notification-alert />
 
     <exo-drawer
       ref="activityKudosDrawer"
@@ -181,10 +180,7 @@ export default {
       if (selectedReceiver) {
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
-          this.$root.$emit('kudos-notification-alert', {
-            message: this.$t('exoplatform.kudos.success.receiverChanged'),
-            type: 'success',
-          });
+          this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
         }
       }
     }
@@ -402,10 +398,10 @@ export default {
           });
         }
         else {
-          this.$root.$emit('kudos-notification-alert', {
-            message: this.$t('exoplatform.kudos.info.noKudosLeft', {0: this.remainingDaysToReset, 1: this.remainingPeriodLabel}),
-            type: 'warning',
-          });
+          this.displayAlert(this.$t('exoplatform.kudos.info.noKudosLeft', {
+            0: this.remainingDaysToReset,
+            1: this.remainingPeriodLabel
+          }), 'warning');
         }
       }
     },
@@ -442,10 +438,7 @@ export default {
         .then(() => {
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
-            this.$root.$emit('kudos-notification-alert', {
-              message: this.$t('exoplatform.kudos.success.kudosSent'),
-              type: 'success',
-            });
+            this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
           }
         })
         .catch(e => {
@@ -472,6 +465,12 @@ export default {
       if (evt.target && evt.target.closest('a')) {
         this.openSentKudos();
       }
+    },
+    displayAlert(message, type) {
+      document.dispatchEvent(new CustomEvent('notification-alert', {detail: {
+        message,
+        type: type || 'success',
+      }}));
     },
   }
 };
