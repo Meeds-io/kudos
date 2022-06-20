@@ -6,7 +6,6 @@
     class="VuetifyApp"
     flat>
     <kudos-api ref="kudosAPI" />
-    <kudos-notification-alert />
 
     <exo-drawer
       ref="activityKudosDrawer"
@@ -158,7 +157,6 @@ export default {
       identity: null,
       currentUserId: eXo.env.portal.userIdentityId,
       selectedReceiver: null,
-      isEditReceiver: false,
       spaceURL: null,
       audience: ''
     };
@@ -180,17 +178,10 @@ export default {
     },
     selectedReceiver(selectedReceiver) {
       if (selectedReceiver) {
-        this.isEditReceiver = false;
-        this.receiverId = selectedReceiver.remoteId;
-        this.identity = {
-          avatar: selectedReceiver.profile.avatarUrl,
-          external: selectedReceiver.profile.external,
-          fullname: selectedReceiver.profile.fullName,
-          id: selectedReceiver.remoteId,
-          identityId: selectedReceiver.identityId,
-          isUserType: true,
-          type: 'user',
-          username: selectedReceiver.remoteId};
+        if (this.receiverId !== selectedReceiver.remoteId) {
+          this.receiverId = selectedReceiver.remoteId;
+          this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
+        }
       }
     }
   },
@@ -204,12 +195,6 @@ export default {
 
         document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
       });
-    // Close user suggester list when clicking outside
-    $(document).on('click', (e) => {
-      if (e.target && !$(e.target).parents(`.${this.invitedAttendeeAutoComplete}`).length && this.selectedReceiver) {
-        this.isEditReceiver = false;
-      }
-    });
   },
   computed: {
     searchOptions() {
@@ -315,18 +300,22 @@ export default {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
-                  this.selectedReceiver = {
-                    receiverId: receiverDetails.id,
-                    id: `organization:${receiverDetails.id}`,
-                    identityId: receiverDetails.identityId,
-                    profile: {
-                      fullName: receiverDetails.fullname,
-                      avatarUrl: receiverDetails.avatar,
-                      external: receiverDetails.external === 'true',
-                    },
-                    providerId: 'organization',
-                    remoteId: receiverDetails.id
-                  };
+                  if (this.isLinkedKudos) {
+                    this.selectedReceiver = {
+                      receiverId: receiverDetails.id,
+                      id: `organization:${receiverDetails.id}`,
+                      identityId: receiverDetails.identityId,
+                      profile: {
+                        fullName: receiverDetails.fullname,
+                        avatarUrl: receiverDetails.avatar,
+                        external: receiverDetails.external === 'true',
+                      },
+                      providerId: 'organization',
+                      remoteId: receiverDetails.id
+                    };
+                  } else {
+                    this.identity = receiverDetails;
+                  }
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
                   const receiverId = receiverDetails.id;
@@ -409,10 +398,10 @@ export default {
           });
         }
         else {
-          this.$root.$emit('kudos-notification-alert', {
-            message: this.$t('exoplatform.kudos.info.noKudosLeft', {0: this.remainingDaysToReset, 1: this.remainingPeriodLabel}),
-            type: 'warning',
-          });
+          this.displayAlert(this.$t('exoplatform.kudos.info.noKudosLeft', {
+            0: this.remainingDaysToReset,
+            1: this.remainingPeriodLabel
+          }), 'warning');
         }
       }
     },
@@ -449,10 +438,7 @@ export default {
         .then(() => {
           this.$refs.activityKudosDrawer.close();
           if (this.entityType === 'COMMENT') {
-            this.$root.$emit('kudos-notification-alert', {
-              message: this.$t('exoplatform.kudos.success.kudosSent'),
-              type: 'success',
-            });
+            this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
           }
         })
         .catch(e => {
@@ -479,6 +465,12 @@ export default {
       if (evt.target && evt.target.closest('a')) {
         this.openSentKudos();
       }
+    },
+    displayAlert(message, type) {
+      document.dispatchEvent(new CustomEvent('notification-alert', {detail: {
+        message,
+        type: type || 'success',
+      }}));
     },
   }
 };
