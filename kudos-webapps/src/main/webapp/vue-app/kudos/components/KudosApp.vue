@@ -181,16 +181,13 @@ export default {
     selectedReceiver(selectedReceiver) {
       if (selectedReceiver) {
         this.isEditReceiver = false;
-        this.receiverId = selectedReceiver.remoteId;
-        this.identity = {
-          avatar: selectedReceiver.profile.avatarUrl,
-          external: selectedReceiver.profile.external,
-          fullname: selectedReceiver.profile.fullName,
-          id: selectedReceiver.remoteId,
-          identityId: selectedReceiver.identityId,
-          isUserType: true,
-          type: 'user',
-          username: selectedReceiver.remoteId};
+        if (this.receiverId !== selectedReceiver.remoteId) {
+          this.receiverId = selectedReceiver.remoteId;
+          this.$root.$emit('kudos-notification-alert', {
+            message: this.$t('exoplatform.kudos.success.receiverChanged'),
+            type: 'success',
+          });
+        }
       }
     }
   },
@@ -315,18 +312,22 @@ export default {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
                 if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
-                  this.selectedReceiver = {
-                    receiverId: receiverDetails.id,
-                    id: `organization:${receiverDetails.id}`,
-                    identityId: receiverDetails.identityId,
-                    profile: {
-                      fullName: receiverDetails.fullname,
-                      avatarUrl: receiverDetails.avatar,
-                      external: receiverDetails.external === 'true',
-                    },
-                    providerId: 'organization',
-                    remoteId: receiverDetails.id
-                  };
+                  if (this.isLinkedKudos) {
+                    this.selectedReceiver = {
+                      receiverId: receiverDetails.id,
+                      id: `organization:${receiverDetails.id}`,
+                      identityId: receiverDetails.identityId,
+                      profile: {
+                        fullName: receiverDetails.fullname,
+                        avatarUrl: receiverDetails.avatar,
+                        external: receiverDetails.external === 'true',
+                      },
+                      providerId: 'organization',
+                      remoteId: receiverDetails.id
+                    };
+                  } else {
+                    this.identity = receiverDetails;
+                  }
                   this.receiverId = receiverDetails.id;
                   this.receiverType = receiverDetails.type;
                   const receiverId = receiverDetails.id;
