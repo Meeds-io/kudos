@@ -30,6 +30,7 @@
             <div class="d-flex flex-row pt-5 align-center">
               <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
               <div
+                v-if="isLinkedKudos"
                 class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
                 <exo-identity-suggester
                   ref="kudosReceiverAutoComplete"
@@ -38,17 +39,22 @@
                   width="220"
                   class="user-suggester"
                   :search-options="searchOptions"
-                  :disabled="!isLinkedKudos"
                   type-of-relations="member_of_space"
                   name="kudosReceiver"
                   include-users />
               </div>
+              <exo-user-avatar
+                v-else
+                class="d-flex flex-row pl-4"
+                :identity="identity"
+                :size="32"
+                :popover="false" />
             </div>
             <div v-if="!isLinkedKudos">
               <div class="d-flex flex-row pt-5">
                 <span class="text-header-title">{{ $t('exoplatform.kudos.choose.audience') }} </span>
               </div>
-              <div class="d-flex flex-row pt-3">
+              <div class="d-flex flex-row">
                 <exo-identity-suggester
                   ref="audienceSuggester"
                   v-model="audience"
