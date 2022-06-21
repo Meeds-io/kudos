@@ -27,7 +27,7 @@
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
             <div class="d-flex flex-row pt-5 align-center">
-              <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
+              <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
               <div
                 v-if="isLinkedKudos"
                 class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
