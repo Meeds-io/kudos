@@ -26,29 +26,34 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-5 align-center">
-              <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
-              <div
-                v-if="isLinkedKudos"
-                class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
-                <exo-identity-suggester
-                  ref="kudosReceiverAutoComplete"
-                  id="kudosReceiverAutoComplete"
-                  v-model="selectedReceiver"
-                  width="220"
-                  class="user-suggester"
-                  :search-options="searchOptions"
-                  :type-of-relations="typeOfRelation"
-                  name="kudosReceiver"
-                  include-users />
-              </div>
-              <exo-user-avatar
-                v-else
-                class="d-flex flex-row pl-4"
-                :identity="identity"
-                :size="32"
-                :popover="false" />
-            </div>
+            <v-row class="pt-3">
+              <v-col
+                class="my-auto col-auto">
+                <span class="text-header-title">{{ $t('exoplatform.kudos.content.to') }}</span>
+              </v-col>
+              <v-col
+                class="d-flex flex-row flex-nowrap py-0">
+                <div
+                  v-if="isLinkedKudos"
+                  class="mb-2">
+                  <exo-identity-suggester
+                    ref="kudosReceiverAutoComplete"
+                    id="kudosReceiverAutoComplete"
+                    v-model="selectedReceiver"
+                    class="user-suggester"
+                    :search-options="searchOptions"
+                    type-of-relations="member_of_space"
+                    name="kudosReceiver"
+                    include-users />
+                </div>
+                <exo-user-avatar
+                  v-else
+                  class="d-flex flex-row"
+                  :identity="identity"
+                  :size="32"
+                  :popover="false" />
+              </v-col>
+            </v-row>
             <div v-if="!isLinkedKudos">
               <div class="d-flex flex-row pt-5">
                 <span class="text-header-title">{{ $t('exoplatform.kudos.choose.audience') }} </span>
