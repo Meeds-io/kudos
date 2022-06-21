@@ -4,6 +4,7 @@
       <div
         v-bind="attrs"
         v-on="on">
+        <div v-if="enabled">        
         <v-btn
           :ripple="false"
           icon
@@ -12,6 +13,7 @@
           <v-icon size="18">fas fa-award</v-icon>
         </v-btn>
       </div>
+      </div>      
     </template>
     <span>
       {{ $t('exoplatform.kudos.title.sendAKudos') }}
@@ -29,7 +31,16 @@ export default {
       type: String,
       default: ''
     },
+    identityEnabled: {
+      type: String,
+      default: '',
+    },      
   },
+  computed: {
+    enabled() {      
+      return this.identityEnabled;
+    }
+  },    
   methods: {
     sendKudos(event) {
       event.preventDefault();

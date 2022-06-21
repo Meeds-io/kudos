@@ -10,7 +10,7 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :disabled="buttonDisabled"
+            :disabled="buttonDisabled === 'same' || buttonDisabled === 'disabled'"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
+        {{ buttonDisabled === 'same'&& $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || buttonDisabled === 'disabled' && $t('exoplatform.kudos.title.sendAKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -118,11 +118,19 @@ export default {
     },
     buttonDisabled() {
       if (this.comment) {
-        const commentOwnerId = this.comment.identity && this.comment.identity.id;
-        return commentOwnerId === eXo.env.portal.userIdentityId;
+        const commentOwnerId = this.comment.identity && this.comment.identity.id; 
+        if (commentOwnerId === eXo.env.portal.userIdentityId) {
+          return 'same'; 
+        } else if (!this.comment.identity.profile.dataEntity.enabled){
+          return 'disabled';        
+        }
       } else if (this.activity) {
-        const activityOwnerId = this.activity.identity && this.activity.identity.id;
-        return activityOwnerId === eXo.env.portal.userIdentityId;
+        const activityOwnerId = this.activity.identity && this.activity.identity.id; 
+        if (activityOwnerId === eXo.env.portal.userIdentityId){
+          return 'same';
+        } else if (!this.activity.identity.profile.dataEntity.enabled){
+          return 'disabled';        
+        }
       }
       return false;
     },

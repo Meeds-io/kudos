@@ -267,6 +267,7 @@ export function registerActivityActionExtension() {
             'fullName': kudos.receiverFullName,
             'avatar': kudos.receiverAvatar,
             'position': kudos.receiverPosition,
+            'enabled': kudos.receiverEnabled,            
             'external': String(kudos.externalReceiver),
           };
           return {
