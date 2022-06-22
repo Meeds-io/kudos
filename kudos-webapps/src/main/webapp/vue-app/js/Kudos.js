@@ -194,6 +194,18 @@ export function registerExternalExtensions(title) {
   document.dispatchEvent(new CustomEvent('profile-extension-updated', { detail: profileExtensionAction}));
 }
 
+export function registerFavoriteExtensions(title) {
+  extensionRegistry.registerExtension('ActivityFavoriteIcon', 'activity-favorite-icon-extensions', {
+    id: 'favorite-kudos',
+    type: 'exokudos:activity',
+    icon: 'fas fa-award',
+    class: 'primary--text',
+    title: activity => {  
+      return `Kudos ${title} ${activity.kudosList[0].receiverFullName}`;
+    }
+  });
+}
+
 export function registerActivityReactionTabs() {
   extensionRegistry.registerComponent('ActivityReactions', 'activity-reaction-action', {
     id: 'kudos',
