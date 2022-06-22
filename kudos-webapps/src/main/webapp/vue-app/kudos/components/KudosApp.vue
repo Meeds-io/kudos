@@ -38,7 +38,7 @@
                   width="220"
                   class="user-suggester"
                   :search-options="searchOptions"
-                  type-of-relations="member_of_space"
+                  :type-of-relations="typeOfRelation"
                   name="kudosReceiver"
                   include-users />
               </div>
@@ -200,7 +200,8 @@ export default {
     searchOptions() {
       return {
         currentUser: eXo.env.portal.userName,
-        spaceURL: this.spaceURL
+        spaceURL: this.spaceURL,
+        activityId: this.entityId
       };
     },
     spaceSuggesterLabels() {
@@ -257,6 +258,9 @@ export default {
     },
     isLinkedKudos() {
       return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
+    },
+    typeOfRelation() {
+      return this.spaceURL ? 'member_of_space' : 'mention_comment';
     }
   },
   methods: {
