@@ -4,6 +4,7 @@ export default {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
     this.$kudosService.registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
+    this.$kudosService.registerFavoriteExtensions(this.$t('exoplatform.kudos.label.to'));
     this.$kudosService.registerActivityActionExtension();
     this.$kudosService.registerActivityReactionTabs();
     document.addEventListener('display-activity-details', this.getActivityInformations);
