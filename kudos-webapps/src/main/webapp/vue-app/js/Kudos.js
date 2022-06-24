@@ -311,6 +311,18 @@ export function registerActivityActionExtension() {
     },
   });
 
+  extensionRegistry.registerExtension('AnalyticsSamples', 'SampleItem', {
+    type: 'kudos',
+    options: {
+      // Rank of executing 'match' method
+      rank: 40,
+      // Used Vue component to display cell value
+      vueComponent: Vue.options.components['analytics-sample-item-identity'],
+      isUserIdentity: true,
+      match: fieldName => (fieldName === 'senderId' || fieldName === 'receiverId'),
+    },
+  });
+
   document.addEventListener('exo-kudos-sent', (event) => {
     const kudosSent = event && event.detail;
     if (kudosSent) {
