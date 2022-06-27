@@ -66,12 +66,10 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
   private void addEventStatistic(Kudos kudos) {
     long activityId = kudos.getActivityId();
     long streamIdentityId = 0;
-    String source = "Profile";
 
     if (activityId <= 0
         && (StringUtils.equals("ACTIVITY", kudos.getEntityType()) || StringUtils.equals("COMMENT", kudos.getEntityType()))) {
       activityId = Long.parseLong(kudos.getEntityId());
-      source = kudos.getEntityType().substring(0, 1).toUpperCase() + kudos.getEntityType().substring(1).toLowerCase();
     }
     StatisticData statisticData = new StatisticData();
 
@@ -118,7 +116,7 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
 
     statisticData.setModule("social");
     statisticData.setSubModule("kudos");
-    statisticData.setOperation("sendKudosFrom" + source);
+    statisticData.setOperation("sendKudos");
     statisticData.setUserId(Long.parseLong(kudos.getSenderIdentityId()));
     statisticData.addParameter("activityId", activityId);
     statisticData.addParameter("streamIdentityId", streamIdentityId);
