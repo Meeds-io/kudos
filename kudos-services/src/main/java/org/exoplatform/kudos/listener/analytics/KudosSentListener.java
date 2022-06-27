@@ -113,6 +113,12 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
         }
       }
     }
+    // kudos sent for a user in a chosen audience
+    if (kudos.getSpacePrettyName() != null) {
+      Space space = getSpaceService().getSpaceByPrettyName(kudos.getSpacePrettyName());
+      streamIdentityId = Long.parseLong(space.getId());
+      addSpaceStatistics(statisticData, space);
+    }
 
     statisticData.setModule("social");
     statisticData.setSubModule("kudos");
