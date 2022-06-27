@@ -10,7 +10,7 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :disabled="buttonDisabled === 'same' || buttonDisabled === 'disabled'"
+            :disabled="buttonDisabled === 'same' || buttonDisabled === 'inactive'"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled === 'same'&& $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || buttonDisabled === 'disabled' && $t('exoplatform.kudos.title.sendAKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
+        {{ buttonDisabled === 'same' && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || buttonDisabled === 'inactive' && $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -116,20 +116,29 @@ export default {
     textColorClass() {
       return this.hasSentKudos && 'primary--text' || '';
     },
+    inactiveCommentOwner() {
+      return !this.comment.identity.profile.dataEntity.enabled || this.comment.identity.deleted;
+    },
+    inactiveActivityOwner() {
+      return  !this.activity.identity.profile.dataEntity.enabled || this.activity.identity.deleted;
+    },   
+    userIdentityId() {
+      return  eXo.env.portal.userIdentityId;
+    },            
     buttonDisabled() {
       if (this.comment) {
         const commentOwnerId = this.comment.identity && this.comment.identity.id; 
-        if (commentOwnerId === eXo.env.portal.userIdentityId) {
+        if (commentOwnerId === this.userIdentityId) {
           return 'same'; 
-        } else if (!this.comment.identity.profile.dataEntity.enabled){
-          return 'disabled';        
+        } else if (this.inactiveCommentOwner){
+          return 'inactive';        
         }
       } else if (this.activity) {
         const activityOwnerId = this.activity.identity && this.activity.identity.id; 
-        if (activityOwnerId === eXo.env.portal.userIdentityId){
+        if (activityOwnerId === this.userIdentityId){
           return 'same';
-        } else if (!this.activity.identity.profile.dataEntity.enabled){
-          return 'disabled';        
+        } else if (this.inactiveActivityOwner){
+          return 'inactive';        
         }
       }
       return false;

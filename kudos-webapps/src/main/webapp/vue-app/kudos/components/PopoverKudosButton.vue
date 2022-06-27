@@ -4,7 +4,8 @@
       <div
         v-bind="attrs"
         v-on="on">
-        <div v-if="enabled">        
+         <div v-if="!identityDeleted">  
+         <div v-if="identityEnabled">          
         <v-btn
           :ripple="false"
           icon
@@ -13,7 +14,8 @@
           <v-icon size="18">fas fa-award</v-icon>
         </v-btn>
       </div>
-      </div>      
+      </div>
+      </div>
     </template>
     <span>
       {{ $t('exoplatform.kudos.title.sendAKudos') }}
@@ -34,13 +36,12 @@ export default {
     identityEnabled: {
       type: String,
       default: '',
-    },      
-  },
-  computed: {
-    enabled() {      
-      return this.identityEnabled;
-    }
-  },    
+    },  
+    identityDeleted: {
+      type: String,
+      default: ''
+    },     
+  },  
   methods: {
     sendKudos(event) {
       event.preventDefault();
