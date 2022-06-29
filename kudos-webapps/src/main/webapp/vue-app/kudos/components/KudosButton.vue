@@ -10,7 +10,7 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :disabled="buttonDisabled === 'same' || buttonDisabled === 'inactive'"
+            :disabled="buttonDisabled"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
