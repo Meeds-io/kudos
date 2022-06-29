@@ -14,7 +14,6 @@
         </v-btn>
       </div>
       </div>
-      </div>
     </template>
     <span>
       {{ $t('exoplatform.kudos.title.sendAKudos') }}
