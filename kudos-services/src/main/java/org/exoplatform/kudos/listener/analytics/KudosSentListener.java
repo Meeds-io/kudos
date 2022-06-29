@@ -66,6 +66,7 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
   private void addEventStatistic(Kudos kudos) {
     long activityId = kudos.getActivityId();
     long streamIdentityId = 0;
+    boolean receiverChanged = false;
 
     if (activityId <= 0
         && (StringUtils.equals("ACTIVITY", kudos.getEntityType()) || StringUtils.equals("COMMENT", kudos.getEntityType()))) {
@@ -86,6 +87,9 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
       }
       Identity streamIdentity = null;
       if (activity != null) {
+        if (!activity.getPosterId().equals(kudos.getReceiverIdentityId())) {
+          receiverChanged = true;
+        }
         ActivityStream activityStream = activity.getActivityStream();
         if (activityStream != null) {
           Type type = activityStream.getType();
@@ -138,6 +142,7 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
     statisticData.addParameter("receiverType", kudos.getReceiverType());
     statisticData.addParameter("messageLength", kudos.getMessage().length());
     statisticData.addParameter("duration", kudos.getTimeInSeconds());
+    statisticData.addParameter("receiverChanged", receiverChanged);
 
     AnalyticsUtils.addStatisticData(statisticData);
   }
