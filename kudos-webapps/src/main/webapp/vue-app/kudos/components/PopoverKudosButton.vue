@@ -4,8 +4,7 @@
       <div
         v-bind="attrs"
         v-on="on">
-         <div v-if="!identityDeleted">  
-         <div v-if="identityEnabled">          
+         <div v-if="identityEnabled && !identityDeleted">  
         <v-btn
           :ripple="false"
           icon
