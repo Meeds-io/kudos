@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled === 'same' && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || buttonDisabled === 'inactive' && $t('exoplatform.kudos.title.sendAKudos') }}
+            {{ buttonDisabled === 'same' ? $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') : $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -124,7 +124,7 @@ export default {
     },   
     userIdentityId() {
       return  eXo.env.portal.userIdentityId;
-    },            
+    },                           
     buttonDisabled() {
       if (this.comment) {
         const commentOwnerId = this.comment.identity && this.comment.identity.id; 
@@ -132,14 +132,14 @@ export default {
           return 'same'; 
         } else if (this.inactiveCommentOwner){
           return 'inactive';        
-        }
+        }        
       } else if (this.activity) {
         const activityOwnerId = this.activity.identity && this.activity.identity.id; 
         if (activityOwnerId === this.userIdentityId){
           return 'same';
         } else if (this.inactiveActivityOwner){
           return 'inactive';        
-        }
+        }        
       }
       return false;
     },
