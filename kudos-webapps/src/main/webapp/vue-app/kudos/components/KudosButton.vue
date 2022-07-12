@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
+            {{ buttonDisabled === 'same' ? $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') : $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -113,13 +113,30 @@ export default {
     textColorClass() {
       return this.hasSentKudos && 'primary--text' || '';
     },
+    inactiveCommentOwner() {
+      return !this.comment.identity.profile.dataEntity.enabled || this.comment.identity.deleted;
+    },
+    inactiveActivityOwner() {
+      return  !this.activity.identity.profile.dataEntity.enabled || this.activity.identity.deleted;
+    },   
+    userIdentityId() {
+      return  eXo.env.portal.userIdentityId;
+    },                           
     buttonDisabled() {
       if (this.comment) {
-        const commentOwnerId = this.comment.identity && this.comment.identity.id;
-        return commentOwnerId === eXo.env.portal.userIdentityId;
+        const commentOwnerId = this.comment.identity && this.comment.identity.id; 
+        if (commentOwnerId === this.userIdentityId) {
+          return 'same'; 
+        } else if (this.inactiveCommentOwner){
+          return 'inactive';        
+        }        
       } else if (this.activity) {
-        const activityOwnerId = this.activity.identity && this.activity.identity.id;
-        return activityOwnerId === eXo.env.portal.userIdentityId;
+        const activityOwnerId = this.activity.identity && this.activity.identity.id; 
+        if (activityOwnerId === this.userIdentityId){
+          return 'same';
+        } else if (this.inactiveActivityOwner){
+          return 'inactive';        
+        }        
       }
       return false;
     },
