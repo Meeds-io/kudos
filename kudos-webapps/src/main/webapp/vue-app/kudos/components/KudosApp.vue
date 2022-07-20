@@ -35,12 +35,13 @@
                   ref="kudosReceiverAutoComplete"
                   id="kudosReceiverAutoComplete"
                   v-model="selectedReceiver"
-                  width="220"
-                  class="user-suggester"
+                  :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
                   :type-of-relations="typeOfRelation"
+                  include-users
                   name="kudosReceiver"
-                  include-users />
+                  width="220"
+                  class="user-suggester" />
               </div>
               <exo-user-avatar
                 v-else
@@ -209,6 +210,13 @@ export default {
         searchPlaceholder: this.$t('exoplatform.kudos.audience.searchPlaceholder'),
         placeholder: this.$t('exoplatform.kudos.audience.placeholder'),
         noDataLabel: this.$t('exoplatform.kudos.audience.noDataLabel'),
+      };
+    },
+    receiverSuggesterLabels() {
+      return {
+        searchPlaceholder: this.$t('exoplatform.kudos.receiver.searchPlaceholder'),
+        placeholder: this.$t('exoplatform.kudos.receiver.placeholder'),
+        noDataLabel: this.spaceURL ? this.$t('exoplatform.kudos.receiver.noDataLabelInSpace') : this.$t('exoplatform.kudos.receiver.noDataLabel'),
       };
     },
     KudosAllowedInfo() {
