@@ -21,16 +21,19 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.exoplatform.kudos.model.GlobalSettings;
 import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-import io.swagger.annotations.*;
 
 @Path("/kudos/api/settings")
-@Api(value = "/kudos/api/settings", description = "Manages Kudos global settings") // NOSONAR
+@Tag(name = "/kudos/api/settings", description = "Manages Kudos global settings")
 @RolesAllowed("users")
 public class KudosSettingsREST implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(KudosSettingsREST.class);
@@ -44,11 +47,11 @@ public class KudosSettingsREST implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Get Kudos global settings", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns Kudos global settings object")
+  @Operation(summary = "Get Kudos global settings", method = "GET", description = "Get Kudos global settings")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+      @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "403", description = "Unauthorized operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getSettings() {
     return Response.ok(kudosService.getGlobalSettings().toString()).build();
   }
@@ -57,12 +60,15 @@ public class KudosSettingsREST implements ResourceContainer {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("administrators")
-  @ApiOperation(value = "Saves Kudos global settings", httpMethod = "POST", response = Response.class, consumes = "application/json", notes = "returns empty response")
+  @Operation(
+          summary = "Saves Kudos global settings",
+          method = "POST",
+          description = "Saves Kudos global settings and returns an empty response")
   @ApiResponses(value = {
-      @ApiResponse(code = 204, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+      @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "403", description = "Unauthorized operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response saveSettings(GlobalSettings settings) {
     if (settings == null) {
       LOG.warn("Bad request sent to server with empty 'settings' parameter");
