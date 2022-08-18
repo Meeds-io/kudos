@@ -23,6 +23,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 
 import org.exoplatform.kudos.model.AccountSettings;
@@ -31,15 +36,14 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-import io.swagger.annotations.*;
 
 @Path("/kudos/api/account")
-@Api(value = "/kudos/api/account", description = "Retrieve Kudos settings for users and spaces") // NOSONAR
+@Tag(name = "/kudos/api/account", description = "Retrieve Kudos settings for users and spaces")
 @RolesAllowed("users")
 public class KudosAccountREST implements ResourceContainer {
   private static final Log LOG = ExoLogger.getLogger(KudosAccountREST.class);
 
-  private KudosService     kudosService;
+  private KudosService     kudosService;// NOSONAR
 
   public KudosAccountREST(KudosService kudosService) {
     this.kudosService = kudosService;
@@ -49,11 +53,11 @@ public class KudosAccountREST implements ResourceContainer {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Retrieves user/space settings for kudos", httpMethod = "GET", response = Response.class, produces = "application/json", notes = "returns account settings object")
+  @Operation(summary = "Retrieves user/space settings for kudos", method = "GET", description = "returns account settings object")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Request fulfilled"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+      @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "403", description = "Unauthorized operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getSettings() {
     try {
       AccountSettings accountDetail = kudosService.getAccountSettings(getCurrentUserId());
@@ -70,13 +74,13 @@ public class KudosAccountREST implements ResourceContainer {
   @Path("isAuthorized")
   @GET
   @RolesAllowed("users")
-  @ApiOperation(value = "Checks if username is authorized to use Kudos", httpMethod = "GET", response = Response.class, notes = "returns empty response")
+  @Operation(summary = "Checks if username is authorized to use Kudos", method = "GET", description = "Checks if username is authorized to use Kudos and returns empty response")
   @ApiResponses(value = {
-      @ApiResponse(code = 204, message = "Request fulfilled"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 403, message = "Unauthorized operation"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response isAuthorized(@ApiParam(value = "User login", required = true) @QueryParam("username") String username) {
+      @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "403", description = "Unauthorized operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response isAuthorized(@Parameter(description = "User login", required = true) @QueryParam("username") String username) {
     if (StringUtils.isBlank(username)) {
       LOG.warn("Bad request sent to server with empty 'username'");
       return Response.status(400).build();
