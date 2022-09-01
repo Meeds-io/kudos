@@ -68,6 +68,8 @@ public class Utils {
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
 
   public static final String                 ACTIVITY_COMMENT_ID_PREFIX      = "comment";
+  
+  public static final String                 CONTENT_TYPE                    = "contentType";
 
   private Utils() {
   }
@@ -247,6 +249,7 @@ public class Utils {
       activity.getTemplateParams().remove(I18NActivityUtils.RESOURCE_BUNDLE_KEY_TO_PROCESS);
       activity.getTemplateParams().remove(I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM);
       activity.getTemplateParams().remove(KUDOS_MESSAGE_PARAM);
+      activity.getTemplateParams().remove(CONTENT_TYPE);
     }
     activity.setTitleId(null);
 
@@ -257,6 +260,7 @@ public class Utils {
                  I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM + BaseActivityProcessorPlugin.TEMPLATE_PARAM_LIST_DELIM
                      + KUDOS_MESSAGE_PARAM);
     activity.getTemplateParams().put(KUDOS_MESSAGE_PARAM, kudosMessage);
+    activity.getTemplateParams().put(CONTENT_TYPE, KUDOS_MESSAGE_PARAM);
   }
 
   private static String getIdentityIdByType(Identity receiverIdentity) {
