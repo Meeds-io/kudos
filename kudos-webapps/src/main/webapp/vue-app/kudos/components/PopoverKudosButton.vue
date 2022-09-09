@@ -4,6 +4,7 @@
       <div
         v-bind="attrs"
         v-on="on">
+         <div v-if="identityEnabled && !identityDeleted">  
         <v-btn
           :ripple="false"
           icon
@@ -11,6 +12,7 @@
           @click="sendKudos($event)">
           <v-icon size="18">fas fa-award</v-icon>
         </v-btn>
+      </div>
       </div>
     </template>
     <span>
@@ -29,7 +31,15 @@ export default {
       type: String,
       default: ''
     },
-  },
+    identityEnabled: {
+      type: String,
+      default: '',
+    },  
+    identityDeleted: {
+      type: String,
+      default: ''
+    },     
+  },  
   methods: {
     sendKudos(event) {
       event.preventDefault();
