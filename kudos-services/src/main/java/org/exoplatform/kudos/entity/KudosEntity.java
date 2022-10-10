@@ -45,7 +45,10 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         + " ORDER BY k.createdDate DESC"),
     @NamedQuery(name = "Kudos.countKudosByPeriodAndReceiver", query = "select count(k) from Kudos k"
         + " WHERE k.receiverId = :receiverId"
-        + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate") })
+        + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
+    @NamedQuery(name = "Kudos.countKudosByPeriodAndReceivers", query = "select k.receiverId,count(k) from Kudos k"
+        + " WHERE k.receiverId IN :receiversId" + " AND k.createdDate > :startDate"
+        + " AND k.createdDate < :endDate GROUP BY k.receiverId") })
 public class KudosEntity implements Serializable {
 
   private static final long serialVersionUID = -8272292325540761902L;

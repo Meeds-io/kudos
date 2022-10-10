@@ -2,8 +2,11 @@ package org.exoplatform.kudos.dao;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
@@ -73,6 +76,13 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     query.setParameter("isReceiverUser", isReceiverUser);
     Long count = query.getSingleResult();
     return count == null ? 0 : count;
+  }
+
+  public Map<Long, Long> countKudosByPeriodAndReceivers(KudosPeriod kudosPeriod, List<Long> receiversId) {
+    TypedQuery<Tuple> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndReceivers", Tuple.class);
+    setPeriodParameters(query, kudosPeriod);
+    query.setParameter("receiversId", receiversId);
+    return query.getResultList().stream().collect(Collectors.toMap(tuple -> (Long) tuple.get(0), tuple -> (Long) tuple.get(1)));
   }
 
   public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId, int limit) {
