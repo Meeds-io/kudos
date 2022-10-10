@@ -4,7 +4,9 @@ import static org.exoplatform.kudos.service.utils.Utils.fromEntity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -122,6 +124,27 @@ public class KudosDAOTest extends BaseKudosTest {
 
     count = kudosDAO.countKudosByPeriodAndReceiver(kudosPeriod, 30, true);
     assertEquals(0, count);
+  }
+
+  @Test
+  public void testCountKudosByPeriodAndReceivers() {
+
+    KudosDAO kudosDAO = getService(KudosDAO.class);
+    KudosPeriod kudosPeriod = new KudosPeriod(getTime(2019, 1, 1), getCurrentTimeInSeconds());
+
+    List<Long> receiversId = new ArrayList<>();
+    receiversId.add(receiverId);
+
+    Map<Long, Long> counts = kudosDAO.countKudosByPeriodAndReceivers(kudosPeriod, receiversId);
+    assertEquals(Long.valueOf(0), java.util.Optional.ofNullable(counts.get(receiverId)).orElse(0L));
+
+    newKudos();
+
+    receiversId.add(30L);
+
+    counts = kudosDAO.countKudosByPeriodAndReceivers(kudosPeriod, receiversId);
+    assertEquals(Long.valueOf(1), java.util.Optional.ofNullable(counts.get(receiverId)).orElse(0L));
+    assertEquals(Long.valueOf(0), java.util.Optional.ofNullable(counts.get(30L)).orElse(0L));
   }
 
   @Test

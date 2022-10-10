@@ -401,6 +401,19 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   }
 
   /**
+   * Count kudos received by a list of identities in a period of time
+   *
+   * @param identitiesId {@link Identity} List of technical id
+   * @param startDateInSeconds timestamp in seconds
+   * @param endDateInSeconds timestamp in seconds
+   * @return Map<identityId,kudoCount> the number of kudos by identity
+   */
+  public Map<Long, Long> countKudosByPeriodAndReceivers(List<Long> identitiesId, long startDateInSeconds, long endDateInSeconds) {
+    KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
+    return kudosStorage.countKudosByPeriodAndReceivers(kudosPeriod, identitiesId);
+  }
+
+  /**
    * Retrieves kudos received by an identity in a period of time
    * 
    * @param identityId {@link Identity} technical id
