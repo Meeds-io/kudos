@@ -47,7 +47,7 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
         + " WHERE k.receiverId = :receiverId"
         + " AND k.isReceiverUser = :isReceiverUser" + " AND k.createdDate > :startDate" + " AND k.createdDate < :endDate"),
     @NamedQuery(name = "Kudos.countKudosByPeriodAndReceivers", query = "select k.receiverId,count(k) from Kudos k"
-        + " WHERE k.receiverId IN :receiversId" + " AND k.createdDate > :startDate"
+        + " WHERE k.receiverId IN :receiversId" + " AND k.createdDate >= :startDate"
         + " AND k.createdDate < :endDate GROUP BY k.receiverId") })
 public class KudosEntity implements Serializable {
 
