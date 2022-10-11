@@ -2,10 +2,13 @@ package org.exoplatform.kudos.test.service;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.regexp.RE;
 import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
@@ -151,6 +154,30 @@ public class KudosServiceTest extends BaseKudosTest {
 
     count = kudosService.countKudosByPeriodAndReceiver(30000, startTime, endTime);
     assertEquals(0, count);
+  }
+
+  @Test
+  public void testCountKudosByPeriodAndReceivers() {
+
+    KudosService kudosService = getService(KudosService.class);
+    long startTime = getTime(2019, 1, 1);
+    long endTime = getCurrentTimeInSeconds();
+
+    List<Long> receivers = new ArrayList<>();
+    receivers.add(RECEIVER_ID);
+
+    Map<Long, Long> counts = kudosService.countKudosByPeriodAndReceivers(receivers, startTime, endTime);
+    assertEquals(Long.valueOf(0), java.util.Optional.ofNullable(counts.get(RECEIVER_ID)).orElse(0L));
+
+    newKudos();
+
+    receivers.add(30L);
+    receivers.add(30000L);
+
+    counts = kudosService.countKudosByPeriodAndReceivers(receivers, startTime, endTime);
+    assertEquals(Long.valueOf(1), java.util.Optional.ofNullable(counts.get(RECEIVER_ID)).orElse(0L));
+    assertEquals(Long.valueOf(0), java.util.Optional.ofNullable(counts.get(30L)).orElse(0L));
+    assertEquals(Long.valueOf(0), java.util.Optional.ofNullable(counts.get(30000L)).orElse(0L));
   }
 
   @Test

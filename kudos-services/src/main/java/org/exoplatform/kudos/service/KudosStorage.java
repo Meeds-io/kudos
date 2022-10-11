@@ -110,6 +110,10 @@ public class KudosStorage {
                                                   isReceiverUser);
   }
 
+  public Map<Long, Long> countKudosByPeriodAndReceivers(KudosPeriod kudosPeriod, List<Long> receiversId) {
+    return kudosDAO.countKudosByPeriodAndReceivers(kudosPeriod, receiversId);
+  }
+
   public List<Kudos> getKudosByPeriodAndReceiver(KudosPeriod kudosPeriod, String receiverType, String receiverId, int limit) {
     boolean isReceiverUser = USER_ACCOUNT_TYPE.equals(receiverType) || OrganizationIdentityProvider.NAME.equals(receiverType);
     long identityId = getIdentityId(receiverId, isReceiverUser);
