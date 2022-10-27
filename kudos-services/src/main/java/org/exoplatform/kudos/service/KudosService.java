@@ -406,7 +406,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    * @param identitiesId {@link Identity} List of technical id
    * @param startDateInSeconds timestamp in seconds
    * @param endDateInSeconds timestamp in seconds
-   * @return Map<identityId,kudoCount> the number of kudos by identity
+   * @return Map&lt;identityId,kudoCount&gt; the number of kudos by identity
    */
   public Map<Long, Long> countKudosByPeriodAndReceivers(List<Long> identitiesId, long startDateInSeconds, long endDateInSeconds) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
