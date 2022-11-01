@@ -3,6 +3,8 @@
     :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'"
     class="white">
     <v-toolbar
+      v-if="!isOverviewDisplay"
+      id="kudosOverviewHeader"
       color="white"
       height="48"
       flat
@@ -12,6 +14,7 @@
       </div>
       <v-spacer />
       <select
+        v-if="!isOverviewDisplay"
         v-model="periodType"
         class="kudosOverviewPeriodSelect fill-height col-auto me-2 my-auto px-3 py-0 subtitle-1 ignore-vuetify-classes">
         <option
@@ -62,6 +65,12 @@
 import {getKudosSent, getKudosReceived} from '../../js/Kudos.js'; 
 
 export default {
+  props: {
+    isOverviewDisplay: {
+      type: Boolean,
+      default: () => false,
+    },
+  },
   data: () => ({
     owner: eXo.env.portal.profileOwner === eXo.env.portal.userName,
     identityId: eXo.env.portal.profileOwnerIdentityId,

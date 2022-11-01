@@ -1,7 +1,7 @@
 <template>
   <v-row
     :class="clickable && 'clickable' || ''"
-    class="border-box-sizing text-center mx-auto justify-center"
+    class="border-box-sizing text-center justify-center"
     @click="clickable && $emit('open-drawer')">
     <v-col class="my-auto px-0 col-md-auto kudosOverviewIcon">
       <v-icon class="tertiary-color uiIconAward" size="56" />

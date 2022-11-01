@@ -9,6 +9,8 @@ import ActivityKudosReactionEmptyList from './components/common/ActivityKudosRea
 import KudosOverviewDrawer from './components/common/KudosOverviewDrawer.vue';
 import KudosOverviewItem from './components/common/KudosOverviewItem.vue';
 import ActivityKudosReactionCount from './components/ActivityKudosReactionCount.vue';
+import KudosOverview from '../kudos-overview/components/KudosOverview.vue';
+import KudosOverviewCard from '../kudos-overview/components/KudosOverviewCard.vue';
 
 const components = {
   'kudos-api': KudosAPI,
@@ -21,7 +23,9 @@ const components = {
   'activity-kudos-reaction-empty-list': ActivityKudosReactionEmptyList,
   'kudos-overview-drawer': KudosOverviewDrawer,
   'kudos-overview-item': KudosOverviewItem,
-  'activity-kudos-reaction-count': ActivityKudosReactionCount
+  'activity-kudos-reaction-count': ActivityKudosReactionCount,
+  'kudos-overview': KudosOverview,
+  'kudos-overview-card': KudosOverviewCard,
 };
 
 for (const key in components) {
