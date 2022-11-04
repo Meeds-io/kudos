@@ -28,6 +28,7 @@
     <v-row id="kudosOverviewCardsParent" class="white border-box-sizing px-4 py-0 ma-0">
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
+          :isOverviewDisplay="isOverviewDisplay"
           :clickable="owner && receivedKudosCount > 0"
           class="kudosReceivedOverviewPeriod"
           @open-drawer="openDrawer('received')">
@@ -39,9 +40,10 @@
           </template>
         </kudos-overview-card>
       </v-col>
-      <v-divider class="my-4" vertical />
+      <v-divider class="my-4 mx-8 mx-md-7" vertical />
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
+          :isOverviewDisplay="isOverviewDisplay"
           :clickable="owner && sentKudosCount > 0"
           class="kudosSentOverviewPeriod"
           @open-drawer="openDrawer('sent')">
