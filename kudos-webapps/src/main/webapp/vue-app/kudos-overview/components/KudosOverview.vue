@@ -25,32 +25,41 @@
         </option>
       </select>
     </v-toolbar>
-    <v-row id="kudosOverviewCardsParent" class="white border-box-sizing px-4 py-0 ma-0">
+    <v-row
+      id="kudosOverviewCardsParent"
+      class="white border-box-sizing px-4 py-0 ma-0 align-center" 
+      :style="isOverviewDisplay && 'min-height:66px;'">
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
-          :isOverviewDisplay="isOverviewDisplay"
+          :is-overview-display="isOverviewDisplay"
           :clickable="owner && receivedKudosCount > 0"
           class="kudosReceivedOverviewPeriod"
           @open-drawer="openDrawer('received')">
           <template slot="count">
             {{ receivedKudosCount || '0' }}
           </template>
-          <template slot="label">
+          <template v-if="isOverviewDisplay" slot="label">
+            {{ $t('exoplatform.kudos.label.received') }}
+          </template> 
+          <template v-else slot="label">
             {{ $t('exoplatform.kudos.button.receivedKudos') }}
           </template>
         </kudos-overview-card>
       </v-col>
-      <v-divider class="my-4 mx-8 mx-md-7" vertical />
+      <v-divider class="my-9 mx-8 mx-md-4" vertical />
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
-          :isOverviewDisplay="isOverviewDisplay"
+          :is-overview-display="isOverviewDisplay"
           :clickable="owner && sentKudosCount > 0"
           class="kudosSentOverviewPeriod"
           @open-drawer="openDrawer('sent')">
           <template slot="count">
             {{ sentKudosCount || '0' }}
           </template>
-          <template slot="label">
+          <template v-if="isOverviewDisplay" slot="label">
+            {{ $t('exoplatform.kudos.label.sent') }}
+          </template>
+          <template v-else slot="label">
             {{ $t('exoplatform.kudos.button.sentKudos') }}
           </template>
         </kudos-overview-card>
