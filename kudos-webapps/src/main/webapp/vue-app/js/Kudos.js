@@ -194,6 +194,14 @@ export function registerExternalExtensions(title) {
   document.dispatchEvent(new CustomEvent('profile-extension-updated', { detail: profileExtensionAction}));
 }
 
+export function registerOverviewExtension() {
+  extensionRegistry.registerComponent('my-reputation-overview', 'my-reputation-item', {
+    id: 'kudos-reputation-overview',
+    vueComponent: Vue.options.components['kudos-overview'],
+    rank: 10,
+  }); 
+}
+
 export function registerFavoriteExtensions(title) {
   extensionRegistry.registerExtension('ActivityFavoriteIcon', 'activity-favorite-icon-extensions', {
     id: 'favorite-kudos',
