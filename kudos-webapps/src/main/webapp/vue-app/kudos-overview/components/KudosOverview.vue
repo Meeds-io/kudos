@@ -28,7 +28,7 @@
     <v-row
       id="kudosOverviewCardsParent"
       class="white border-box-sizing px-4 py-0 ma-0 align-center" 
-      :style="isOverviewDisplay && 'min-height:66px;'">
+      :style="isOverviewDisplay && 'min-height:15px;'">
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"

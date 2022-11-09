@@ -4,7 +4,7 @@
     class="border-box-sizing text-center justify-center"
     @click="clickable && $emit('open-drawer')">
     <v-col class="my-auto px-0 col-md-auto kudosOverviewIcon">
-      <v-icon class="tertiary-color uiIconAward" :size="isOverviewDisplay ? '40' : '56'" />
+        <v-icon class="tertiary-color uiIconAward" :size="isOverviewDisplay ? '40' : '56'" />
     </v-col>
     <v-col class="my-auto col-md-auto kudosOverviewCount text-color mx-0 display-1 font-weight-bold">
       <slot name="count"></slot>
