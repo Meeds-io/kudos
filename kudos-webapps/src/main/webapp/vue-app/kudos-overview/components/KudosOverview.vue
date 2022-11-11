@@ -33,7 +33,7 @@
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
           :clickable="owner && receivedKudosCount > 0"
-          class="kudosReceivedOverviewPeriod"
+          class="kudosReceivedOverviewPeriod mx-n4"
           @open-drawer="openDrawer('received')">
           <template slot="count">
             {{ receivedKudosCount || '0' }}
@@ -51,7 +51,7 @@
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
           :clickable="owner && sentKudosCount > 0"
-          class="kudosSentOverviewPeriod"
+          class="kudosSentOverviewPeriod mx-n4"
           @open-drawer="openDrawer('sent')">
           <template slot="count">
             {{ sentKudosCount || '0' }}
