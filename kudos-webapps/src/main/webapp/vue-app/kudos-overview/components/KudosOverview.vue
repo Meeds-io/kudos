@@ -46,7 +46,10 @@
           </template>
         </kudos-overview-card>
       </v-col>
-      <v-divider class="my-9 mx-8 mx-md-4" vertical />
+      <v-divider
+        class="my-9 mx-8 mx-md-4"
+        :class="isOverviewDisplay && 'mr-md-1 ml-md-5' || ''"
+        vertical />
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
