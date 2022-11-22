@@ -28,12 +28,12 @@
     <v-row
       id="kudosOverviewCardsParent"
       class="white border-box-sizing px-4 py-0 ma-0 align-center" 
-      :style="isOverviewDisplay && 'min-height:55px;'">
+      :style="isOverviewDisplay && 'min-height:27px;' || ''">
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
           :clickable="owner && receivedKudosCount > 0"
-          class="kudosReceivedOverviewPeriod"
+          class="kudosReceivedOverviewPeriod mx-n4"
           @open-drawer="openDrawer('received')">
           <template slot="count">
             {{ receivedKudosCount || '0' }}
@@ -46,12 +46,15 @@
           </template>
         </kudos-overview-card>
       </v-col>
-      <v-divider class="my-9 mx-8 mx-md-4" vertical />
+      <v-divider
+        class="my-9 mx-8 mx-md-4"
+        :class="isOverviewDisplay && 'me-md-1 ms-md-5' || ''"
+        vertical />
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
           :clickable="owner && sentKudosCount > 0"
-          class="kudosSentOverviewPeriod"
+          class="kudosSentOverviewPeriod mx-n4"
           @open-drawer="openDrawer('sent')">
           <template slot="count">
             {{ sentKudosCount || '0' }}
