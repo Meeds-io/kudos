@@ -7,7 +7,8 @@ const config = {
   entry: {
     kudos: './src/main/webapp/vue-app/kudos/main.js',
     kudosAdmin: './src/main/webapp/vue-app/kudos-admin/main.js',
-    kudosOverview: './src/main/webapp/vue-app/kudos-overview/main.js'
+    kudosOverview: './src/main/webapp/vue-app/kudos-overview/main.js',
+    engagementCenterExtensions: './src/main/webapp/vue-app/engagementCenterExtensions/extensions.js'
   },
   module: {
     rules: [
