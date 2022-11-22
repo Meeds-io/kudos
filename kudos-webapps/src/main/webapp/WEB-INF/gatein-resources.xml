@@ -121,4 +121,24 @@
     </module>
   </portlet>
 
+  <module>
+    <name>engagementCenterActionsKudosExtensions</name>
+    <load-group>engagement-center-user-actions</load-group>
+    <script>
+      <path>/js/engagementCenterExtensions.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
+
 </gatein-resources>
