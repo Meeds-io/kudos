@@ -28,7 +28,7 @@
     <v-row
       id="kudosOverviewCardsParent"
       class="white border-box-sizing px-4 py-0 ma-0 align-center" 
-      :style="isOverviewDisplay && 'min-height:66px;'">
+      :style="isOverviewDisplay && 'min-height:55px;'">
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :is-overview-display="isOverviewDisplay"
@@ -146,6 +146,7 @@ export default {
           this.$root.$emit('application-loaded');
           // Decrement 'loading' effect in top of the page
           document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+          document.dispatchEvent(new CustomEvent('kudosCount', {detail: this.sentKudosCount + this.receivedKudosCount}));
         });
     },
   },
