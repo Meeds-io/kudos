@@ -130,14 +130,14 @@ export default {
         const commentOwnerId = this.comment.identity && this.comment.identity.id; 
         if (commentOwnerId === this.userIdentityId) {
           return 'same'; 
-        } else if (this.inactiveCommentOwner){
+        } else if (this.inactiveCommentOwner || !this.comment.owner.isMember){
           return 'inactive';        
         }        
       } else if (this.activity) {
         const activityOwnerId = this.activity.identity && this.activity.identity.id; 
         if (activityOwnerId === this.userIdentityId){
           return 'same';
-        } else if (this.inactiveActivityOwner){
+        } else if (this.inactiveActivityOwner || !this.activity.owner.isMember){
           return 'inactive';        
         }        
       }
