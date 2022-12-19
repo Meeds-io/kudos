@@ -4,15 +4,15 @@
       <div
         v-bind="attrs"
         v-on="on">
-         <div v-if="identityEnabled && !identityDeleted">  
-        <v-btn
-          :ripple="false"
-          icon
-          color="primary"
-          @click="sendKudos($event)">
-          <v-icon size="18">fas fa-award</v-icon>
-        </v-btn>
-      </div>
+        <div v-if="identityEnabled && !identityDeleted">  
+          <v-btn
+            :ripple="false"
+            icon
+            color="primary"
+            @click="sendKudos($event)">
+            <v-icon size="18">fas fa-award</v-icon>
+          </v-btn>
+        </div>
       </div>
     </template>
     <span>

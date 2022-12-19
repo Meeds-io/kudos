@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-            {{ buttonDisabled === 'same' ? $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') : $t('exoplatform.kudos.title.sendAKudos') }}
+        {{ buttonDisabled === 'same' ? $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') : $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
