@@ -272,7 +272,7 @@ export function registerActivityActionExtension() {
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: `<a href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}" v-identity-popover="${JSON.stringify(receiverIdentity).replace(/'/g, '\\\'').replace(/"/g, '\'')}">${kudos.receiverFullName}</a>`
+              0: `<a class="primary--text" href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}" v-identity-popover="${JSON.stringify(receiverIdentity).replace(/'/g, '\\\'').replace(/"/g, '\'')}">${kudos.receiverFullName}</a>`
             },
           };
         }
