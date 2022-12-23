@@ -10,7 +10,11 @@
       <slot name="count"></slot>
     </v-col>
     <v-col class="my-auto col-12 col-md-1 text-md-left px-0 mx-0 kudosOverviewLabel text-color">
-      <slot name="label"></slot>
+      <v-card
+        flat
+        :min-width="isOverviewDisplay ? '55' : '113'">
+        <slot name="label"></slot>
+      </v-card>
     </v-col>
   </v-row>
 </template>
