@@ -74,10 +74,13 @@
             <div class="d-flex flex-row pt-3">
               <exo-activity-rich-editor
                 :ref="ckEditorId"
+                :key="spaceURL"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorId"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
+                :suggestor-type-of-relation="typeOfRelation"
+                :suggester-space-u-r-l="spaceURL"
                 class="flex"
                 autofocus />
             </div>
@@ -184,6 +187,9 @@ export default {
           this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
         }
       }
+    },
+    audience() {
+      this.spaceURL = this.audience?.remoteId || null;
     }
   },
   created() {
@@ -268,7 +274,7 @@ export default {
       return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
     },
     typeOfRelation() {
-      return this.spaceURL ? 'member_of_space' : 'mention_comment';
+      return this.isLinkedKudos ? 'mention_comment' : 'mention_activity_stream';
     }
   },
   methods: {
@@ -398,7 +404,7 @@ export default {
             this.entityOwner = event && event.detail && event.detail.owner;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-            this.spaceURL = event && event.detail && event.detail.spaceURL;
+            this.spaceURL = event && event.detail && event.detail.spaceURL || null;
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer().then(() => {
