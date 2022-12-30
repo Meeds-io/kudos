@@ -1,25 +1,30 @@
 package org.exoplatform.kudos.test;
 
-import static org.junit.Assert.*;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
 
-import org.exoplatform.container.*;
-import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.component.test.AbstractKernelTest;
+import org.exoplatform.component.test.ConfigurationUnit;
+import org.exoplatform.component.test.ConfiguredBy;
+import org.exoplatform.component.test.ContainerScope;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.service.utils.Utils;
 
-public abstract class BaseKudosTest {
+@ConfiguredBy({
+  @ConfigurationUnit(scope = ContainerScope.ROOT, path = "conf/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/portal/configuration.xml"),
+  @ConfigurationUnit(scope = ContainerScope.PORTAL, path = "conf/kudos-test-configuration.xml"),
+})
+public abstract class BaseKudosTest extends AbstractKernelTest {
 
   protected static final String    DEFAULT_PORTAL   = "meeds";
-
-  protected static PortalContainer container;
 
   protected KudosEntityType        kudosEntityType  = KudosEntityType.USER_TIPTIP;
 
@@ -37,25 +42,24 @@ public abstract class BaseKudosTest {
 
   protected String                 message          = "message";
 
-  @BeforeClass
-  public static void beforeTest() {
-    RootContainer rootContainer = RootContainer.getInstance();
-    container = rootContainer.getPortalContainer("portal");
-    assertNotNull("Container shouldn't be null", container);
-    assertTrue("Container should have been started", container.isStarted());
-  }
+  protected PortalContainer     container;
 
   @Before
-  public void beforeMethodTest() {
+  @Override
+  public void setUp() throws Exception {
+    container = getContainer();
+    assertNotNull("Container shouldn't be null", container);
+    assertTrue("Container should have been started", container.isStarted());
     begin();
+    super.setUp();
   }
 
   @After
-  public void afterMethodTest() {
+  @Override
+  public void tearDown() throws Exception {
     KudosDAO kudosDAO = getService(KudosDAO.class);
 
-    end();
-    RequestLifeCycle.begin(container);
+    restartTransaction();
 
     kudosDAO.deleteAll();
 
@@ -65,6 +69,7 @@ public abstract class BaseKudosTest {
                  kudosCount);
 
     end();
+    super.tearDown();
   }
 
   protected <T> T getService(Class<T> componentType) {
@@ -122,25 +127,6 @@ public abstract class BaseKudosTest {
     return kudosEntity;
   }
 
-  protected void restartTransaction() {
-    int i = 0;
-    // Close transactions until no encapsulated transaction
-    boolean success = true;
-    do {
-      try {
-        end();
-        i++;
-      } catch (IllegalStateException e) {
-        success = false;
-      }
-    } while (success);
-
-    // Restart transactions with the same number of encapsulations
-    for (int j = 0; j < i; j++) {
-      begin();
-    }
-  }
-
   protected void compareResults(KudosEntity kudosEntity, Kudos kudos) {
     assertEquals(kudosEntity.getActivityId(), kudos.getActivityId());
     assertEquals(kudosEntity.getCreatedDate(), kudos.getTimeInSeconds());
@@ -159,15 +145,6 @@ public abstract class BaseKudosTest {
 
   protected long getCurrentTimeInSeconds() {
     return System.currentTimeMillis() / 1000 + 10;
-  }
-
-  protected void begin() {
-    ExoContainerContext.setCurrentContainer(container);
-    RequestLifeCycle.begin(container);
-  }
-
-  protected void end() {
-    RequestLifeCycle.end();
   }
 
 }
