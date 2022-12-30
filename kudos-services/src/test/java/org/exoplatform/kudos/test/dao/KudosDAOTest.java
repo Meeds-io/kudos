@@ -1,8 +1,6 @@
 package org.exoplatform.kudos.test.dao;
 
 import static org.exoplatform.kudos.service.utils.Utils.fromEntity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;

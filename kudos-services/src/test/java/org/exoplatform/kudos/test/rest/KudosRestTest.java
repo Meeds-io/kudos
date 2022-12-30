@@ -1,14 +1,16 @@
 package org.exoplatform.kudos.test.rest;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.listener.NewKudosSentActivityGeneratorListener;
-import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.model.Kudos;
+import org.exoplatform.kudos.model.KudosEntityType;
+import org.exoplatform.kudos.model.KudosList;
 import org.exoplatform.kudos.rest.KudosREST;
 import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.kudos.service.utils.Utils;
@@ -25,22 +27,27 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Before
   public void setUp() throws Exception {
-    beforeBeginTest();
-    resourceTest.addResource(KudosREST.class, null);
+    super.setUp();
+    addResource(KudosREST.class, null);
   }
 
   @After
   public void tearDown() throws Exception {
-    afterEndTest();
-    resourceTest.removeResource(KudosREST.class);
+    super.tearDown();
+    removeResource(KudosREST.class);
+  }
+
+  @Override
+  public String getURLResource(String resourceURL) {
+    return "/kudos/api/kudos/" + resourceURL;
   }
 
   @Test
   public void testGetAllKudos() throws Exception {
-    resourceTest.startSessionAs("root4");
+    startSessionAs("root4");
     begin();
     try {
-      ContainerResponse response = resourceTest.service("GET", resourceTest.getURLResource(""), "", null, null);
+      ContainerResponse response = service("GET", getURLResource(""), "", null, null);
       assertNotNull(response);
       assertEquals(200, response.getStatus());
       List<Kudos> kudosList = (List<Kudos>) response.getEntity();
@@ -48,7 +55,7 @@ public class KudosRestTest extends BaseKudosRestTest {
 
       newKudos();
 
-      response = resourceTest.service("GET", resourceTest.getURLResource(""), "", null, null);
+      response = service("GET", getURLResource(""), "", null, null);
       assertNotNull(response);
       assertEquals(200, response.getStatus());
       kudosList = (List<Kudos>) response.getEntity();
@@ -62,14 +69,14 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Test
   public void testGetReceivedKudos() throws Exception {
-    String url = resourceTest.getURLResource(receiverId + "/received?returnSize=true&limit=10");
+    String url = getURLResource(receiverId + "/received?returnSize=true&limit=10");
 
-    resourceTest.startSessionAs("root4");
-    ContainerResponse response = resourceTest.service("GET",
-                                                      url,
-                                                      "",
-                                                      null,
-                                                      null);
+    startSessionAs("root4");
+    ContainerResponse response = service("GET",
+                                         url,
+                                         "",
+                                         null,
+                                         null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     KudosList kudosList = (KudosList) response.getEntity();
@@ -77,11 +84,11 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     newKudos();
 
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     kudosList = (KudosList) response.getEntity();
@@ -92,14 +99,14 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Test
   public void testGetSentKudos() throws Exception {
-    String url = resourceTest.getURLResource(senderId + "/sent?returnSize=true&limit=10");
+    String url = getURLResource(senderId + "/sent?returnSize=true&limit=10");
 
-    resourceTest.startSessionAs("root4");
-    ContainerResponse response = resourceTest.service("GET",
-                                                      url,
-                                                      "",
-                                                      null,
-                                                      null);
+    startSessionAs("root4");
+    ContainerResponse response = service("GET",
+                                         url,
+                                         "",
+                                         null,
+                                         null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     KudosList kudosList = (KudosList) response.getEntity();
@@ -107,11 +114,11 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     newKudos();
 
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     kudosList = (KudosList) response.getEntity();
@@ -122,7 +129,7 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Test
   public void testGetKudosByActivityId() throws Exception {
-    resourceTest.startSessionAs("root4");
+    startSessionAs("root4");
     KudosService kudosService = getService(KudosService.class);
 
     KudosEntity kudosEntity = newKudosInstance();
@@ -134,12 +141,12 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     assertEquals(activityId, kudos.getActivityId());
 
-    String url = resourceTest.getURLResource("byActivity/" + activityId);
-    ContainerResponse response = resourceTest.service("GET",
-                                                      url,
-                                                      "",
-                                                      null,
-                                                      null);
+    String url = getURLResource("byActivity/" + activityId);
+    ContainerResponse response = service("GET",
+                                         url,
+                                         "",
+                                         null,
+                                         null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
 
@@ -148,24 +155,24 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertTrue(kudosByActivity.getActivityId() > 0);
     assertEquals(kudos.getTechnicalId(), kudosByActivity.getTechnicalId());
 
-    url = resourceTest.getURLResource("byActivity/200");
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    url = getURLResource("byActivity/200");
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     kudosByActivity = (Kudos) response.getEntity();
     assertNull(kudosByActivity);
 
-    resourceTest.startSessionAs("root3");
-    url = resourceTest.getURLResource("byActivity/" + activityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    startSessionAs("root3");
+    url = getURLResource("byActivity/" + activityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
 
@@ -174,13 +181,13 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertTrue(kudosByActivity.getActivityId() > 0);
     assertEquals(kudos.getTechnicalId(), kudosByActivity.getTechnicalId());
 
-    resourceTest.startSessionAs("root2");
-    url = resourceTest.getURLResource("byActivity/" + activityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    startSessionAs("root2");
+    url = getURLResource("byActivity/" + activityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
 
@@ -197,32 +204,32 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     activityId = kudos.getActivityId();
 
-    url = resourceTest.getURLResource("byActivity/" + activityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    url = getURLResource("byActivity/" + activityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(404, response.getStatus());
 
-    resourceTest.startSessionAs("root4");
-    url = resourceTest.getURLResource("byActivity/" + activityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    startSessionAs("root4");
+    url = getURLResource("byActivity/" + activityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
 
-    resourceTest.startSessionAs("root3");
-    url = resourceTest.getURLResource("byActivity/" + activityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    startSessionAs("root3");
+    url = getURLResource("byActivity/" + activityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
   }
@@ -231,7 +238,7 @@ public class KudosRestTest extends BaseKudosRestTest {
   public void testGetKudosListOfActivity() throws Exception {
     String senderUsername = "root4";
 
-    resourceTest.startSessionAs(senderUsername);
+    startSessionAs(senderUsername);
     KudosService kudosService = getService(KudosService.class);
 
     KudosEntity kudosEntity = newKudosInstance();
@@ -288,14 +295,14 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Test
   public void testCountSentKudosByEntityAndUser() throws Exception {
-    resourceTest.startSessionAs("root4");
+    startSessionAs("root4");
 
-    String url = resourceTest.getURLResource("byEntity/sent/count?entityType=" + kudosEntityType + "&entityId=" + entityId);
-    ContainerResponse response = resourceTest.service("GET",
-                                                      url,
-                                                      "",
-                                                      null,
-                                                      null);
+    String url = getURLResource("byEntity/sent/count?entityType=" + kudosEntityType + "&entityId=" + entityId);
+    ContainerResponse response = service("GET",
+                                         url,
+                                         "",
+                                         null,
+                                         null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     String count = (String) response.getEntity();
@@ -304,24 +311,24 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     newKudos();
 
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     count = (String) response.getEntity();
     assertNotNull(count);
     assertEquals("1", count);
 
-    resourceTest.startSessionAs("root3");
+    startSessionAs("root3");
 
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     count = (String) response.getEntity();
@@ -331,16 +338,16 @@ public class KudosRestTest extends BaseKudosRestTest {
 
   @Test
   public void testSendKudos() throws Exception {
-    resourceTest.startSessionAs("root4");
+    startSessionAs("root4");
 
-    String url = resourceTest.getURLResource("");
+    String url = getURLResource("");
     String input = "{\"entityId\":\"" + entityId + "\", \"entityType\":\"" + kudosEntityType.name() + "\", \"receiverId\":\"root"
         + receiverId
         + "\", \"receiverType\":\"" + OrganizationIdentityProvider.NAME + "\", \"parentEntityId\":\"" + parentEntityId
         + "\", \"message\":\"" + message + "\"}";
-    ContainerResponse response = resourceTest.getResponse("POST",
-                                                          url,
-                                                          input);
+    ContainerResponse response = getResponse("POST",
+                                             url,
+                                             input);
 
     assertNotNull(response);
     assertEquals(String.valueOf(response.getEntity()), 200, response.getStatus());
@@ -352,12 +359,12 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertEquals(kudosEntityType.name(), kudos.getEntityType());
     assertEquals(message, kudos.getMessage());
 
-    url = resourceTest.getURLResource("byEntity/sent/count?entityType=" + kudosEntityType + "&entityId=" + entityId);
-    response = resourceTest.service("GET",
-                                    url,
-                                    "",
-                                    null,
-                                    null);
+    url = getURLResource("byEntity/sent/count?entityType=" + kudosEntityType + "&entityId=" + entityId);
+    response = service("GET",
+                       url,
+                       "",
+                       null,
+                       null);
     assertNotNull(response);
     assertEquals(200, response.getStatus());
     String count = (String) response.getEntity();
@@ -366,13 +373,13 @@ public class KudosRestTest extends BaseKudosRestTest {
   }
 
   private List<Kudos> getKudosListOfActivity(String activityId, String username, int expectedStatus) throws Exception {
-    resourceTest.startSessionAs(username);
-    String url = resourceTest.getURLResource("byActivity/" + activityId + "/all");
-    ContainerResponse response = resourceTest.service("GET",
-                                                      url,
-                                                      "",
-                                                      null,
-                                                      null);
+    startSessionAs(username);
+    String url = getURLResource("byActivity/" + activityId + "/all");
+    ContainerResponse response = service("GET",
+                                         url,
+                                         "",
+                                         null,
+                                         null);
     assertNotNull(response);
     assertEquals(response.getEntity() == null ? "Unexpected status: " + response.getStatus() : response.getEntity().toString(),
                  expectedStatus,
