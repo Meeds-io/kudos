@@ -38,7 +38,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled === 'same' ? $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') : $t('exoplatform.kudos.title.sendAKudos') }}
+        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -124,22 +124,17 @@ export default {
     },   
     userIdentityId() {
       return  eXo.env.portal.userIdentityId;
-    },                           
+    },
+    sharedInSpace() {
+      return this.activity?.activityStream?.type === 'space';
+    },
     buttonDisabled() {
       if (this.comment) {
-        const commentOwnerId = this.comment.identity && this.comment.identity.id; 
-        if (commentOwnerId === this.userIdentityId) {
-          return 'same'; 
-        } else if (this.inactiveCommentOwner || !this.comment.owner.isMember){
-          return 'inactive';        
-        }        
+        const commentOwnerId = this.comment.identity && this.comment.identity.id;
+        return commentOwnerId === this.userIdentityId || this.inactiveCommentOwner || (this.sharedInSpace && !this.comment.owner.isMember);
       } else if (this.activity) {
-        const activityOwnerId = this.activity.identity && this.activity.identity.id; 
-        if (activityOwnerId === this.userIdentityId){
-          return 'same';
-        } else if (this.inactiveActivityOwner || !this.activity.owner.isMember){
-          return 'inactive';        
-        }        
+        const activityOwnerId = this.activity.identity && this.activity.identity.id;
+        return activityOwnerId === this.userIdentityId || this.inactiveActivityOwner || (this.sharedInSpace && !this.activity.owner.isMember);
       }
       return false;
     },
