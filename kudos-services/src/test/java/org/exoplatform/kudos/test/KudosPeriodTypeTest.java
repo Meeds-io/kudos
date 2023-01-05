@@ -1,7 +1,5 @@
 package org.exoplatform.kudos.test;
 
-import static org.junit.Assert.*;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -12,7 +10,7 @@ import org.junit.Test;
 import org.exoplatform.kudos.model.KudosPeriod;
 import org.exoplatform.kudos.model.KudosPeriodType;
 
-public class KudosPeriodTypeTest {
+public class KudosPeriodTypeTest extends BaseKudosTest {
 
   @Test
   public void testGetWeekPeriod() {
