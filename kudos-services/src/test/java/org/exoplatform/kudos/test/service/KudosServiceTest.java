@@ -1,6 +1,6 @@
 package org.exoplatform.kudos.test.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,18 +8,24 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.regexp.RE;
 import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
 import org.exoplatform.kudos.listener.GamificationIntegrationListener;
 import org.exoplatform.kudos.listener.NewKudosSentActivityGeneratorListener;
-import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.model.AccountSettings;
+import org.exoplatform.kudos.model.GlobalSettings;
+import org.exoplatform.kudos.model.Kudos;
+import org.exoplatform.kudos.model.KudosEntityType;
+import org.exoplatform.kudos.model.KudosPeriod;
+import org.exoplatform.kudos.model.KudosPeriodType;
 import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.kudos.service.KudosStorage;
 import org.exoplatform.kudos.service.utils.Utils;
 import org.exoplatform.kudos.test.BaseKudosTest;
-import org.exoplatform.services.listener.*;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.Listener;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
