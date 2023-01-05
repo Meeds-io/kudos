@@ -22,7 +22,11 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.application.PortletPreferenceRequiredPlugin;
 import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.space.*;
+import org.exoplatform.social.core.space.SpaceApplicationConfigPlugin;
+import org.exoplatform.social.core.space.SpaceException;
+import org.exoplatform.social.core.space.SpaceFilter;
+import org.exoplatform.social.core.space.SpaceListAccess;
+import org.exoplatform.social.core.space.SpaceListenerPlugin;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceLifeCycleListener;
 import org.exoplatform.social.core.space.spi.SpaceService;
@@ -554,8 +558,7 @@ public class SpaceServiceMock implements SpaceService {
   }
 
   public void setPortletsPrefsRequired(PortletPreferenceRequiredPlugin portletPrefsRequiredPlugin) {
-    throw new UnsupportedOperationException();
-
+    // Nothing to do
   }
 
   public String[] getPortletsPrefsRequired() {
