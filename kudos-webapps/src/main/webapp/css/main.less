@@ -86,17 +86,19 @@
   line-height: inherit;
 }
 
-#KudosAdminApp {
-   margin: 10px 11px 0;
-}
-
-#KudosAdminApp, #KudosApp {
+#KudosApp {
   .v-autocomplete label {
     z-index: 1002;
   }
   .v-menu__content {
     z-index: 1050 !important;
   }
+  .contactAutoCompleteContent {
+    z-index: 1050 !important;
+  }
+}
+
+#KudosAdminApp, #KudosApp {
   .v-input input {
     margin-bottom: 0;
     border: 0;
@@ -108,7 +110,6 @@
     right: 0 ~'!important; /** orientation=rt */ ';
     position: absolute;
     width: 100%;
-    z-index: 1050 !important;
   }
   .contactAutoComplete {
     position: relative;
