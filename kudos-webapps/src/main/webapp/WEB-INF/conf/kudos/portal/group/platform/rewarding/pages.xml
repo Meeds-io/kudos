@@ -28,14 +28,17 @@
         <title>Kudo administration</title>
         <access-permissions>*:/platform/rewarding</access-permissions>
         <edit-permission>manager:/platform/rewarding</edit-permission>
-        <portlet-application>
-            <portlet>
-                <application-ref>kudos</application-ref>
-                <portlet-ref>KudosAdmin</portlet-ref>
-            </portlet>
-            <title>Kudos administration</title>
-            <access-permissions>*:/platform/rewarding</access-permissions>
-            <show-info-bar>false</show-info-bar>
-        </portlet-application>
+        <container id="singlePageApplicationContainer" template="system:/groovy/portal/webui/container/UIContainer.gtmpl" cssClass="singlePageApplication">
+          <access-permissions>*:/platform/rewarding</access-permissions>
+          <portlet-application>
+              <portlet>
+                  <application-ref>kudos</application-ref>
+                  <portlet-ref>KudosAdmin</portlet-ref>
+              </portlet>
+              <title>Kudos administration</title>
+              <access-permissions>*:/platform/rewarding</access-permissions>
+              <show-info-bar>false</show-info-bar>
+          </portlet-application>
+        </container>
     </page>
 </page-set>
