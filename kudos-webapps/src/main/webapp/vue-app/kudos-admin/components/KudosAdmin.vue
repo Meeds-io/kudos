@@ -1,21 +1,22 @@
 <template>
   <v-app
     id="KudosAdminApp"
-    color="transaprent"
-    class="VuetifyApp">
+    color="transaprent">
     <main>
       <v-layout>
-        <v-flex class="white text-center" flat>
+        <v-flex class="text-center" flat>
           <div v-if="error && !loading" class="alert alert-error v-content">
             <i class="uiIconError"></i>{{ error }}
           </div>
-          <v-tabs v-model="selectedTab" grow>
+          <v-tabs
+            v-model="selectedTab"
+            slider-size="4">
             <v-tabs-slider color="primary" />
             <v-tab key="general" href="#general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
             <v-tab key="kudosList" href="#kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
           </v-tabs>
 
-          <v-tabs-items v-model="selectedTab">
+          <v-tabs-items v-model="selectedTab" class="mt-2">
             <v-tab-item
               id="general"
               value="general"
@@ -79,13 +80,6 @@
                       dense
                       flat
                       @update:search-input="search">
-                      <template slot="no-data">
-                        <v-list-item>
-                          <v-list-item-title>
-                            {{ $t('exoplatform.kudos.label.kudosAccessPermissionNoData') }}
-                          </v-list-item-title>
-                        </v-list-item>
-                      </template>
                       <template slot="selection" slot-scope="{ item, selected }">
                         <v-chip
                           v-if="item.error"
