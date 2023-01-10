@@ -10,13 +10,6 @@ if (extensionRegistry) {
   }
 }
 
-Vue.use(Vuetify);
-
-const vuetify = new Vuetify({
-  dark: true,
-  iconfont: 'mdi',
-});
-
 const appId = 'KudosOverview';
 const cacheId = `${appId}_${eXo.env.portal.profileOwnerIdentityId}`;
 
@@ -35,7 +28,7 @@ export function init() {
       },
       template: `<kudos-overview id="${appId}" v-cacheable="{cacheId: '${cacheId}'}" />`,
       i18n,
-      vuetify,
+      vuetify: Vue.prototype.vuetifyOptions,
     }).$mount(appElement);
   });
 }
