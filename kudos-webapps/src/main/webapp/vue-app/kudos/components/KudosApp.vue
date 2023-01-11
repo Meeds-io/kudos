@@ -455,9 +455,7 @@ export default {
         })
         .then(() => {
           this.$refs.activityKudosDrawer.close();
-          if (this.entityType === 'COMMENT') {
-            this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
-          }
+          this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
         })
         .catch(e => {
           console.error('Error refreshing UI', e);
