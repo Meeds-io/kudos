@@ -61,7 +61,7 @@
         </value-param>
         <value-param>
           <name>containerName</name>
-          <value>profile-after-about-me-container</value>
+          <value>profile-right-container</value>
         </value-param>
         <object-param>
           <name>kudos-overview-portlet</name>
