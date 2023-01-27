@@ -74,4 +74,12 @@
     </component-plugin>
   </external-component-plugins>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.social.core.manager.IdentityManager</target-component>
+    <component-plugin>
+      <name>ProfileUpdateListener</name>
+      <set-method>addProfileListener</set-method>
+      <type>org.exoplatform.kudos.listener.ProfileUpdateListener</type>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>
