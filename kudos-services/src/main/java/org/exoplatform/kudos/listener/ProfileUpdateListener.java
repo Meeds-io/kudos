@@ -28,7 +28,7 @@ public class ProfileUpdateListener extends ProfileListenerPlugin {
 
   @Override
   public void bannerUpdated(ProfileLifeCycleEvent event) {
-
+    // NOSONAR
   }
 
   @Override
@@ -39,21 +39,24 @@ public class ProfileUpdateListener extends ProfileListenerPlugin {
 
   @Override
   public void experienceSectionUpdated(ProfileLifeCycleEvent event) {
-
+    // NOSONAR
   }
 
   @Override
   public void createProfile(ProfileLifeCycleEvent event) {
-
+    // NOSONAR
   }
 
   private void clearUserActivitiesCache(String userId) {
-    if (activityStorage instanceof CachedActivityStorage) {
-      long count = kudosService.countKudosByPeriodAndReceiver(Long.parseLong(userId),0 , System.currentTimeMillis());
-      List<Kudos> kudosList = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(userId),0 , System.currentTimeMillis(),(int) count);
-      if (kudosList == null || kudosList.isEmpty())
-        return;
-      kudosList.stream().forEach(kudos -> ((CachedActivityStorage) activityStorage).clearActivityCached(String.valueOf(kudos.getActivityId())));
-    }
+    long count = kudosService.countKudosByPeriodAndReceiver(Long.parseLong(userId), 0, System.currentTimeMillis());
+    List<Kudos> kudosList = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(userId),
+                                                                     0,
+                                                                     System.currentTimeMillis(),
+                                                                     (int) count);
+    if (kudosList == null || kudosList.isEmpty())
+      return;
+    kudosList.stream()
+             .forEach(kudos -> ((CachedActivityStorage) activityStorage).clearActivityCached(String.valueOf(kudos.getActivityId())));
   }
+
 }

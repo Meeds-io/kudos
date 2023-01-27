@@ -3,35 +3,38 @@ package org.exoplatform.kudos.test.listener;
 import org.exoplatform.commons.testing.BaseExoTestCase;
 import org.exoplatform.kudos.listener.ProfileUpdateListener;
 import org.exoplatform.kudos.service.KudosService;
+import org.exoplatform.kudos.test.BaseKudosTest;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.profile.ProfileLifeCycleEvent;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
+import org.exoplatform.social.core.storage.cache.CachedActivityStorage;
+import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
-public class ProfileUpdateListenerTest extends BaseExoTestCase {
+public class ProfileUpdateListenerTest extends BaseKudosTest {
+
   private IdentityManager identityManager;
 
   private KudosService    kudosService;
 
   private ActivityStorage activityStorage;
 
-  public void setUp() throws Exception {
-    super.setUp();
-    identityManager = getContainer().getComponentInstanceOfType(IdentityManager.class);
-  }
-
+  @Test
   public void testUpdateProfileAndDetectChanges() {
+    identityManager =  getService(IdentityManager.class);
+    kudosService = mock(KudosService.class);
+    activityStorage = mock(CachedActivityStorage.class);
     Identity rootIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root1");
     Profile profile = rootIdentity.getProfile();
-    List<Integer> changes = new ArrayList<>();
     identityManager.registerProfileListener(new ProfileUpdateListener(kudosService, activityStorage) {
       @Override
       public void experienceSectionUpdated(ProfileLifeCycleEvent event) {
+        // noop
       }
 
       @Override
@@ -46,36 +49,36 @@ public class ProfileUpdateListenerTest extends BaseExoTestCase {
 
       @Override
       public void contactSectionUpdated(ProfileLifeCycleEvent event) {
-        changes.add(1);
+        ((CachedActivityStorage) activityStorage).clearActivityCached("1");
       }
 
       @Override
       public void bannerUpdated(ProfileLifeCycleEvent event) {
+        // noop
       }
 
       @Override
       public void avatarUpdated(ProfileLifeCycleEvent event) {
-        changes.add(2);
+        ((CachedActivityStorage) activityStorage).clearActivityCached("2");
       }
 
       @Override
       public void aboutMeUpdated(ProfileLifeCycleEvent event) {
+        // noop
       }
     });
+    doNothing().when(((CachedActivityStorage) activityStorage)).clearActivityCached(anyString());
     profile.setProperty(Profile.FIRST_NAME, "Changed Firstname");
     identityManager.updateProfile(profile);
-    assertEquals(1, changes.size());
-    assertTrue(changes.contains(1));
+    verify((CachedActivityStorage) activityStorage, times(1)).clearActivityCached(anyString());
 
     profile.setProperty(Profile.ABOUT_ME, "Changed ABOUT_ME");
     profile.removeProperty(Profile.FIRST_NAME);
     identityManager.updateProfile(profile);
-    assertEquals(1, changes.size());
-    assertTrue(changes.contains(1));
+    verify((CachedActivityStorage) activityStorage, times(1)).clearActivityCached(anyString());
+
     profile.setProperty(Profile.AVATAR, "new/avatar");
     identityManager.updateProfile(profile);
-    assertEquals(2, changes.size());
-    assertTrue(changes.contains(2));
+    verify((CachedActivityStorage) activityStorage, times(2)).clearActivityCached(anyString());
   }
-
 }
