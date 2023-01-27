@@ -21,6 +21,9 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.storage.api.IdentityStorage;
 
 public class IdentityManagerMock implements IdentityManager {
+
+  protected ProfileLifeCycle                 profileLifeCycle  = new ProfileLifeCycle();
+
   List<Identity> identities = new ArrayList<>();
 
   public IdentityManagerMock() {
@@ -30,6 +33,7 @@ public class IdentityManagerMock implements IdentityManager {
       identity.setEnable(true);
       identity.setProviderId(OrganizationIdentityProvider.NAME);
       identity.setRemoteId("root" + i);
+      identity.setId(String.valueOf(i));
       Profile profile = new Profile(identity);
       identity.setProfile(profile);
       identities.add(identity);
@@ -136,7 +140,16 @@ public class IdentityManagerMock implements IdentityManager {
 
   @Override
   public void updateProfile(Profile specificProfile) {
-    // empty
+    List<Profile.UpdateType> list = new ArrayList<>();
+    if (specificProfile.getProperty(Profile.FIRST_NAME) != null || specificProfile.getProperty(Profile.POSITION) != null ) {
+      list.add(Profile.UpdateType.CONTACT);
+    }
+    if (specificProfile.getProperty(Profile.AVATAR) != null){
+      list.add(Profile.UpdateType.AVATAR);
+    }
+    for (Profile.UpdateType type : list) {
+      type.updateActivity(profileLifeCycle, specificProfile);
+    }
   }
 
   @Override
@@ -171,7 +184,7 @@ public class IdentityManagerMock implements IdentityManager {
 
   @Override
   public void registerProfileListener(ProfileListenerPlugin profileListenerPlugin) {
-    throw new UnsupportedOperationException();
+    profileLifeCycle.addListener(profileListenerPlugin);
   }
 
   @Override

@@ -16,6 +16,22 @@
     </init-params>
   </component>
 
+
+  <component>
+    <key>org.exoplatform.social.common.lifecycle.LifeCycleCompletionService</key>
+    <type>org.exoplatform.social.common.lifecycle.LifeCycleCompletionService</type>
+    <init-params>
+      <value-param>
+        <name>thread-number</name>
+        <value>10</value>
+      </value-param>
+      <value-param>
+        <name>async-execution</name>
+        <value>false</value>
+      </value-param>
+    </init-params>
+  </component>
+
   <!-- Bind datasource -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.naming.InitialContextInitializer</target-component>
