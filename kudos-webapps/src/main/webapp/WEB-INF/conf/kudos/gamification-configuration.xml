@@ -3,30 +3,6 @@
   for more details. You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org. -->
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-    <!-- Gamification zones : reward  zone -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.addons.gamification.service.setting.zone.ZoneRegistry</target-component>
-    <component-plugin>
-      <name>social.zone</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.addons.gamification.service.setting.zone.model.ZoneConfig</type>
-      <init-params>
-        <value-param>
-          <name>zone-name</name>
-          <value>reward</value>
-        </value-param>
-        <value-param>
-          <name>zone-description</name>
-          <value>reward</value>
-        </value-param>
-        <value-param>
-          <name>zone-priority</name>
-          <value>1</value>
-        </value-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
   <external-component-plugins>
     <target-component>org.exoplatform.addons.gamification.service.setting.rule.RuleRegistry</target-component>
     <component-plugin>
@@ -47,12 +23,8 @@
           <value>10</value>
         </value-param>
         <value-param>
-          <name>rule-zone</name>
-          <value>reward</value>
-        </value-param>
-        <value-param>
           <name>rule-enable</name>
-          <value>true</value>
+          <value>false</value>
         </value-param>
       </init-params>
     </component-plugin>
@@ -77,12 +49,8 @@
           <value>5</value>
         </value-param>
         <value-param>
-          <name>rule-zone</name>
-          <value>reward</value>
-        </value-param>
-        <value-param>
           <name>rule-enable</name>
-          <value>true</value>
+          <value>false</value>
         </value-param>
       </init-params>
     </component-plugin>
