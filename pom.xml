@@ -29,7 +29,7 @@
     <!-- 3rd party libraries versions -->
     <io.meeds.social.version>7.0.x-devx-SNAPSHOT</io.meeds.social.version>
     <io.meeds.platform-ui.version>7.0.x-devx-SNAPSHOT</io.meeds.platform-ui.version>
-    <addon.meeds.analytics.version>7.0.x-edevxxo-SNAPSHOT</addon.meeds.analytics.version>
+    <addon.meeds.analytics.version>7.0.x-devx-SNAPSHOT</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
