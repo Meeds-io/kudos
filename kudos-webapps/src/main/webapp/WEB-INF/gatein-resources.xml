@@ -28,16 +28,7 @@
         <module>eXoVueI18n</module>
       </depends>
       <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
         <module>commonVueComponents</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>
@@ -69,15 +60,6 @@
         <module>eXoVueI18n</module>
       </depends>
       <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
-      </depends>
-      <depends>
         <module>extensionRegistry</module>
       </depends>
     </module>
@@ -102,15 +84,6 @@
       <depends>
         <module>jquery</module>
         <as>$</as>
-      </depends>
-      <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
       </depends>
       <depends>
         <module>vuetify</module>
