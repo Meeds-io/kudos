@@ -16,6 +16,14 @@ import org.exoplatform.kudos.model.KudosPeriod;
 
 public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
 
+  private static final String ACTIVITY_ID = "activityId";
+
+  private static final String ENTITY_TYPE = "entityType";
+
+  private static final String ENTITY_ID   = "entityId";
+
+  private static final String SENDER_ID   = "senderId";
+
   public List<KudosEntity> getKudosByPeriod(KudosPeriod kudosPeriod, int limit) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriod", KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
@@ -27,15 +35,15 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndEntityType",
                                                                         KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
-    query.setParameter("entityType", entityType);
+    query.setParameter(ENTITY_TYPE, entityType);
     query.setMaxResults(limit);
     return query.getResultList();
   }
 
   public List<KudosEntity> getKudosByEntity(int entityType, long entityId, int limit) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByEntity", KudosEntity.class);
-    query.setParameter("entityId", entityId);
-    query.setParameter("entityType", entityType);
+    query.setParameter(ENTITY_ID, entityId);
+    query.setParameter(ENTITY_TYPE, entityType);
     query.setMaxResults(limit);
     return query.getResultList();
   }
@@ -54,17 +62,17 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
 
   public long countKudosByEntity(int entityType, long entityId) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByEntity", Long.class);
-    query.setParameter("entityId", entityId);
-    query.setParameter("entityType", entityType);
+    query.setParameter(ENTITY_ID, entityId);
+    query.setParameter(ENTITY_TYPE, entityType);
     Long count = query.getSingleResult();
     return count == null ? 0 : count;
   }
   
   public long countKudosByEntityAndSender(int entityType, long entityId, long senderId) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByEntityAndSender", Long.class);
-    query.setParameter("entityId", entityId);
-    query.setParameter("entityType", entityType);
-    query.setParameter("senderId", senderId);
+    query.setParameter(ENTITY_ID, entityId);
+    query.setParameter(ENTITY_TYPE, entityType);
+    query.setParameter(SENDER_ID, senderId);
     Long count = query.getSingleResult();
     return count == null ? 0 : count;
   }
@@ -88,14 +96,14 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
   public List<KudosEntity> getKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId, int limit) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByPeriodAndSender", KudosEntity.class);
     setPeriodParameters(query, kudosPeriod);
-    query.setParameter("senderId", senderId);
+    query.setParameter(SENDER_ID, senderId);
     query.setMaxResults(limit);
     return query.getResultList();
   }
 
   public KudosEntity getKudosByActivityId(Long  activityId) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosByActivityId", KudosEntity.class);
-    query.setParameter("activityId",activityId);
+    query.setParameter(ACTIVITY_ID,activityId);
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {
@@ -105,15 +113,23 @@ public class KudosDAO extends GenericDAOJPAImpl<KudosEntity, Long> {
 
   public List<KudosEntity> getKudosListOfActivity(Long activityId) {
     TypedQuery<KudosEntity> query = getEntityManager().createNamedQuery("Kudos.getKudosListOfActivity", KudosEntity.class);
-    query.setParameter("activityId", activityId);
+    query.setParameter(ACTIVITY_ID, activityId);
     query.setParameter("activityTypes", Arrays.asList(KudosEntityType.ACTIVITY.ordinal(), KudosEntityType.COMMENT.ordinal()));
     return query.getResultList();
+  }
+
+  public long countKudosOfActivity(Long activityId) {
+    TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosOfActivity", Long.class);
+    query.setParameter(ACTIVITY_ID, activityId);
+    query.setParameter("activityTypes", Arrays.asList(KudosEntityType.ACTIVITY.ordinal(), KudosEntityType.COMMENT.ordinal()));
+    Long count = query.getSingleResult();
+    return count == null ? 0 : count;
   }
 
   public long countKudosByPeriodAndSender(KudosPeriod kudosPeriod, long senderId) {
     TypedQuery<Long> query = getEntityManager().createNamedQuery("Kudos.countKudosByPeriodAndSender", Long.class);
     setPeriodParameters(query, kudosPeriod);
-    query.setParameter("senderId", senderId);
+    query.setParameter(SENDER_ID, senderId);
     Long count = query.getSingleResult();
     return count == null ? 0 : count;
   }

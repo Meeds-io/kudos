@@ -59,6 +59,10 @@ public class Utils {
 
   public static final String                 GAMIFICATION_GENERIC_EVENT      = "exo.gamification.generic.action";
 
+  public static final String                 KUDOS_CANCEL_ACTIVITY_EVENT     = "kudos.cancel.activity";
+
+  public static final String                 GAMIFICATION_CANCEL_EVENT       = "gamification.cancel.kudos.action";
+
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos_content";
@@ -68,7 +72,7 @@ public class Utils {
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
 
   public static final String                 ACTIVITY_COMMENT_ID_PREFIX      = "comment";
-  
+
   public static final String                 CONTENT_TYPE                    = "contentType";
 
   private Utils() {

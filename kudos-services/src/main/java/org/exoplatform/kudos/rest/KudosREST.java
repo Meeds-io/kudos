@@ -35,6 +35,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.kudos.exception.KudosAlreadyLinkedException;
 import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.service.KudosService;
 import org.exoplatform.services.log.ExoLogger;
@@ -433,6 +435,40 @@ public class KudosREST implements ResourceContainer {
       return Response.ok(kudosSent).build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @DELETE
+  @Path("{kudosId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @Operation(summary = "Cancels a sent kudos", method = "DELETE", description = "Cancels a sent kudos")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "404", description = "Object not found"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public Response deleteKudos(@Parameter(description = "Kudos technical identifier", required = true)
+                              @PathParam("kudosId") long kudosId) {
+
+    String currentUser = getCurrentUserId();
+
+    try {
+      kudosService.deleteKudosById(kudosId, currentUser);
+      return Response.noContent().build();
+    } catch (IllegalAccessException e) {
+      LOG.debug("User '{}' doesn't have enough privileges to delete kudos with id {}", currentUser, kudosId, e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("User '{}' attempts to delete a not existing kudos '{}'", currentUser, e);
+      return Response.status(Response.Status.NOT_FOUND).entity("kudos not found").build();
+    } catch (KudosAlreadyLinkedException e) {
+      LOG.debug("User '{}' attempts to delete a kudos '{}' already linked to kudos entities", currentUser, e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity("KudosAlreadyLinked").build();
+    } catch (Exception e) {
+      LOG.warn("Error canceling kudos: {}", e);
       return Response.serverError().build();
     }
   }

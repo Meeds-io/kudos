@@ -372,6 +372,35 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertEquals("1", count);
   }
 
+
+  @Test
+  public void testDeleteKudos() throws Exception {
+    startSessionAs("root4");
+
+    String url = getURLResource("" + entityId);
+    ContainerResponse response = service("DELETE", url, "", null, null);
+    assertNotNull(response);
+    assertEquals(404, response.getStatus());
+
+    KudosEntity kudos = newKudos();
+
+    startSessionAs("root3");
+    url = getURLResource("" + kudos.getId());
+    response = service("DELETE", url, "", null, null);
+    assertNotNull(response);
+    assertEquals(401, response.getStatus());
+
+    startSessionAs("root4");
+
+    response = service("DELETE", url, "", null, null);
+    assertNotNull(response);
+    assertEquals(204, response.getStatus());
+
+    response = service("DELETE", url, "", null, null);
+    assertNotNull(response);
+    assertEquals(404, response.getStatus());
+  }
+
   private List<Kudos> getKudosListOfActivity(String activityId, String username, int expectedStatus) throws Exception {
     startSessionAs(username);
     String url = getURLResource("byActivity/" + activityId + "/all");
