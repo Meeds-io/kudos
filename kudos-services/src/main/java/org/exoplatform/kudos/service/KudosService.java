@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.kudos.exception.KudosAlreadyLinkedException;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.api.settings.SettingService;
@@ -208,6 +210,38 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     listenerService.broadcast(KUDOS_SENT_EVENT, this, createdKudos);
 
     return createdKudos;
+  }
+
+  /**
+   * Deletes a sent kudos
+   *
+   * @param kudosId Kudos technical identifier to delete
+   * @param username User name deleting kudos
+   * @throws IllegalAccessException when user is not authorized to delete the
+   *           kudos
+   * @throws ObjectNotFoundException when the kudos identified by its technical
+   *           identifier is not found
+   */
+  public void deleteKudosById(long kudosId, String username) throws Exception {
+    if (username == null) {
+      throw new IllegalArgumentException("Username is mandatory");
+    }
+    if (kudosId <= 0) {
+      throw new IllegalArgumentException("Kudos id has to be positive integer");
+    }
+    Kudos kudos = kudosStorage.getKudoById(kudosId);
+    if (kudos == null) {
+      throw new ObjectNotFoundException("Kudos with id " + kudosId + " wasn't found");
+    }
+    if (!kudos.getSenderId().equals(username)) {
+      throw new IllegalAccessException("user " + username + " is not allowed to delete kudos with id " + kudosId);
+    }
+    long kudosOfActivityCount = kudosStorage.countKudosOfActivity(kudos.getActivityId());
+    if (kudosOfActivityCount > 1) {
+      throw new KudosAlreadyLinkedException("kudos with id " + kudosId + "already linked to kudos entities");
+    }
+    kudosStorage.deleteKudosById(kudosId);
+    listenerService.broadcast(KUDOS_CANCEL_ACTIVITY_EVENT, this, kudos);
   }
 
   /**

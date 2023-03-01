@@ -124,6 +124,11 @@
       <set-method>addListener</set-method>
       <type>org.exoplatform.kudos.listener.GamificationIntegrationListener</type>
     </component-plugin>
+    <component-plugin>
+      <name>kudos.cancel.activity</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.GamificationIntegrationListener</type>
+    </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>

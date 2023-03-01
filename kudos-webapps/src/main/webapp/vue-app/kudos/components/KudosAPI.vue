@@ -3,6 +3,7 @@ export default {
   created() {
     document.addEventListener('exo-kudos-get-period', this.getPeriodDates);
     document.addEventListener('exo-kudos-get-kudos-list', this.getKudosList);
+    document.addEventListener('kudos-cancel-action', this.cancelKudos);
     this.$kudosService.registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
     this.$kudosService.registerFavoriteExtensions(this.$t('exoplatform.kudos.label.to'));
     this.$kudosService.registerOverviewExtension();
@@ -123,6 +124,19 @@ export default {
               </a>
             </li>`);
         }
+      }
+    },
+    cancelKudos(event) {
+      if (event && event.detail) {
+        document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+        return this.$kudosService.deleteKudos(event.detail).catch(e => {
+          if (e.message === 'KudosAlreadyLinked') {
+            document.dispatchEvent(new CustomEvent('notification-alert', {detail: {
+              message: this.$t('kudos.cancel.error.alreadyLinked'),
+              type: 'error',
+            }}));
+          }})
+          .finally(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')));
       }
     }
   }
