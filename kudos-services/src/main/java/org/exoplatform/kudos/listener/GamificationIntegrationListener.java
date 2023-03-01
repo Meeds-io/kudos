@@ -2,6 +2,9 @@ package org.exoplatform.kudos.listener;
 
 import static org.exoplatform.kudos.service.utils.Utils.ACTIVITY_COMMENT_ID_PREFIX;
 import static org.exoplatform.kudos.service.utils.Utils.GAMIFICATION_GENERIC_EVENT;
+import static org.exoplatform.kudos.service.utils.Utils.KUDOS_ACTIVITY_EVENT;
+import static org.exoplatform.kudos.service.utils.Utils.KUDOS_CANCEL_ACTIVITY_EVENT;
+import static org.exoplatform.kudos.service.utils.Utils.GAMIFICATION_CANCEL_EVENT;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +68,19 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getSenderId()); // matches the gamification's earner id
         gam.put("receiverId", kudos.getReceiverId());
-        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+        switch (event.getEventName()) {
+        case KUDOS_ACTIVITY_EVENT: {
+          listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+          break;
+        }
+        case KUDOS_CANCEL_ACTIVITY_EVENT: {
+          getActivityManager().deleteActivity(String.valueOf(kudos.getActivityId()));
+          listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+          break;
+        }
+        default:
+          throw new IllegalArgumentException("Unexpected listener event name: " + event.getEventName());
+        }
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
@@ -76,7 +91,18 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
         gam.put("object", activityURL);
         gam.put("senderId", kudos.getReceiverId()); // matches the gamification's earner id
         gam.put("receiverId", kudos.getSenderId());
-        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+        switch (event.getEventName()) {
+        case KUDOS_ACTIVITY_EVENT: {
+          listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+          break;
+        }
+        case KUDOS_CANCEL_ACTIVITY_EVENT: {
+          listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+          break;
+        }
+        default:
+          throw new IllegalArgumentException("Unexpected listener event name: " + event.getEventName());
+        }
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
