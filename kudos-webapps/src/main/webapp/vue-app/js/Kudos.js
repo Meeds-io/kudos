@@ -54,6 +54,23 @@ export function sendKudos(kudo) {
   }
 }
 
+export function deleteKudos(kudosId) {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/kudos/api/kudos/${kudosId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else if (resp.status === 401) {
+      return resp.text().then((text) => {
+        throw new Error(text);
+      });
+    } else {
+      throw new Error('Response code indicates a server error', resp);
+    }
+  });
+}
+
 export function getKudosSent(senderIdentityId, limit, returnSize, periodType, dateInSeconds) {
   return fetch(`/portal/rest/kudos/api/kudos/${senderIdentityId}/sent?limit=${limit || 0}&returnSize=${returnSize || true}&periodType=${periodType || ''}&dateInSeconds=${dateInSeconds || '0'}`, {
     method: 'GET',
@@ -316,6 +333,51 @@ export function registerActivityActionExtension() {
       },
       canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
       forceCanEditOverwrite: true,
+    },
+  });
+
+  extensionRegistry.registerExtension('activity', 'action', {
+    id: 'cancelKudos',
+    labelKey: 'kudos.label.cancelKudos',
+    icon: 'fa-undo-alt',
+    confirmDialog: true,
+    confirmMessageKey: 'kudos.label.confirmCancelKudos',
+    confirmTitleKey: 'kudos.label.button.Confirmation',
+    confirmOkKey: 'kudos.label.button.ok',
+    confirmCancelKey: 'kudos.label.button.cancel',
+    rank: 50,
+    isEnabled: (activity, activityTypeExtension) => {
+      return activity.type === 'exokudos:activity' && activity.canEdit === 'true' && (!activityTypeExtension.canEdit || activityTypeExtension.canEdit(activity));
+    },
+    click: (activity) => {
+      const activityId = Number(activity.id);
+      const kudos = activity.kudosList.find(kudosTmp => kudosTmp.activityId === activityId);
+      document.dispatchEvent(new CustomEvent('kudos-cancel-action', {detail: kudos.technicalId}));
+    },
+  });
+
+  extensionRegistry.registerExtension('activity', 'comment-action', {
+    id: 'cancelKudos',
+    rank: 30,
+    labelKey: 'kudos.label.cancelKudos',
+    icon: 'fa-undo-alt',
+    confirmDialog: true,
+    confirmMessageKey: 'kudos.label.confirmCancelKudos',
+    confirmTitleKey: 'kudos.label.button.Confirmation',
+    confirmOkKey: 'kudos.label.button.ok',
+    confirmCancelKey: 'kudos.label.button.cancel',
+    isEnabled: (activity, comment, activityTypeExtension) => {
+      if (activityTypeExtension.canEdit) {
+        if (activityTypeExtension.forceCanEditOverwrite) {
+          return activityTypeExtension.canEdit(comment);
+        } else if (!activityTypeExtension.canEdit(comment)) {
+          return false;
+        }
+      }
+      return comment.type === 'exokudos:activity' && comment.canEdit === 'true';
+    },
+    click: (activity, comment) => {
+      document.dispatchEvent(new CustomEvent('kudos-cancel-action', {detail: comment.kudos.technicalId}));
     },
   });
 
