@@ -52,6 +52,14 @@ public class KudosStorage {
     return fromEntity(kudosEntity, defaultPortal);
   }
 
+  public void deleteKudosById(long kudosId) {
+    KudosEntity kudosEntity = this.kudosDAO.find(kudosId);
+    if (kudosEntity == null) {
+      return;
+    }
+    kudosDAO.delete(kudosEntity);
+  }
+
   public void saveKudosActivityId(long kudosId, long activityId) {
     KudosEntity kudosEntity = kudosDAO.find(kudosId);
     if (kudosEntity == null) {
@@ -189,6 +197,10 @@ public class KudosStorage {
                                                   : kudosEntities.stream()
                                                                  .map(entity -> Utils.fromEntity(entity, defaultPortal))
                                                                  .collect(Collectors.toList());
+  }
+
+  public long countKudosOfActivity(Long activityId) {
+    return kudosDAO.countKudosOfActivity(activityId);
   }
 
   public Kudos updateKudos(Kudos kudos) {

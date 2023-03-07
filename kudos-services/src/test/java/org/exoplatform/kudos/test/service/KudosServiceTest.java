@@ -1,6 +1,7 @@
 package org.exoplatform.kudos.test.service;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
@@ -658,6 +660,23 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos newKudos = kudosService.updateKudos(storedKudos);
     assertEquals(newKudos.getMessage(), storedKudos.getMessage());
     compareResults(Utils.toEntity(newKudos), storedKudos);
+  }
+
+  @Test
+  public void testDeleteKudosById() throws Exception {
+    KudosService kudosService = getService(KudosService.class);
+    KudosStorage kudosStorage = getService(KudosStorage.class);
+    Kudos kudos = newKudosDTO();
+    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    long kudosId = kudos.getTechnicalId();
+
+    assertThrows(IllegalArgumentException.class, () -> kudosService.deleteKudosById(0, "root4"));
+    assertThrows(ObjectNotFoundException.class, () -> kudosService.deleteKudosById(100, "root4"));
+    assertThrows(IllegalAccessException.class, () -> kudosService.deleteKudosById(kudosId, "root3"));
+    kudosService.deleteKudosById(kudosId, "root4");
+    Kudos kudos1 = kudosStorage.getKudoById(kudos.getTechnicalId());
+    assertNull(kudos1);
   }
 
   private void resetGlobalSettings() {
