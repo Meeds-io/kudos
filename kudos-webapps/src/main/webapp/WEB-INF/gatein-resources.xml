@@ -10,10 +10,9 @@
   <portlet>
     <name>Kudos</name>
     <module>
-      <script>
-        <minify>false</minify>
-        <path>/js/kudos.bundle.js</path>
-      </script>
+      <depends>
+        <module>kudos</module>
+      </depends>
       <depends>
         <module>jquery</module>
         <as>$</as>
@@ -28,16 +27,7 @@
         <module>eXoVueI18n</module>
       </depends>
       <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
         <module>commonVueComponents</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>
@@ -69,15 +59,6 @@
         <module>eXoVueI18n</module>
       </depends>
       <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
-      </depends>
-      <depends>
         <module>extensionRegistry</module>
       </depends>
     </module>
@@ -104,15 +85,6 @@
         <as>$</as>
       </depends>
       <depends>
-        <module>fetchPolyfill</module>
-      </depends>
-      <depends>
-        <module>customEventPolyfill</module>
-      </depends>
-      <depends>
-        <module>iePolyfills</module>
-      </depends>
-      <depends>
         <module>vuetify</module>
       </depends>
       <depends>
@@ -120,6 +92,34 @@
       </depends>
     </module>
   </portlet>
+
+  <module>
+    <name>kudos</name>
+    <load-group>popoverGRP</load-group>
+    <script>
+      <minify>false</minify>
+      <path>/js/kudos.bundle.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
 
   <module>
     <name>engagementCenterActionsKudosExtensions</name>
