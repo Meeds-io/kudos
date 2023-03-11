@@ -30,7 +30,7 @@
               <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
               <div
                 v-if="isLinkedKudos"
-                class="d-flex flex-row pl-4 mb-2 kudosReceiverAttendeeItem">
+                class="d-flex flex-row pl-4 mb-2 text-truncate kudosReceiverAttendeeItem">
                 <exo-identity-suggester
                   ref="kudosReceiverAutoComplete"
                   id="kudosReceiverAutoComplete"
