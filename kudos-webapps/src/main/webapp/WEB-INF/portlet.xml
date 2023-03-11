@@ -17,6 +17,14 @@
        <value>locale.addon.Kudos</value>
      </init-param>
      <init-param>
+       <name>use-js-manager</name>
+       <value>true</value>
+     </init-param>
+     <init-param>
+       <name>js-manager-jsModule</name>
+       <value>SHARED/kudos</value>
+     </init-param>
+     <init-param>
        <name>preload.resource.rest</name>
        <value><![CDATA[/portal/rest/kudos/api/account/settings,/portal/rest/kudos/api/settings,/portal/rest/kudos/api/kudos/{userId}/sent?limit=20&returnSize=true&periodType=&dateInSeconds=0]]></value>
      </init-param>
