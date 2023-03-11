@@ -60,7 +60,7 @@
               <v-avatar size="36px">
                 <img
                   :src="props.item.avatar"
-                  onerror="this.src = '/eXoSkin/skin/images/system/SpaceAvtDefault.png'">
+                  onerror="this.src = '/platform-ui/skin/images/avatar/DefaultSpaceAvatar.png'">
               </v-avatar>
             </td>
             <td class="text-start">
