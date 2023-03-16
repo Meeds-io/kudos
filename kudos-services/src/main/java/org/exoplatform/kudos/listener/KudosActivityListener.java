@@ -2,18 +2,26 @@ package org.exoplatform.kudos.listener;
 
 import static org.exoplatform.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
 
+import org.apache.commons.lang.StringUtils;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.service.KudosService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.ActivityLifeCycleEvent;
 import org.exoplatform.social.core.activity.ActivityListenerPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
+
+import java.util.List;
 
 /**
  * A listener to propagate comment or activity modification to Kudos stored
  * message
  */
 public class KudosActivityListener extends ActivityListenerPlugin {
+
+  private static final Log LOG = ExoLogger.getLogger(KudosActivityListener.class);
 
   private ActivityManager activityManager;
 
@@ -47,8 +55,28 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   }
 
   @Override
+  public void deleteActivity(ActivityLifeCycleEvent activityLifeCycleEvent) {
+    ExoSocialActivity activity = activityLifeCycleEvent.getSource();
+    List<Kudos> linkedKudosList = kudosService.getKudosListOfActivity(activity.getId());
+    if (!StringUtils.equals(activity.getType(), KUDOS_ACTIVITY_COMMENT_TYPE) && linkedKudosList.isEmpty()) {
+      return;
+    }
+    deleteLinkedKudos(linkedKudosList);
+  }
+
+  @Override
   public void saveComment(ActivityLifeCycleEvent activityLifeCycleEvent) {
     // NOT needed
+  }
+
+  @Override
+  public void deleteComment(ActivityLifeCycleEvent activityLifeCycleEvent) {
+    ExoSocialActivity activity = activityLifeCycleEvent.getSource();
+    List<Kudos> linkedKudosList = kudosService.getKudosListOfActivity(activity.getId());
+    if (!StringUtils.equals(activity.getType(), KUDOS_ACTIVITY_COMMENT_TYPE) && linkedKudosList.isEmpty()) {
+      return;
+    }
+    deleteLinkedKudos(linkedKudosList);
   }
 
   @Override
@@ -64,5 +92,15 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   @Override
   public void likeComment(ActivityLifeCycleEvent activityLifeCycleEvent) {
     // NOT needed
+  }
+
+  private void deleteLinkedKudos(List<Kudos> linkedKudosList) {
+    linkedKudosList.forEach(kudos -> {
+      try {
+        kudosService.deleteKudosById(kudos.getTechnicalId());
+      } catch (ObjectNotFoundException e) {
+        LOG.debug("Kudos with id {} wasn't found", kudos.getTechnicalId(), e);
+      }
+    });
   }
 }

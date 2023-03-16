@@ -74,8 +74,8 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
           break;
         }
         case KUDOS_CANCEL_ACTIVITY_EVENT: {
-          getActivityManager().deleteActivity(String.valueOf(kudos.getActivityId()));
           listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, String.valueOf(kudos.getTechnicalId()));
+          getActivityManager().deleteActivity(String.valueOf(kudos.getActivityId()));
           break;
         }
         default:

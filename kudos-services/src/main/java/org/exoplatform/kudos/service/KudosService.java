@@ -245,6 +245,24 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   }
 
   /**
+   * Deletes a sent kudos
+   *
+   * @param kudosId Kudos technical identifier to delete
+   * @throws ObjectNotFoundException when the kudos identified by its technical
+   *           identifier is not found
+   */
+  public void deleteKudosById(long kudosId) throws ObjectNotFoundException {
+    if (kudosId <= 0) {
+      throw new IllegalArgumentException("Kudos id has to be positive integer");
+    }
+    Kudos kudos = kudosStorage.getKudoById(kudosId);
+    if (kudos == null) {
+      throw new ObjectNotFoundException("Kudos with id " + kudosId + " wasn't found");
+    }
+    kudosStorage.deleteKudosById(kudosId);
+  }
+
+  /**
    * Stores generated activity for created {@link Kudos}
    * 
    * @param kudosId {@link Kudos} technical identifier
