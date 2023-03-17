@@ -58,10 +58,9 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   public void deleteActivity(ActivityLifeCycleEvent activityLifeCycleEvent) {
     ExoSocialActivity activity = activityLifeCycleEvent.getSource();
     List<Kudos> linkedKudosList = kudosService.getKudosListOfActivity(activity.getId());
-    if (!StringUtils.equals(activity.getType(), KUDOS_ACTIVITY_COMMENT_TYPE) && linkedKudosList.isEmpty()) {
-      return;
+    if (!linkedKudosList.isEmpty()) {
+      deleteLinkedKudos(linkedKudosList);
     }
-    deleteLinkedKudos(linkedKudosList);
   }
 
   @Override
@@ -73,10 +72,9 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   public void deleteComment(ActivityLifeCycleEvent activityLifeCycleEvent) {
     ExoSocialActivity activity = activityLifeCycleEvent.getSource();
     List<Kudos> linkedKudosList = kudosService.getKudosListOfActivity(activity.getId());
-    if (!StringUtils.equals(activity.getType(), KUDOS_ACTIVITY_COMMENT_TYPE) && linkedKudosList.isEmpty()) {
-      return;
+    if (!linkedKudosList.isEmpty()) {
+      deleteLinkedKudos(linkedKudosList);
     }
-    deleteLinkedKudos(linkedKudosList);
   }
 
   @Override
