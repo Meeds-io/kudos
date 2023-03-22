@@ -25,8 +25,8 @@ export function init() {
       rank: 40,
       icon: 'fas fa-award',
       match: (actionLabel) => kudosUserActions.includes(actionLabel),
-      getObjectURL: (objectId) => {
-        return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${objectId}`;
+      getLink: (realization) => {
+        Vue.prototype.$set(realization, 'link', `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${realization?.objectId}`);
       }
     },
   });
