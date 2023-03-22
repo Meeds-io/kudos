@@ -240,7 +240,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     if (kudosOfActivityCount > 1) {
       throw new KudosAlreadyLinkedException("kudos with id " + kudosId + "already linked to kudos entities");
     }
-    kudosStorage.deleteKudosById(kudosId);
+    deleteKudosById(kudosId);
     listenerService.broadcast(KUDOS_CANCEL_ACTIVITY_EVENT, this, kudos);
   }
 
