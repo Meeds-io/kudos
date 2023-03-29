@@ -29,6 +29,8 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.core.utils.MentionUtils;
 
+import static org.exoplatform.social.core.manager.ActivityManagerImpl.REMOVABLE;
+
 public class Utils {
   private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
 
@@ -61,7 +63,7 @@ public class Utils {
 
   public static final String                 KUDOS_CANCEL_ACTIVITY_EVENT     = "kudos.cancel.activity";
 
-  public static final String                 GAMIFICATION_CANCEL_EVENT       = "gamification.cancel.kudos.action";
+  public static final String                 GAMIFICATION_CANCEL_EVENT       = "gamification.cancel.event.action";
 
   public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
 
@@ -254,6 +256,7 @@ public class Utils {
       activity.getTemplateParams().remove(I18NActivityUtils.RESOURCE_BUNDLE_VALUES_PARAM);
       activity.getTemplateParams().remove(KUDOS_MESSAGE_PARAM);
       activity.getTemplateParams().remove(CONTENT_TYPE);
+      activity.getTemplateParams().remove(REMOVABLE);
     }
     activity.setTitleId(null);
 
@@ -265,6 +268,7 @@ public class Utils {
                      + KUDOS_MESSAGE_PARAM);
     activity.getTemplateParams().put(KUDOS_MESSAGE_PARAM, kudosMessage);
     activity.getTemplateParams().put(CONTENT_TYPE, KUDOS_MESSAGE_PARAM);
+    activity.getTemplateParams().put(REMOVABLE, "false");
   }
 
   private static String getIdentityIdByType(Identity receiverIdentity) {
