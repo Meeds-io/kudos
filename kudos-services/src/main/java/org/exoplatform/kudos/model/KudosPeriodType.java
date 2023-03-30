@@ -7,7 +7,7 @@ import java.time.*;
 public enum KudosPeriodType {
   WEEK, MONTH, QUARTER, SEMESTER, YEAR;
 
-  public static final KudosPeriodType DEFAULT = MONTH;
+  public static final KudosPeriodType DEFAULT = WEEK;
 
   public KudosPeriod getPeriodOfTime(LocalDateTime localDateTime) {
     KudosPeriod kudosPeriod = new KudosPeriod();
