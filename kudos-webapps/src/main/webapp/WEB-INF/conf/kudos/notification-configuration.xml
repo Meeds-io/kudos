@@ -95,7 +95,7 @@
         </value-param>
       </init-params>
     </component-plugin>
-    <component-plugin>
+    <component-plugin profiles="push-notifications">
       <name>push.channel.kudos.template</name>
       <set-method>registerTemplateProvider</set-method>
       <type>org.exoplatform.kudos.notification.provider.MobilePushTemplateProvider</type>
