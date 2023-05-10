@@ -16,6 +16,8 @@
 package org.exoplatform.kudos.exception;
 
 public class KudosAlreadyLinkedException extends Exception {
+  private static final long serialVersionUID = -91701909117712293L;
+
   public KudosAlreadyLinkedException() {
   }
 

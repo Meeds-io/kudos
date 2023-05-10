@@ -13,8 +13,6 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
-import org.exoplatform.kudos.listener.GamificationIntegrationListener;
-import org.exoplatform.kudos.listener.NewKudosSentActivityGeneratorListener;
 import org.exoplatform.kudos.model.AccountSettings;
 import org.exoplatform.kudos.model.GlobalSettings;
 import org.exoplatform.kudos.model.Kudos;
@@ -528,13 +526,6 @@ public class KudosServiceTest extends BaseKudosTest {
     KudosService kudosService = getService(KudosService.class);
     KudosStorage kudosStorage = getService(KudosStorage.class);
     ListenerService listenerService = getService(ListenerService.class);
-    ActivityManager activityManager = getService(ActivityManager.class);
-
-    listenerService.addListener(Utils.KUDOS_SENT_EVENT,
-                                new NewKudosSentActivityGeneratorListener(activityManager, null));
-
-    listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT,
-                                new GamificationIntegrationListener(container, listenerService));
 
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
     listenerService.addListener(Utils.GAMIFICATION_GENERIC_EVENT, new Listener<KudosService, Kudos>() {
@@ -671,6 +662,23 @@ public class KudosServiceTest extends BaseKudosTest {
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     long kudosId = kudos.getTechnicalId();
 
+    assertThrows(IllegalArgumentException.class, () -> kudosService.deleteKudosById(0, "root4"));
+    assertThrows(ObjectNotFoundException.class, () -> kudosService.deleteKudosById(100, "root4"));
+    assertThrows(IllegalAccessException.class, () -> kudosService.deleteKudosById(kudosId, "root3"));
+    kudosService.deleteKudosById(kudosId, "root4");
+    Kudos kudos1 = kudosStorage.getKudoById(kudos.getTechnicalId());
+    assertNull(kudos1);
+  }
+
+  @Test
+  public void testCancelKudosById() throws Exception {
+    KudosService kudosService = getService(KudosService.class);
+    KudosStorage kudosStorage = getService(KudosStorage.class);
+    Kudos kudos = newKudosDTO();
+    kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
+    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    long kudosId = kudos.getTechnicalId();
+    
     assertThrows(IllegalArgumentException.class, () -> kudosService.deleteKudosById(0, "root4"));
     assertThrows(ObjectNotFoundException.class, () -> kudosService.deleteKudosById(100, "root4"));
     assertThrows(IllegalAccessException.class, () -> kudosService.deleteKudosById(kudosId, "root3"));
