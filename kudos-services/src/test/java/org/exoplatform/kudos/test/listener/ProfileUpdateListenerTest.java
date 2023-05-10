@@ -1,6 +1,5 @@
 package org.exoplatform.kudos.test.listener;
 
-import org.exoplatform.commons.testing.BaseExoTestCase;
 import org.exoplatform.kudos.listener.ProfileUpdateListener;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.service.KudosService;
@@ -9,7 +8,6 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.profile.ProfileLifeCycleEvent;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.core.storage.cache.CachedActivityStorage;
 import org.junit.Test;

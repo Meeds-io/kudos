@@ -23,20 +23,20 @@ import org.exoplatform.social.notification.Utils;
 /**
  * A listener to add comment or activity
  */
-public class NewKudosSentActivityGeneratorListener extends Listener<KudosService, Kudos> {
-  private static final Log LOG = ExoLogger.getLogger(NewKudosSentActivityGeneratorListener.class);
+public class KudosSentActivityGeneratorListener extends Listener<KudosService, Kudos> {
+  private static final Log LOG = ExoLogger.getLogger(KudosSentActivityGeneratorListener.class);
 
   private ActivityStorage  activityStorage;
 
   private ActivityManager  activityManager;
 
-  public NewKudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
+  public KudosSentActivityGeneratorListener(ActivityManager activityManager, ActivityStorage activityStorage) {
     this.activityManager = activityManager;
     this.activityStorage = activityStorage;
   }
 
   @Override
-  public void onEvent(Event<KudosService, Kudos> event) throws Exception {
+  public void onEvent(Event<KudosService, Kudos> event) throws Exception { // NOSONAR
     Kudos kudos = event.getData();
     KudosService kudosService = event.getSource();
 
@@ -68,10 +68,8 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         kudos.setActivityId(commentId);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), kudos.getActivityId());
 
-        if (activityStorage instanceof CachedActivityStorage) {
-          ((CachedActivityStorage) activityStorage).clearActivityCached(activity.getId());
-          ((CachedActivityStorage) activityStorage).clearActivityCached(activityComment.getId());
-        }
+        clearActivityCached(activity.getId());
+        clearActivityCached(activityComment.getId());
       } catch (Exception e) {
         LOG.warn("Error adding comment on activity with id '" + activityId + "' for Kudos with id " + kudos.getTechnicalId(), e);
       }
@@ -94,9 +92,7 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
         activityManager.saveActivityNoReturn(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(),
                                                     org.exoplatform.kudos.service.utils.Utils.getActivityId(activity.getId()));
-        if (activityStorage instanceof CachedActivityStorage) {
-          ((CachedActivityStorage) activityStorage).clearActivityCached(activity.getId());
-        }
+        clearActivityCached(activity.getId());
       }
     }
   }
@@ -110,6 +106,12 @@ public class NewKudosSentActivityGeneratorListener extends Listener<KudosService
     activity.setUserId(kudos.getSenderIdentityId());
     org.exoplatform.kudos.service.utils.Utils.computeKudosActivityProperties(activity, kudos);
     return activity;
+  }
+
+  private void clearActivityCached(String id) {
+    if (activityStorage instanceof CachedActivityStorage cachedActivityStorage) {
+      cachedActivityStorage.clearActivityCached(id);
+    }
   }
 
 }

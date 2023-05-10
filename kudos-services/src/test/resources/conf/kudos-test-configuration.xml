@@ -23,5 +23,34 @@
     <type>org.exoplatform.kudos.test.mock.ActivityManagerMock</type>
   </component>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    <component-plugin>
+      <name>exo.kudos.activity</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.KudosSentNotificationListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.kudos.sent</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.KudosSentActivityGeneratorListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.kudos.activity</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.GamificationIntegrationListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>kudos.cancel.activity</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.GamificationIntegrationListener</type>
+    </component-plugin>
+    <component-plugin>
+      <name>kudos.cancel.activity</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.kudos.listener.KudosCanceledListener</type>
+    </component-plugin>
+  </external-component-plugins>
+
   <remove-configuration>org.exoplatform.commons.search.index.IndexingOperationProcessor</remove-configuration>
 </configuration>

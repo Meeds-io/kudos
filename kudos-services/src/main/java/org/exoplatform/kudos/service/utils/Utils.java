@@ -2,7 +2,6 @@ package org.exoplatform.kudos.service.utils;
 
 import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,50 +31,56 @@ import org.exoplatform.social.core.utils.MentionUtils;
 import static org.exoplatform.social.core.manager.ActivityManagerImpl.REMOVABLE;
 
 public class Utils {
-  private static final Log                   LOG                             = ExoLogger.getLogger(Utils.class);
+  private static final Log                   LOG                                   = ExoLogger.getLogger(Utils.class);
 
-  public static final String                 KUDOS_ICON                      =
+  public static final String                 KUDOS_ICON                            =
                                                         "<i class='uiIcon fa fa-award uiIconKudos uiIconBlue'></i>";
 
-  public static final String                 SCOPE_NAME                      = "ADDONS_KUDOS";
+  public static final String                 SCOPE_NAME                            = "ADDONS_KUDOS";
 
-  public static final String                 SETTINGS_KEY_NAME               = "ADDONS_KUDOS_SETTINGS";
+  public static final String                 SETTINGS_KEY_NAME                     = "ADDONS_KUDOS_SETTINGS";
 
-  public static final Context                KUDOS_CONTEXT                   = Context.GLOBAL;
+  public static final Context                KUDOS_CONTEXT                         = Context.GLOBAL;
 
-  public static final Scope                  KUDOS_SCOPE                     = Scope.APPLICATION.id(SCOPE_NAME);
+  public static final Scope                  KUDOS_SCOPE                           = Scope.APPLICATION.id(SCOPE_NAME);
 
-  public static final String                 SPACE_ACCOUNT_TYPE              = SpaceIdentityProvider.NAME;
+  public static final String                 SPACE_ACCOUNT_TYPE                    = SpaceIdentityProvider.NAME;
 
-  public static final String                 USER_ACCOUNT_TYPE               = "user";
+  public static final String                 USER_ACCOUNT_TYPE                     = "user";
 
-  public static final String                 DEFAULT_ACCESS_PERMISSION       = "defaultAccessPermission";
+  public static final String                 DEFAULT_ACCESS_PERMISSION             = "defaultAccessPermission";
 
-  public static final String                 DEFAULT_KUDOS_PER_PERIOD        = "defaultKudosPerPeriod";
+  public static final String                 DEFAULT_KUDOS_PER_PERIOD              = "defaultKudosPerPeriod";
 
-  public static final String                 KUDOS_RECEIVER_NOTIFICATION_ID  = "KudosActivityReceiverNotificationPlugin";
+  public static final String                 KUDOS_RECEIVER_NOTIFICATION_ID        = "KudosActivityReceiverNotificationPlugin";
 
-  public static final String                 KUDOS_SENT_EVENT                = "exo.kudos.sent";
+  public static final String                 KUDOS_SENT_EVENT                      = "exo.kudos.sent";
 
-  public static final String                 KUDOS_ACTIVITY_EVENT            = "exo.kudos.activity";
+  public static final String                 KUDOS_ACTIVITY_EVENT                  = "exo.kudos.activity";
 
-  public static final String                 GAMIFICATION_GENERIC_EVENT      = "exo.gamification.generic.action";
+  public static final String                 GAMIFICATION_GENERIC_EVENT            = "exo.gamification.generic.action";
 
-  public static final String                 KUDOS_CANCEL_ACTIVITY_EVENT     = "kudos.cancel.activity";
+  public static final String                 KUDOS_CANCEL_ACTIVITY_EVENT           = "kudos.cancel.activity";
 
-  public static final String                 GAMIFICATION_CANCEL_EVENT       = "gamification.cancel.event.action";
+  public static final String                 GAMIFICATION_CANCEL_EVENT             = "gamification.cancel.event.action";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE     = "exokudos:activity";
+  public static final String                 GAMIFICATION_RECEIVE_KUDOS_EVENT_NAME = "receiveKudos";
 
-  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID = "activity_kudos_content";
+  public static final String                 GAMIFICATION_SEND_KUDOS_EVENT_NAME    = "sendKudos";
 
-  public static final String                 KUDOS_MESSAGE_PARAM             = "kudosMessage";
+  public static final String                 GAMIFICATION_OBJECT_TYPE              = "activity";
 
-  public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER         = new ArgumentLiteral<>(Kudos.class, "kudos");
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TYPE           = "exokudos:activity";
 
-  public static final String                 ACTIVITY_COMMENT_ID_PREFIX      = "comment";
+  public static final String                 KUDOS_ACTIVITY_COMMENT_TITLE_ID       = "activity_kudos_content";
 
-  public static final String                 CONTENT_TYPE                    = "contentType";
+  public static final String                 KUDOS_MESSAGE_PARAM                   = "kudosMessage";
+
+  public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER               = new ArgumentLiteral<>(Kudos.class, "kudos");
+
+  public static final String                 ACTIVITY_COMMENT_ID_PREFIX            = "comment";
+
+  public static final String                 CONTENT_TYPE                          = "contentType";
 
   private Utils() {
   }
@@ -120,7 +125,7 @@ public class Utils {
         } else if (StringUtils.isBlank(senderId)) {
           return Arrays.asList(members);
         } else {
-          return Arrays.stream(members).filter(member -> !senderId.equals(member)).collect(Collectors.toList());
+          return Arrays.stream(members).filter(member -> !senderId.equals(member)).toList();
         }
       }
     } else {
@@ -161,7 +166,9 @@ public class Utils {
       kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
       kudos.setReceiverType(USER_ACCOUNT_TYPE);
       kudos.setReceiverPosition(StringEscapeUtils.unescapeHtml(receiverIdentity.getProfile().getPosition()));
-      kudos.setExternalReceiver(receiverIdentity.getProfile() != null && receiverIdentity.getProfile().getProperty("external") != null && receiverIdentity.getProfile().getProperty("external").equals("true"));
+      kudos.setExternalReceiver(receiverIdentity.getProfile() != null
+          && receiverIdentity.getProfile().getProperty("external") != null
+          && receiverIdentity.getProfile().getProperty("external").equals("true"));
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
       kudos.setReceiverURL(LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));
