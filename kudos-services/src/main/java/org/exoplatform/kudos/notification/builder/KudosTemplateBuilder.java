@@ -6,7 +6,6 @@ import java.io.Writer;
 import java.util.Calendar;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -20,7 +19,6 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.social.common.xmlprocessor.XMLProcessor;
-import org.exoplatform.social.common.xmlprocessor.XMLProcessorImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -46,7 +44,7 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
   }
 
   @Override
-  protected MessageInfo makeMessage(NotificationContext ctx) {
+  protected MessageInfo makeMessage(NotificationContext ctx) { // NOSONAR
     NotificationInfo notification = ctx.getNotificationInfo();
     String activityId = notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey());
     ExoSocialActivity activity = null;
