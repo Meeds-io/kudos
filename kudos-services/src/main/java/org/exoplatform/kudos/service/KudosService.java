@@ -196,10 +196,10 @@ public class KudosService implements ExoKudosStatisticService, Startable {
     Object receiverObject = checkStatusAndGetReceiver(kudos.getReceiverType(), kudos.getReceiverId());
 
     if (kudos.getReceiverIdentityId() == null) {
-      if (receiverObject instanceof Identity) {
-        kudos.setReceiverIdentityId(((Identity) receiverObject).getId());
-      } else if (receiverObject instanceof Space) {
-        kudos.setReceiverIdentityId(((Space) receiverObject).getId());
+      if (receiverObject instanceof Identity identity) {
+        kudos.setReceiverIdentityId(identity.getId());
+      } else if (receiverObject instanceof Space space) {
+        kudos.setReceiverIdentityId(space.getId());
       }
     }
 
@@ -217,9 +217,8 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    *
    * @param kudosId Kudos technical identifier to delete
    * @param username User name deleting kudos
-   * @throws IllegalAccessException when user is not authorized to delete the
-   *           kudos
-   * @throws ObjectNotFoundException when the kudos identified by its technical
+   * @throws Exception when user is not authorized to delete the
+   *           kudos or when the kudos identified by its technical
    *           identifier is not found
    */
   public void deleteKudosById(long kudosId, String username) throws Exception {
@@ -546,7 +545,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
   @Override
   public Map<String, Object> getStatisticParameters(String operation, Object result, Object... methodArgs) {
     if (result == null) {
-      return null;
+      return Collections.emptyMap();
     }
     Map<String, Object> parameters = new HashMap<>();
 

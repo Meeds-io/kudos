@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.exoplatform.kudos.entity.KudosEntity;
-import org.exoplatform.kudos.listener.NewKudosSentActivityGeneratorListener;
+import org.exoplatform.kudos.listener.KudosSentActivityGeneratorListener;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.model.KudosList;
@@ -195,7 +195,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     assertNull(kudosByActivity);
 
     ActivityManager activityManager = getService(ActivityManager.class);
-    new NewKudosSentActivityGeneratorListener(activityManager, null).onEvent(new Event<KudosService, Kudos>(null,
+    new KudosSentActivityGeneratorListener(activityManager, null).onEvent(new Event<KudosService, Kudos>(null,
                                                                                                             kudosService,
                                                                                                             kudos));
     List<Kudos> kudosList = kudosService.getKudosByEntity(kudos.getEntityType(), kudos.getEntityId(), 1);
