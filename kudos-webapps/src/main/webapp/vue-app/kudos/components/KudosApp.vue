@@ -81,6 +81,7 @@
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 :suggestor-type-of-relation="typeOfRelation"
                 :suggester-space-u-r-l="spaceURL"
+                :attachment-enabled="false"
                 class="flex"
                 autofocus />
             </div>
