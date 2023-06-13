@@ -69,11 +69,8 @@ public class KudosActivityListener extends ActivityListenerPlugin {
 
   @Override
   public void deleteComment(ActivityLifeCycleEvent activityLifeCycleEvent) {
-    ExoSocialActivity activity = activityLifeCycleEvent.getSource();
-    List<Kudos> linkedKudosList = kudosService.getKudosListOfActivity(activity.getId());
-    if (!linkedKudosList.isEmpty()) {
-      deleteLinkedKudos(linkedKudosList);
-    }
+    // Same as activity processing
+    deleteActivity(activityLifeCycleEvent);
   }
 
   @Override

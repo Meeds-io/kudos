@@ -16,8 +16,8 @@ import org.exoplatform.services.log.Log;
 /**
  * A listener to send notification after sending a new Kudos
  */
-public class NewKudosSentNotificationListener extends Listener<KudosService, Kudos> {
-  private static final Log LOG = ExoLogger.getLogger(NewKudosSentNotificationListener.class);
+public class KudosSentNotificationListener extends Listener<KudosService, Kudos> {
+  private static final Log LOG = ExoLogger.getLogger(KudosSentNotificationListener.class);
 
   @Override
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
