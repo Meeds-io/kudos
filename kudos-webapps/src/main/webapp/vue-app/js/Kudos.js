@@ -249,6 +249,10 @@ export function registerActivityReactionTabs() {
 export function registerActivityActionExtension() {
   extensionRegistry.registerComponent('ActivityFooter', 'activity-footer-action', {
     id: 'kudos',
+    isEnabled: (params) => params.activity
+          && (!params.activityTypeExtension
+          || !params.activityTypeExtension.canComment
+          || params.activityTypeExtension.canComment(params.activity)),
     vueComponent: Vue.options.components['kudos-button'],
     rank: 50,
   });
