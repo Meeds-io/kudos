@@ -39,7 +39,7 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   @Override
   public void updateActivity(ActivityLifeCycleEvent activityLifeCycleEvent) {
     ExoSocialActivity activity = activityLifeCycleEvent.getSource();
-    if (activity.getType().equals(KUDOS_ACTIVITY_COMMENT_TYPE)) {
+    if (activity != null && activity.getType().equals(KUDOS_ACTIVITY_COMMENT_TYPE)) {
       long activityId = org.exoplatform.kudos.service.utils.Utils.getActivityId(activity.getId());
       Kudos kudos = kudosService.getKudosByActivityId(activityId);
       if (kudos != null) {
