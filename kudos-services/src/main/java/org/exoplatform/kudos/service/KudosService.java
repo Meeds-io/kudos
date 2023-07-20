@@ -209,7 +209,7 @@ public class KudosService implements ExoKudosStatisticService, Startable {
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, createdKudos);
 
-    return createdKudos;
+    return kudosStorage.getKudoById(createdKudos.getTechnicalId());
   }
 
   /**
