@@ -119,6 +119,9 @@
     <depends>
       <module>extensionRegistry</module>
     </depends>
+    <depends>
+      <module>attachImage</module>
+    </depends>
   </module>
 
   <module>
