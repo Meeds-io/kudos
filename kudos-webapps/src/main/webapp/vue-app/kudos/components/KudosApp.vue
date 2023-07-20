@@ -177,11 +177,15 @@
                 :key="spaceURL"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
-                :ck-editor-type="ckEditorId"
+                :ck-editor-type="ckEditorType"
+                :ck-editor-id="ckEditorId"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 :suggestor-type-of-relation="typeOfRelation"
                 :suggester-space-u-r-l="spaceURL"
-                class="flex" />
+                :object-id="metadataObjectId"
+                object-type="activity"
+                class="flex"
+                autofocus />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
               <span class="text-sm-caption error--text">
@@ -246,6 +250,7 @@ export default {
       entityOwner: '',
       receiverType: null,
       receiverId: null,
+      metadataObjectId: null,
       error: null,
       drawer: false,
       MESSAGE_MAX_LENGTH: 1300,
@@ -388,6 +393,10 @@ export default {
     typeOfRelation() {
       return this.isLinkedKudos ? 'mention_comment' : 'mention_activity_stream';
     },
+    ckEditorType() {
+      return this.isLinkedKudos ? 'activityComment' : 'activityContent';
+    },
+    },
     postInYourSpacesChoice() {
       return this.audienceChoice === 'oneOfYourSpaces';
     },
@@ -434,7 +443,7 @@ export default {
     resetEditor() {
       this.$refs[this.ckEditorId].destroyCKEditor();
     },
-    initDrawer () {
+    initDrawer() {
       this.kudosMessage = '';
       this.kudosToSend = null;
       this.error = null;
@@ -533,18 +542,20 @@ export default {
             this.readOnlySpace = event?.detail?.readOnlySpace;
             this.entityType = event && event.detail && event.detail.type;
             this.entityId = event && event.detail && event.detail.id;
+            this.metadataObjectId = null;
             this.entityOwner = event && event.detail && event.detail.owner;
             this.parentEntityId = event && event.detail && event.detail.parentId;
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
             this.spaceURL = event && event.detail && event.detail.spaceURL || null;
             this.$refs.activityKudosDrawer.open();
             this.$refs.activityKudosDrawer.startLoading();
-            this.initDrawer().then(() => {
-              this.$refs[this.ckEditorId].initCKEditor();
-            }).finally( () => {
-              this.loading = false;
-              this.$refs.activityKudosDrawer.endLoading();
-            });
+            this.initDrawer()
+              .then(() => this.$nextTick())
+              .then(() => this.$refs[this.ckEditorId].initCKEditor())
+              .finally( () => {
+                this.loading = false;
+                this.$refs.activityKudosDrawer.endLoading();
+              });
           });
         }
         else {
@@ -573,7 +584,12 @@ export default {
           if (!kudosSent) {
             throw new Error(this.$t('exoplatform.kudos.error.errorSendingKudos'));
           }
+          this.metadataObjectId = this.isLinkedKudos && `comment${kudosSent.activityId}` || `${kudosSent.activityId}`;
           document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudosSent}));
+          return this.$nextTick();
+        })
+        .then(() => this.$refs[this.ckEditorId].saveAttachments())
+        .then(() => {
           return this.init()
             .catch(e => {
               console.error('Error refreshing allowed number of kudos for current user', e);
