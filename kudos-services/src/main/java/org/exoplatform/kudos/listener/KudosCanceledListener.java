@@ -17,16 +17,13 @@
  */
 package org.exoplatform.kudos.listener;
 
-import org.exoplatform.commons.api.persistence.ExoTransactional;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.service.KudosService;
-import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.social.core.manager.ActivityManager;
 
-@Asynchronous
 public class KudosCanceledListener extends Listener<KudosService, Kudos> {
 
   private PortalContainer container;
@@ -36,7 +33,6 @@ public class KudosCanceledListener extends Listener<KudosService, Kudos> {
   }
 
   @Override
-  @ExoTransactional
   public void onEvent(Event<KudosService, Kudos> event) throws Exception {
     Kudos kudos = event.getData();
     if (kudos != null && kudos.getActivityId() > 0) {
