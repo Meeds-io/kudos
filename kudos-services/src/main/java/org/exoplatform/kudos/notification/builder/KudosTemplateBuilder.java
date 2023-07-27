@@ -131,7 +131,16 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     }
     // body construction must be made after subject building
     if (activity != null) {
-      messageInfo.body(SocialNotificationUtils.getBody(ctx, templateContext, activity));
+      if (StringUtils.isNotBlank(activity.getParentCommentId())) {
+        String parentCommentTitle = Utils.getActivityManager().getActivityTitle(activity.getParentCommentId());
+        templateContext.put("ACTIVITY", parentCommentTitle);
+      } else if (StringUtils.isNotBlank(activity.getParentId())) {
+        String parentActivityTitle = Utils.getActivityManager().getActivityTitle(activity.getParentId());
+        templateContext.put("ACTIVITY", parentActivityTitle);
+      } else {
+        templateContext.put("ACTIVITY", "");
+      }
+      messageInfo.body(TemplateUtils.processGroovy(templateContext));
     } else {
       templateContext.put("ACTIVITY", "");
       messageInfo.body(TemplateUtils.processGroovy(templateContext));
