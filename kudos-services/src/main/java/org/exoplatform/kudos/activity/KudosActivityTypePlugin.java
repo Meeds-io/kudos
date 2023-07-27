@@ -47,4 +47,10 @@ public class KudosActivityTypePlugin extends ActivityTypePlugin {
     }
   }
 
+  @Override
+  public String getActivityTitle(ExoSocialActivity activity) {
+    Kudos kudos = this.kudosService.getKudosByActivityId(Long.parseLong(activity.getId().replace("comment", "")));
+    return kudos == null ? activity.getTitle() : kudos.getMessage();
+  }
+
 }
