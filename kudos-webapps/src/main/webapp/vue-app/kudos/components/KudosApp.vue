@@ -9,7 +9,7 @@
 
     <exo-drawer
       ref="activityKudosDrawer"
-      v-draggable="objectType"
+      v-draggable="enabled"
       width="500px"
       hide-actions
       id="activityKudosDrawer"
@@ -285,6 +285,9 @@ export default {
     ckEditorType() {
       return this.isLinkedKudos ? 'activityComment' : 'activityContent';
     },
+    enabled() {
+      return eXo.env.portal.editorAttachImageEnabled && eXo.env.portal.attachmentObjectTypes?.indexOf(this.objectType) >= 0;
+    }
   },
   methods: {
     init() {
