@@ -9,6 +9,7 @@
 
     <exo-drawer
       ref="activityKudosDrawer"
+      v-draggable="enabled"
       width="500px"
       hide-actions
       id="activityKudosDrawer"
@@ -83,7 +84,7 @@
                 :suggestor-type-of-relation="typeOfRelation"
                 :suggester-space-u-r-l="spaceURL"
                 :object-id="metadataObjectId"
-                object-type="activity"
+                :object-type="objectType"
                 class="flex"
                 autofocus />
             </div>
@@ -166,7 +167,8 @@ export default {
       currentUserId: eXo.env.portal.userIdentityId,
       selectedReceiver: null,
       spaceURL: null,
-      audience: ''
+      audience: '',
+      objectType: 'activity'
     };
   },
   watch: {
@@ -283,6 +285,9 @@ export default {
     ckEditorType() {
       return this.isLinkedKudos ? 'activityComment' : 'activityContent';
     },
+    enabled() {
+      return eXo.env.portal.editorAttachImageEnabled && eXo.env.portal.attachmentObjectTypes?.indexOf(this.objectType) >= 0;
+    }
   },
   methods: {
     init() {
