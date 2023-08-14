@@ -2,6 +2,7 @@ import KudosIdentityLink from './components/KudosIdentityLink.vue';
 import KudosAPI from './components/KudosAPI.vue';
 import KudosApp from './components/KudosApp.vue';
 import KudosButton from '../kudos/components/KudosButton.vue';
+import SendKudosComposer from '../kudos/components/SendKudosComposer.vue';
 import PopoverKudosButton from '../kudos/components/PopoverKudosButton.vue';
 import ActivityKudosReactionItem from './components/ActivityKudosReactionItem.vue';
 import ActivityKudosReactionList from './components/ActivityKudosReactionList.vue';
@@ -26,6 +27,7 @@ const components = {
   'activity-kudos-reaction-count': ActivityKudosReactionCount,
   'kudos-overview': KudosOverview,
   'kudos-overview-card': KudosOverviewCard,
+  'send-kudos-composer': SendKudosComposer,
 };
 
 for (const key in components) {

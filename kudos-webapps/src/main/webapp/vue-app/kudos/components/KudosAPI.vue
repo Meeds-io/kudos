@@ -7,6 +7,7 @@ export default {
     this.$kudosService.registerExternalExtensions(this.$t('exoplatform.kudos.title.sendAKudos'));
     this.$kudosService.registerFavoriteExtensions(this.$t('exoplatform.kudos.label.to'));
     this.$kudosService.registerOverviewExtension();
+    this.$kudosService.registerComposerExtension();
     this.$kudosService.registerActivityActionExtension();
     this.$kudosService.registerActivityReactionTabs();
     document.addEventListener('display-activity-details', this.getActivityInformations);
