@@ -16,6 +16,7 @@
 export default {
   methods: {
     openSendKudosDrawer() {
+      document.dispatchEvent(new CustomEvent('activity-composer-closed'));
       document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
         id: eXo.env.portal.spaceId,
         type: 'USER_PROFILE',
