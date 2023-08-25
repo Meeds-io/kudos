@@ -3,6 +3,7 @@ import KudosAPI from './components/KudosAPI.vue';
 import KudosApp from './components/KudosApp.vue';
 import KudosButton from '../kudos/components/KudosButton.vue';
 import SendKudosComposer from '../kudos/components/SendKudosComposer.vue';
+import SendKudosToolbarAction from '../kudos/components/SendKudosToolbarAction.vue';
 import PopoverKudosButton from '../kudos/components/PopoverKudosButton.vue';
 import ActivityKudosReactionItem from './components/ActivityKudosReactionItem.vue';
 import ActivityKudosReactionList from './components/ActivityKudosReactionList.vue';
@@ -28,6 +29,7 @@ const components = {
   'kudos-overview': KudosOverview,
   'kudos-overview-card': KudosOverviewCard,
   'send-kudos-composer': SendKudosComposer,
+  'send-kudos-toolbar-action': SendKudosToolbarAction,
 };
 
 for (const key in components) {
