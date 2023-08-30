@@ -37,6 +37,7 @@
                   :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
                   :type-of-relations="typeOfRelation"
+                  :autofocus="readOnlySpace"
                   include-users
                   name="kudosReceiver"
                   width="220"
@@ -137,8 +138,8 @@
                 :suggester-space-u-r-l="spaceURL"
                 :object-id="metadataObjectId"
                 :object-type="objectType"
-                class="flex"
-                autofocus />
+                :autofocus="!readOnlySpace"
+                class="flex" />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
               <span class="text-sm-caption error--text">
