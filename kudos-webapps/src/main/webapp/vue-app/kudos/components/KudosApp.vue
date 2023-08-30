@@ -31,8 +31,8 @@
               <div class="d-flex flex-column pt-5">
                 <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.receiver.title') }}</span>
                 <exo-identity-suggester
-                  ref="kudosReceiverAutoComplete"
-                  id="kudosReceiverAutoComplete"
+                  ref="kudosReceiver"
+                  id="kudosReceiver"
                   v-model="selectedReceiver"
                   :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
@@ -531,6 +531,7 @@ export default {
             });
         })
         .then(() => {
+          this.selectedReceiver = null;
           this.$refs.activityKudosDrawer.close();
           this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
         })
