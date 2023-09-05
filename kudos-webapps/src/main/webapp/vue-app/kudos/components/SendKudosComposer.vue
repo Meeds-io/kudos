@@ -1,16 +1,22 @@
 <template>
-  <div
-    class="d-flex flex-row align-center" 
-    @click="openSendKudosDrawer">
-    <v-icon
-      color="primary"
-      size="50">
-      fa-award
-    </v-icon>
-    <v-span class="caption font-weight-bold ms-5">
-      {{ $t('exoplatform.kudos.title.sendAKudos') }}
-    </v-span>
-  </div>
+  <v-card
+    class="mx-4 mb-3 px-6 py-3"
+    outlined 
+    flat 
+    hover>
+    <div
+      class="d-flex flex-row align-center" 
+      @click="openSendKudosDrawer">
+      <v-icon
+        color="primary"
+        size="50">
+        fa-award
+      </v-icon>
+      <v-span class="caption font-weight-bold ms-5">
+        {{ $t('exoplatform.kudos.title.sendAKudos') }}
+      </v-span>
+    </div>
+  </v-card>
 </template>
 <script>
 export default {
