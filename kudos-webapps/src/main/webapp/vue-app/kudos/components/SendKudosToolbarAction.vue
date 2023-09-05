@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    id="kudosBtnToolbar"
     :ripple="false"
     class="d-flex flex-row align-center py-2 px-3"
     text
