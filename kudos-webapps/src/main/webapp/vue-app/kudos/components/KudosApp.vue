@@ -26,11 +26,9 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row pt-5 align-center">
-              <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
-              <div
-                v-if="isLinkedKudos"
-                class="d-flex flex-row pl-4 mb-2 text-truncate kudosReceiverAttendeeItem">
+            <div v-if="readOnlySpace">
+              <div class="d-flex flex-column pt-5">
+                <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.receiver.title') }}</span>
                 <exo-identity-suggester
                   ref="kudosReceiverAutoComplete"
                   id="kudosReceiverAutoComplete"
@@ -43,14 +41,34 @@
                   width="220"
                   class="user-suggester" />
               </div>
-              <exo-user-avatar
-                v-else
-                class="d-flex flex-row pl-4"
-                :identity="identity"
-                :size="32"
-                :popover="false" />
             </div>
-            <div v-if="!isLinkedKudos">
+            <div v-else>
+              <div class="d-flex flex-row pt-5 align-center">
+                <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
+                <div
+                  v-if="isLinkedKudos"
+                  class="d-flex flex-row pl-4 mb-2 text-truncate kudosReceiverAttendeeItem">
+                  <exo-identity-suggester
+                    ref="kudosReceiverAutoComplete"
+                    id="kudosReceiverAutoComplete"
+                    v-model="selectedReceiver"
+                    :labels="receiverSuggesterLabels"
+                    :search-options="searchOptions"
+                    :type-of-relations="typeOfRelation"
+                    include-users
+                    name="kudosReceiver"
+                    width="220"
+                    class="user-suggester" />
+                </div>
+                <exo-user-avatar
+                  v-else
+                  class="d-flex flex-row pl-4"
+                  :identity="identity"
+                  :size="32"
+                  :popover="false" />
+              </div>
+            </div>
+            <div v-if="!isLinkedKudos && !readOnlySpace">
               <div class="d-flex flex-row pt-5">
                 <span class="text-header-title">{{ $t('exoplatform.kudos.choose.audience') }} </span>
               </div>
@@ -69,7 +87,41 @@
               </div>
             </div>
             <div class="d-flex flex-row pt-5">
-              <span class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
+              <v-list-item v-if="readOnlySpace" class="text-truncate px-0 pt-3">
+                <exo-space-avatar
+                  v-if="spaceId"
+                  :space-id="spaceId"
+                  :size="30"
+                  extra-class="text-truncate"
+                  avatar />
+                <exo-user-avatar
+                  :profile-id="username"
+                  :size="spaceId && 25 || 30"
+                  :extra-class="spaceId && 'ms-n4 mt-6' || ''"
+                  avatar />
+                <v-list-item-content class="py-0 accountTitleLabel text-truncate">
+                  <v-list-item-title class="font-weight-bold d-flex body-2 mb-0">
+                    <exo-space-avatar
+                      :space-id="spaceId"
+                      :space="space"
+                      extra-class="text-truncate"
+                      fullname
+                      bold-title
+                      link-style
+                      username-class />
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="d-flex flex-row flex-nowrap">
+                    <exo-user-avatar
+                      :profile-id="username"
+                      extra-class="text-truncate ms-2 me-1"
+                      fullname
+                      link-style
+                      small-font-size
+                      username-class />
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+              <span v-else class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
             <div class="d-flex flex-row pt-3">
               <exo-activity-rich-editor
@@ -162,7 +214,10 @@ export default {
       currentUserId: eXo.env.portal.userIdentityId,
       selectedReceiver: null,
       spaceURL: null,
-      audience: ''
+      audience: '',
+      readOnlySpace: false,
+      username: eXo.env.portal.userName,
+      spaceId: eXo.env.portal.spaceId,
     };
   },
   watch: {
@@ -184,7 +239,9 @@ export default {
       if (selectedReceiver) {
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
-          this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
+          if (!this.readOnlySpace) {
+            this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
+          }
         }
       }
     },
@@ -206,7 +263,7 @@ export default {
   computed: {
     searchOptions() {
       return {
-        currentUser: eXo.env.portal.userName,
+        currentUser: this.username,
         spaceURL: this.spaceURL,
         activityId: this.entityId
       };
@@ -317,7 +374,7 @@ export default {
             .then(receiverDetails => {
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
-                if (!receiverDetails.isUserType || receiverDetails.id !== eXo.env.portal.userName) {
+                if (!receiverDetails.isUserType || receiverDetails.id !== this.username) {
                   if (this.isLinkedKudos) {
                     this.selectedReceiver = {
                       receiverId: receiverDetails.id,
@@ -398,7 +455,7 @@ export default {
         if ( this.remainingKudos > 0 ) {
           this.loading = true;
           this.$nextTick(() => {
-            
+            this.readOnlySpace = event?.detail?.readOnlySpace;
             this.entityType = event && event.detail && event.detail.type;
             this.entityId = event && event.detail && event.detail.id;
             this.entityOwner = event && event.detail && event.detail.owner;
@@ -434,7 +491,7 @@ export default {
         receiverType: this.receiverType,
         receiverId: this.receiverId,
         message: this.kudosMessage,
-        spacePrettyName: this.audience?.remoteId
+        spacePrettyName: this.audience?.remoteId || this.spaceId
       };
       sendKudos(kudos)
         .then(kudosSent => {
