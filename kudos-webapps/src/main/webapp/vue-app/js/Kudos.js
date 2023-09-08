@@ -219,6 +219,14 @@ export function registerOverviewExtension() {
   }); 
 }
 
+export function registerComposerExtension() {
+  extensionRegistry.registerComponent('ComposerAction', 'composer-action-item', {
+    id: 'sendKudosButton',
+    vueComponent: Vue.options.components['send-kudos-composer'],
+    rank: 1,
+  });
+}
+
 export function registerFavoriteExtensions(title) {
   extensionRegistry.registerExtension('ActivityFavoriteIcon', 'activity-favorite-icon-extensions', {
     id: 'favorite-kudos',
