@@ -36,6 +36,7 @@
                   :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
                   :type-of-relations="typeOfRelation"
+                  :autofocus="readOnlySpace"
                   include-users
                   name="kudosReceiver"
                   width="220"
@@ -133,8 +134,8 @@
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 :suggestor-type-of-relation="typeOfRelation"
                 :suggester-space-u-r-l="spaceURL"
-                class="flex"
-                autofocus />
+                :autofocus="!readOnlySpace"
+                class="flex" />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
               <span class="text-sm-caption error--text">
@@ -298,7 +299,7 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     sendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel ;
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || !this.selectedReceiver;
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
