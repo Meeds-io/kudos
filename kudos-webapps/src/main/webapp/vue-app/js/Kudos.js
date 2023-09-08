@@ -225,6 +225,11 @@ export function registerComposerExtension() {
     vueComponent: Vue.options.components['send-kudos-composer'],
     rank: 1,
   });
+  extensionRegistry.registerComponent('ActivityToolbarAction', 'activity-toolbar-action', {
+    id: 'sendKudosToolbarButton',
+    vueComponent: Vue.options.components['send-kudos-toolbar-action'],
+    rank: 10,
+  });
 }
 
 export function registerFavoriteExtensions(title) {
