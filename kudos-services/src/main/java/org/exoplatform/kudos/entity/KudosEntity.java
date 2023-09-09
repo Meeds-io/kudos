@@ -76,7 +76,7 @@ public class KudosEntity implements Serializable {
   @Column(name = "IS_RECEIVER_USER", nullable = false)
   public boolean            isReceiverUser;
 
-  @Column(name = "PARENT_ENTITY_ID", nullable = false)
+  @Column(name = "PARENT_ENTITY_ID", nullable = true)
   public Long               parentEntityId;
 
   @Column(name = "ENTITY_ID", nullable = false)

@@ -202,6 +202,8 @@ public class Utils {
     kudosEntity.setActivityId(kudos.getActivityId());
     if (StringUtils.isNoneBlank(kudos.getParentEntityId())) {
       kudosEntity.setParentEntityId(Long.parseLong(kudos.getParentEntityId()));
+    } else {
+      kudosEntity.setParentEntityId(0l);
     }
     kudosEntity.setEntityType(KudosEntityType.valueOf(kudos.getEntityType()).ordinal());
     kudosEntity.setSenderId(Long.parseLong(kudos.getSenderIdentityId()));
