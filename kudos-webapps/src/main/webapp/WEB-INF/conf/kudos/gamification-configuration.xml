@@ -1,56 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (C) 2018 eXo Platform SAS. This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version. This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
   for more details. You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org. -->
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd" xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <external-component-plugins>
-    <target-component>io.meeds.gamification.service.RuleRegistry</target-component>
+    <target-component>io.meeds.gamification.service.EventRegistry</target-component>
     <component-plugin>
-      <name>rule.SendKudos</name>
+      <name>SendKudos</name>
       <set-method>addPlugin</set-method>
-      <type>io.meeds.gamification.plugin.RuleConfigPlugin</type>
+      <type>io.meeds.gamification.plugin.EventConfigPlugin</type>
       <init-params>
-        <value-param>
-          <name>rule-title</name>
-          <value>sendKudos</value>
-        </value-param>
-        <value-param>
-          <name>rule-description</name>
-          <value>You sent a Kudos</value>
-        </value-param>
-        <value-param>
-          <name>rule-score</name>
-          <value>10</value>
-        </value-param>
-        <value-param>
-          <name>rule-enable</name>
-          <value>false</value>
-        </value-param>
+        <object-param>
+          <name>event</name>
+          <object type="io.meeds.gamification.model.EventDTO">
+            <field name="title">
+              <string>sendKudos</string>
+            </field>
+            <field name="type">
+              <string>meeds</string>
+            </field>
+            <field name="trigger">
+              <string>sendKudos</string>
+            </field>
+          </object>
+        </object-param>
       </init-params>
     </component-plugin>
     <component-plugin>
-      <name>rule.ReceiveKudos</name>
+      <name>ReceiveKudos</name>
       <set-method>addPlugin</set-method>
-      <type>io.meeds.gamification.plugin.RuleConfigPlugin</type>
+      <type>io.meeds.gamification.plugin.EventConfigPlugin</type>
       <init-params>
-        <value-param>
-          <name>rule-title</name>
-          <value>receiveKudos</value>
-        </value-param>
-        <value-param>
-          <name>rule-description</name>
-          <value>You received a Kudos</value>
-        </value-param>
-        <value-param>
-          <name>rule-score</name>
-          <value>5</value>
-        </value-param>
-        <value-param>
-          <name>rule-enable</name>
-          <value>false</value>
-        </value-param>
+        <object-param>
+          <name>event</name>
+          <object type="io.meeds.gamification.model.EventDTO">
+            <field name="title">
+              <string>receiveKudos</string>
+            </field>
+            <field name="type">
+              <string>meeds</string>
+            </field>
+            <field name="trigger">
+              <string>receiveKudos</string>
+            </field>
+          </object>
+        </object-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
 </configuration>
