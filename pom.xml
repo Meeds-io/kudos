@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.exoplatform.addons.kudos</groupId>
   <artifactId>kudos</artifactId>
-  <version>7.0.x-meed-SNAPSHOT</version>
+  <version>7.0.x-whitepaper-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Add-on:: Kudos - Parent POM</name>
   <description>eXo Kudos Addon</description>
@@ -27,9 +27,9 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <org.exoplatform.social.version>7.0.x-meed-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.platform-ui.version>7.0.x-meed-SNAPSHOT</org.exoplatform.platform-ui.version>
-    <addon.exo.analytics.version>7.0.x-meed-SNAPSHOT</addon.exo.analytics.version>
+    <org.exoplatform.social.version>7.0.x-whitepaper-SNAPSHOT</org.exoplatform.social.version>
+    <org.exoplatform.platform-ui.version>7.0.x-whitepaper-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <addon.exo.analytics.version>7.0.x-whitepaper-SNAPSHOT</addon.exo.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
