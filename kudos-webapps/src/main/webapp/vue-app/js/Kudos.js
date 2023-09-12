@@ -220,16 +220,18 @@ export function registerOverviewExtension() {
 }
 
 export function registerComposerExtension() {
-  extensionRegistry.registerComponent('ComposerAction', 'composer-action-item', {
-    id: 'sendKudosButton',
-    vueComponent: Vue.options.components['send-kudos-composer'],
-    rank: 1,
-  });
-  extensionRegistry.registerComponent('ActivityToolbarAction', 'activity-toolbar-action', {
-    id: 'sendKudosToolbarButton',
-    vueComponent: Vue.options.components['send-kudos-toolbar-action'],
-    rank: 10,
-  });
+  if (eXo.env.portal.spaceGroup?.length) {
+    extensionRegistry.registerComponent('ComposerAction', 'composer-action-item', {
+      id: 'sendKudosButton',
+      vueComponent: Vue.options.components['send-kudos-composer'],
+      rank: 1,
+    });
+    extensionRegistry.registerComponent('ActivityToolbarAction', 'activity-toolbar-action', {
+      id: 'sendKudosToolbarButton',
+      vueComponent: Vue.options.components['send-kudos-toolbar-action'],
+      rank: 10,
+    });
+  }
 }
 
 export function registerFavoriteExtensions(title) {
