@@ -17,8 +17,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+extensionRegistry.registerExtension('WebNotification', 'notification-content-extension', {
+  type: 'KudosActivityReceiverNotificationPlugin',
+  rank: 10,
+  vueComponent: Vue.options.components['user-notification-kudos-received'],
+});
 extensionRegistry.registerComponent('WebNotification', 'NewUserPlugin-actions', {
   type: 'NewUserKudosButton',
   rank: 10,
-  vueComponent: Vue.options.components['user-notification-new-user-kudos'],
+  vueComponent: Vue.options.components['user-notification-kudos-button'],
+});
+extensionRegistry.registerExtension('WebNotification', 'activity-notification-exokudos:activity', {
+  id: 'KudosActivity',
+  rank: 10,
+  isEnabled: () => true,
+  getContent: (_notification, activity) => activity?.templateParams?.kudosMessage,
 });
