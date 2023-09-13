@@ -18,9 +18,11 @@
  */
 
 import NewUserKudosButton from './components/NewUserKudosButton.vue';
+import NewUserKudosNotification from './components/NewUserKudosNotification.vue';
 
 const components = {
-  'user-notification-new-user-kudos': NewUserKudosButton,
+  'user-notification-kudos-button': NewUserKudosButton,
+  'user-notification-kudos-received': NewUserKudosNotification,
 };
 
 for (const key in components) {

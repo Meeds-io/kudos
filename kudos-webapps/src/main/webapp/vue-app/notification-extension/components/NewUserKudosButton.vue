@@ -17,7 +17,7 @@ export default {
     },
   },
   data: () => ({
-    helloIcon: window.decodeURIComponent('\uD83D\uDC4B'),
+    helloIcon: window.decodeURIComponent('%F0%9F%91%8B'),
   }),
   methods: {
     openKudosForm() {
