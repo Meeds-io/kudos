@@ -17,6 +17,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+extensionRegistry.registerExtension('WebNotification', 'notification-group-extension', {
+  rank: 40,
+  name: 'kudos',
+  plugins: [
+    'KudosActivityReceiverNotificationPlugin'
+  ],
+  icon: 'fa-award',
+});
 extensionRegistry.registerExtension('WebNotification', 'notification-content-extension', {
   type: 'KudosActivityReceiverNotificationPlugin',
   rank: 10,
