@@ -38,7 +38,7 @@ export default {
         parentId: '',
         owner: eXo.env.portal.userName,
         spaceURL: eXo.env.portal.spaceUrl,
-        readOnlySpace: true
+        readOnlySpace: eXo.env.portal.spaceUrl ? true : false
       }}));
     },
   },
