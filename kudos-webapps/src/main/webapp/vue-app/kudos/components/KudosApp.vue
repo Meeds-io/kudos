@@ -185,7 +185,6 @@
                 :suggester-space-u-r-l="spaceURL"
                 :object-id="metadataObjectId"
                 :object-type="objectType"
-                :autofocus="!readOnlySpace"
                 class="flex" />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
