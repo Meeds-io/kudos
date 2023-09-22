@@ -27,24 +27,7 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div v-if="readOnlySpace">
-              <div class="d-flex flex-column pt-5">
-                <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.receiver.title') }}</span>
-                <exo-identity-suggester
-                  ref="kudosReceiver"
-                  id="kudosReceiver"
-                  v-model="selectedReceiver"
-                  :labels="receiverSuggesterLabels"
-                  :search-options="searchOptions"
-                  :type-of-relations="typeOfRelation"
-                  :autofocus="readOnlySpace"
-                  include-users
-                  name="kudosReceiver"
-                  width="220"
-                  class="user-suggester" />
-              </div>
-            </div>
-            <div v-else>
+            <div v-if="isLinkedKudos || !noReceiverIdentityId">
               <div class="d-flex flex-row pt-5 align-center">
                 <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
                 <div
@@ -70,28 +53,68 @@
                   :popover="false" />
               </div>
             </div>
-            <div v-if="!isLinkedKudos && !readOnlySpace">
-              <div class="d-flex flex-row pt-5">
-                <span class="text-header-title">{{ $t('exoplatform.kudos.choose.audience') }} </span>
-              </div>
-              <div class="d-flex flex-row">
+            <div v-else>
+              <div class="d-flex flex-column pt-5">
+                <span class="subtitle-1 text-color text-no-wrap">{{ $t('exoplatform.kudos.receiver.title') }}</span>
                 <exo-identity-suggester
-                  ref="audienceSuggester"
-                  v-model="audience"
-                  :labels="spaceSuggesterLabels"
-                  :include-users="false"
-                  :width="220"
-                  name="audienceAutocomplete"
-                  class="user-suggester"
-                  include-spaces
-                  only-redactor
-                  required />
+                  v-if="!selectedReceiver"
+                  ref="kudosReceiver"
+                  id="kudosReceiver"
+                  v-model="selectedReceiver"
+                  :labels="receiverSuggesterLabels"
+                  :search-options="searchOptions"
+                  :type-of-relations="typeOfRelation"
+                  include-users
+                  name="kudosReceiver"
+                  width="220"
+                  class="user-suggester" />
+                <div v-else class="pt-1">
+                  <v-chip
+                    class="primary"
+                    close
+                    @click:close="removeReceiver">
+                    <v-avatar left>
+                      <v-img :src="selectedReceiver.profile.avatarUrl" role="presentation" />
+                    </v-avatar>
+                    <span class="text-truncate">
+                      {{ selectedReceiver.profile.fullName }}
+                    </span>
+                  </v-chip>
+                </div>
               </div>
             </div>
-            <div class="d-flex flex-row pt-5">
-              <v-list-item v-if="readOnlySpace" class="text-truncate px-0 pt-3">
+            <div v-if="audienceTypesDisplay" class="mt-3 pt-4">
+              <span class="subtitle-1 text-color"> {{ $t('exoplatform.kudos.visibility.title') }} </span>
+              <v-radio-group
+                v-model="audienceChoice"
+                class="mt-0 mb-7"
+                mandatory>
+                <v-radio value="yourNetwork">
+                  <template #label>
+                    <span class="text-color text-subtitle-2 ms-1"> {{ $t('exoplatform.kudos.visibility.yourNetwork') }}</span>
+                  </template>
+                </v-radio>
+                <v-radio value="oneOfYourSpaces">
+                  <template #label>
+                    <span class="text-color text-subtitle-2 ms-1"> {{ $t('exoplatform.kudos.visibility.oneOfYourSpaces') }}</span>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+              <exo-identity-suggester
+                v-if="spaceSuggesterDisplay"
+                ref="audienceSuggester"
+                v-model="audience"
+                :labels="spaceSuggesterLabels"
+                :include-users="false"
+                :width="220"
+                name="audienceAutocomplete"
+                class="user-suggester mt-n2"
+                include-spaces
+                only-redactor />
+            </div>
+            <div class="d-flex flex-row">
+              <v-list-item v-if="audienceAvatarDisplay" class="text-truncate px-0 pt-3">
                 <exo-space-avatar
-                  v-if="spaceId"
                   :space-id="spaceId"
                   :size="30"
                   extra-class="text-truncate"
@@ -122,10 +145,23 @@
                       username-class />
                   </v-list-item-subtitle>
                 </v-list-item-content>
+                <v-list-item-action v-if="!readOnlySpace ">
+                  <v-btn icon @click="removeAudience()">
+                    <v-icon size="14">
+                      fas fa-redo
+                    </v-icon>
+                  </v-btn>
+                </v-list-item-action>
               </v-list-item>
-              <span v-else class="text-header-title">{{ $t('exoplatform.kudos.title.message') }} </span>
             </div>
-            <div class="d-flex flex-row pt-3">
+            <exo-user-avatar
+              v-if="postInYourNetwork"
+              :profile-id="username"
+              extra-class="text-truncate ms-2 me-1"
+              link-style
+              small-font-size
+              username-class />
+            <div class="d-flex flex-row pt-8">
               <rich-editor
                 :ref="ckEditorId"
                 :key="spaceURL"
@@ -138,7 +174,6 @@
                 :suggester-space-u-r-l="spaceURL"
                 :object-id="metadataObjectId"
                 :object-type="objectType"
-                :autofocus="!readOnlySpace"
                 class="flex" />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
@@ -225,6 +260,8 @@ export default {
       readOnlySpace: false,
       username: eXo.env.portal.userName,
       spaceId: eXo.env.portal.spaceId,
+      audienceChoice: null,
+      noReceiverIdentityId: false
     };
   },
   watch: {
@@ -246,7 +283,7 @@ export default {
       if (selectedReceiver) {
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
-          if (!this.readOnlySpace) {
+          if (this.isLinkedKudos) {
             this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
           }
         }
@@ -254,6 +291,12 @@ export default {
     },
     audience() {
       this.spaceURL = this.audience?.remoteId || null;
+      this.spaceId = this.audience?.spaceId || null;
+    },
+    audienceChoice(newVal) {
+      if (newVal === 'yourNetwork') {
+        this.removeAudience();
+      }
     }
   },
   created() {
@@ -305,7 +348,7 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     sendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || (this.readOnlySpace && !this.selectedReceiver);
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || (this.postInYourSpacesChoice && !this.audience) || (this.noReceiverIdentityId && !this.selectedReceiver);
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -345,6 +388,21 @@ export default {
     },
     enabled() {
       return eXo.env.portal.editorAttachImageEnabled && eXo.env.portal.attachmentObjectTypes?.indexOf(this.objectType) >= 0;
+    },
+    postInYourSpacesChoice() {
+      return this.audienceChoice === 'oneOfYourSpaces';
+    },
+    postInYourNetwork() {
+      return this.audienceChoice === 'yourNetwork';
+    },
+    spaceSuggesterDisplay() {
+      return this.postInYourSpacesChoice && !this.audience;
+    },
+    audienceTypesDisplay() {
+      return (!this.spaceId && !this.isLinkedKudos)  || (!this.spaceId && !this.readOnlySpace) || !this.readOnlySpace;
+    },
+    audienceAvatarDisplay() {
+      return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
     }
   },
   methods: {
@@ -419,6 +477,8 @@ export default {
                   };
                   if (receiverDetails.entityId) {
                     this.entityId = receiverDetails.entityId;
+                  } else {
+                    this.noReceiverIdentityId = true;
                   }
                   if (receiverDetails.notAuthorized) {
                     this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
@@ -532,6 +592,8 @@ export default {
         })
         .then(() => {
           this.selectedReceiver = null;
+          this.resetAudienceChoice();
+          this.removeAudience();
           this.$refs.activityKudosDrawer.close();
           this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
         })
@@ -566,6 +628,15 @@ export default {
         type: type || 'success',
       }}));
     },
+    resetAudienceChoice() {
+      this.audienceChoice = 'yourNetwork';
+    },
+    removeAudience() {
+      this.audience = '';
+    },
+    removeReceiver() {
+      this.selectedReceiver = '';
+    }
   }
 };
 </script>
