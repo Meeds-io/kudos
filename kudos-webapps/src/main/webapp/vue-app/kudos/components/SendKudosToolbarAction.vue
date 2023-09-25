@@ -3,11 +3,11 @@
     id="kudosBtnToolbar"
     :icon="!spaceId"
     :text="spaceId"
-    :class="spaceId && 'd-flex flex-row align-center py-2 px-3'"
+    :class="kudosButtonStyle"
     @click="openSendKudosDrawer">
     <v-icon
-      color="primary"
-      size="27">
+      :size="iconSize"
+      color="primary">
       fa-award
     </v-icon>
     <v-span v-if="spaceId" class="body-2 font-weight-bold ms-5  mt-1 dark-grey-color">
@@ -21,6 +21,14 @@ export default {
     return {
       spaceId: eXo.env.portal.spaceId,
     };
+  },
+  computed: {
+    iconSize() {
+      return this.spaceId ? '27' : '21';
+    },
+    kudosButtonStyle() {
+      return this.spaceId && 'd-flex flex-row align-center py-2 px-3';
+    }
   },
   methods: {
     openSendKudosDrawer() {
