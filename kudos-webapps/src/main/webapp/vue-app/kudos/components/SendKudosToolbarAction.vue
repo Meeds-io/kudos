@@ -1,16 +1,37 @@
 <template>
+  <v-tooltip v-if="!spaceId" bottom>
+    <template #activator="{ on, attrs }">
+      <v-btn
+        id="kudosBtnToolbar"
+        height="36px"
+        width="36px"
+        icon
+        v-bind="attrs"
+        v-on="on"
+        @click="openSendKudosDrawer">
+        <v-icon
+          size="20px"
+          color="primary">
+          fa-award
+        </v-icon>
+      </v-btn>
+    </template>
+    <span>
+      {{ $t('exoplatform.kudos.tooltip') }}
+    </span>
+  </v-tooltip>
   <v-btn
+    v-else
     id="kudosBtnToolbar"
-    :icon="!spaceId"
-    :text="spaceId"
-    :class="kudosButtonStyle"
+    class="d-flex flex-row align-center py-2 px-3"
+    text
     @click="openSendKudosDrawer">
     <v-icon
-      :size="iconSize"
+      size="27px"
       color="primary">
       fa-award
     </v-icon>
-    <v-span v-if="spaceId" class="body-2 font-weight-bold ms-5  mt-1 dark-grey-color">
+    <v-span class="body-2 font-weight-bold ms-5  mt-1 dark-grey-color">
       {{ $t('kudos.title') }}
     </v-span>
   </v-btn>
@@ -21,14 +42,6 @@ export default {
     return {
       spaceId: eXo.env.portal.spaceId,
     };
-  },
-  computed: {
-    iconSize() {
-      return this.spaceId ? '27' : '21';
-    },
-    kudosButtonStyle() {
-      return this.spaceId && 'd-flex flex-row align-center py-2 px-3';
-    }
   },
   methods: {
     openSendKudosDrawer() {
