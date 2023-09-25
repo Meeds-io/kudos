@@ -54,7 +54,7 @@
               </div>
             </div>
             <div v-else>
-              <div class="d-flex flex-column pt-5">
+              <div class="d-flex flex-column pt-5 pb-3">
                 <span class="subtitle-1 text-color text-no-wrap">{{ $t('exoplatform.kudos.receiver.title') }}</span>
                 <exo-identity-suggester
                   v-if="!selectedReceiver"
@@ -83,7 +83,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="audienceTypesDisplay" class="mt-3 pt-4">
+            <div v-if="audienceTypesDisplay" class="pt-4">
               <span class="subtitle-1 text-color"> {{ $t('exoplatform.kudos.visibility.title') }} </span>
               <v-radio-group
                 v-model="audienceChoice"
@@ -113,7 +113,7 @@
                 only-redactor />
             </div>
             <div class="d-flex flex-row">
-              <v-list-item v-if="audienceAvatarDisplay" class="text-truncate px-0 pt-3">
+              <v-list-item v-if="audienceAvatarDisplay" class="text-truncate px-0 mt-n1">
                 <exo-space-avatar
                   :space-id="spaceId"
                   :size="30"
@@ -145,7 +145,7 @@
                       username-class />
                   </v-list-item-subtitle>
                 </v-list-item-content>
-                <v-list-item-action v-if="!readOnlySpace ">
+                <v-list-item-action v-if="!readOnlySpace" class="my-0">
                   <v-btn icon @click="removeAudience()">
                     <v-icon size="14">
                       fas fa-redo
