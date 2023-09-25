@@ -27,7 +27,7 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div v-if="isLinkedKudos || userProfile">
+            <div v-if="isLinkedKudos || !noReceiverIdentityId">
               <div class="d-flex flex-row pt-5 align-center">
                 <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
                 <div
@@ -261,6 +261,7 @@ export default {
       username: eXo.env.portal.userName,
       spaceId: eXo.env.portal.spaceId,
       audienceChoice: null,
+      noReceiverIdentityId: false
     };
   },
   watch: {
@@ -347,7 +348,7 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     sendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || (this.postInYourSpacesChoice && !this.audience) || !this.selectedReceiver;
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || (this.postInYourSpacesChoice && !this.audience) || (!this.identity && !this.selectedReceiver);
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -378,9 +379,6 @@ export default {
     },
     isLinkedKudos() {
       return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
-    },
-    userProfile() {
-      return this.entityType === 'USER_PROFILE';
     },
     typeOfRelation() {
       return this.isLinkedKudos ? 'mention_comment' : 'mention_activity_stream';
@@ -479,6 +477,8 @@ export default {
                   };
                   if (receiverDetails.entityId) {
                     this.entityId = receiverDetails.entityId;
+                  } else {
+                    this.noReceiverIdentityId = true;
                   }
                   if (receiverDetails.notAuthorized) {
                     this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
