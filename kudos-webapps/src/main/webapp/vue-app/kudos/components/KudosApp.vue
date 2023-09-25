@@ -27,10 +27,11 @@
           ref="activityKudosForm"
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
-            <div v-if="isLinkedKudos">
+            <div v-if="isLinkedKudos || userProfile">
               <div class="d-flex flex-row pt-5 align-center">
                 <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
                 <div
+                  v-if="isLinkedKudos"
                   class="d-flex flex-row pl-4 mb-2 text-truncate kudosReceiverAttendeeItem">
                   <exo-identity-suggester
                     ref="kudosReceiverAutoComplete"
@@ -44,6 +45,12 @@
                     width="220"
                     class="user-suggester" />
                 </div>
+                <exo-user-avatar
+                  v-else
+                  class="d-flex flex-row pl-4"
+                  :identity="identity"
+                  :size="32"
+                  :popover="false" />
               </div>
             </div>
             <div v-else>
@@ -371,6 +378,9 @@ export default {
     },
     isLinkedKudos() {
       return this.entityType === 'ACTIVITY' || this.entityType === 'COMMENT';
+    },
+    userProfile() {
+      return this.entityType === 'USER_PROFILE';
     },
     typeOfRelation() {
       return this.isLinkedKudos ? 'mention_comment' : 'mention_activity_stream';
