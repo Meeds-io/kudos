@@ -1,22 +1,35 @@
 <template>
   <v-btn
     id="kudosBtnToolbar"
-    :ripple="false"
-    class="d-flex flex-row align-center py-2 px-3"
-    text
+    :icon="!spaceId"
+    :text="spaceId"
+    :class="kudosButtonStyle"
     @click="openSendKudosDrawer">
     <v-icon
-      color="primary"
-      size="27">
+      :size="iconSize"
+      color="primary">
       fa-award
     </v-icon>
-    <v-span class="body-2 font-weight-bold ms-5  mt-1 dark-grey-color">
+    <v-span v-if="spaceId" class="body-2 font-weight-bold ms-5  mt-1 dark-grey-color">
       {{ $t('kudos.title') }}
     </v-span>
   </v-btn>
 </template>
 <script>
 export default {
+  data () {
+    return {
+      spaceId: eXo.env.portal.spaceId,
+    };
+  },
+  computed: {
+    iconSize() {
+      return this.spaceId ? '27' : '21';
+    },
+    kudosButtonStyle() {
+      return this.spaceId && 'd-flex flex-row align-center py-2 px-3';
+    }
+  },
   methods: {
     openSendKudosDrawer() {
       document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
