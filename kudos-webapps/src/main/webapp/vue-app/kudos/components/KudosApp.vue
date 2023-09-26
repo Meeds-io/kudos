@@ -152,7 +152,7 @@
                         icon
                         v-bind="attrs"
                         v-on="on"
-                        @click="removeAudience()">
+                        @click="resetAudienceChoice()">
                         <v-icon size="14">
                           fas fa-redo
                         </v-icon>
@@ -410,7 +410,7 @@ export default {
       return this.postInYourSpacesChoice && !this.audience;
     },
     audienceTypesDisplay() {
-      return (!this.spaceId && !this.isLinkedKudos)  || (!this.spaceId && !this.readOnlySpace) || !this.readOnlySpace;
+      return (!this.spaceId && !this.isLinkedKudos)  || (!this.spaceId && !this.readOnlySpace) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience);
     },
     audienceAvatarDisplay() {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
@@ -604,7 +604,6 @@ export default {
         .then(() => {
           this.selectedReceiver = null;
           this.resetAudienceChoice();
-          this.removeAudience();
           this.noReceiverIdentityId = false;
           this.$refs.activityKudosDrawer.close();
           this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
@@ -642,6 +641,7 @@ export default {
     },
     resetAudienceChoice() {
       this.audienceChoice = null;
+      this.audience = '';
     },
     removeAudience() {
       this.audience = '';
