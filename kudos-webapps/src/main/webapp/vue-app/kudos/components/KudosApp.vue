@@ -146,11 +146,22 @@
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action v-if="!readOnlySpace" class="my-0">
-                  <v-btn icon @click="removeAudience()">
-                    <v-icon size="14">
-                      fas fa-redo
-                    </v-icon>
-                  </v-btn>
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="removeAudience()">
+                        <v-icon size="14">
+                          fas fa-redo
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>
+                      {{ $t('exoplatform.kudos.audience.reset.tooltip') }}
+                    </span>
+                  </v-tooltip>
                 </v-list-item-action>
               </v-list-item>
             </div>
