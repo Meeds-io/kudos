@@ -594,6 +594,7 @@ export default {
           this.selectedReceiver = null;
           this.resetAudienceChoice();
           this.removeAudience();
+          this.noReceiverIdentityId = false;
           this.$refs.activityKudosDrawer.close();
           this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
         })
@@ -629,7 +630,7 @@ export default {
       }}));
     },
     resetAudienceChoice() {
-      this.audienceChoice = 'yourNetwork';
+      this.audienceChoice = null;
     },
     removeAudience() {
       this.audience = '';
