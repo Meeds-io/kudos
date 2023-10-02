@@ -13,7 +13,7 @@
         size="50">
         fa-award
       </v-icon>
-      <v-span class="caption font-weight-bold ms-5">
+      <v-span class="caption font-weight-bold ms-7">
         {{ $t('exoplatform.kudos.title.sendAKudos') }}
       </v-span>
     </div>
