@@ -8,12 +8,18 @@
     <div
       class="d-flex flex-row align-center" 
       @click="openSendKudosDrawer">
-      <v-icon
-        color="primary"
-        size="50">
-        fa-award
-      </v-icon>
-      <v-span class="caption font-weight-bold ms-7">
+      <v-btn
+        class="px-auto"
+        width="44px"
+        height="50px"
+        icon>
+        <v-icon
+          color="primary"
+          size="50px">
+          fa-award
+        </v-icon>
+      </v-btn>
+      <v-span class="caption font-weight-bold ms-5">
         {{ $t('exoplatform.kudos.title.sendAKudos') }}
       </v-span>
     </div>
