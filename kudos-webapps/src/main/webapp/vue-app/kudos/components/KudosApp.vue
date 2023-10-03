@@ -166,7 +166,7 @@
               </v-list-item>
             </div>
             <exo-user-avatar
-              v-if="kudosSenderAvatar"
+              v-if="displaySenderAvatar"
               :profile-id="username"
               extra-class="text-truncate ms-2 me-1"
               link-style
@@ -415,7 +415,7 @@ export default {
     audienceAvatarDisplay() {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
     },
-    kudosSenderAvatar() {
+    displaySenderAvatar() {
       return this.postInYourNetwork || this.isLinkedKudos;
     }
   },
