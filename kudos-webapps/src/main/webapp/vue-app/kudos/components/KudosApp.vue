@@ -458,6 +458,7 @@ export default {
         if (this.remainingKudos > 0) {
           return getReceiver(this.entityType, this.entityId)
             .then(receiverDetails => {
+              this.noReceiverIdentityId = false;
               if (receiverDetails && receiverDetails.id && receiverDetails.type) {
                 receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
                 if (!receiverDetails.isUserType || receiverDetails.id !== this.username) {
