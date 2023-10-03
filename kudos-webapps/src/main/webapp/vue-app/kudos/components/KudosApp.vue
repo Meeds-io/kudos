@@ -43,7 +43,7 @@
                     include-users
                     name="kudosReceiver"
                     width="220"
-                    class="user-suggester" />
+                    class="user-suggester mb-2" />
                 </div>
                 <exo-user-avatar
                   v-else
@@ -166,7 +166,7 @@
               </v-list-item>
             </div>
             <exo-user-avatar
-              v-if="postInYourNetwork"
+              v-if="kudosSenderAvatar"
               :profile-id="username"
               extra-class="text-truncate ms-2 me-1"
               link-style
@@ -410,10 +410,13 @@ export default {
       return this.postInYourSpacesChoice && !this.audience;
     },
     audienceTypesDisplay() {
-      return (!this.spaceId && !this.isLinkedKudos)  || (!this.spaceId && !this.readOnlySpace) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience);
+      return (!this.spaceId && !this.isLinkedKudos) || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience);
     },
     audienceAvatarDisplay() {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
+    },
+    kudosSenderAvatar() {
+      return this.postInYourNetwork || this.isLinkedKudos;
     }
   },
   methods: {
