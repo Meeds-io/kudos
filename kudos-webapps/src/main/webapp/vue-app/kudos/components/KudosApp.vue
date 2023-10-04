@@ -28,11 +28,11 @@
           class="flex mx-4">
           <div class="d-flex flex-column flex-grow-1">
             <div v-if="isLinkedKudos || !noReceiverIdentityId">
-              <div class="d-flex flex-row pt-5 align-center">
+              <div class="d-flex flex-row pt-5 pb-3 align-center">
                 <span class="text-header-title text-no-wrap">{{ $t('exoplatform.kudos.content.to') }}</span>
                 <div
                   v-if="isLinkedKudos"
-                  class="d-flex flex-row pl-4 mb-2 text-truncate kudosReceiverAttendeeItem">
+                  class="d-flex flex-row pl-4 text-truncate kudosReceiverAttendeeItem">
                   <exo-identity-suggester
                     ref="kudosReceiverAutoComplete"
                     id="kudosReceiverAutoComplete"
