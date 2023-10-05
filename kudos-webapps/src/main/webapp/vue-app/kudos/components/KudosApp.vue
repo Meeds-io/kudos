@@ -410,14 +410,14 @@ export default {
     spaceSuggesterDisplay() {
       return this.postInYourSpacesChoice && !this.audience;
     },
-    audienceTypesDisplay() {
-      return (!this.spaceId && !this.isLinkedKudos) || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience);
-    },
     audienceAvatarDisplay() {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
     },
+    audienceTypesDisplay() {
+      return (!this.spaceId && !this.isLinkedKudos) || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience) || (!this.isLinkedKudos && !this.noReceiverIdentityId && !this.audienceAvatarDisplay);
+    },
     displaySenderAvatar() {
-      return this.postInYourNetwork || this.isLinkedKudos;
+      return (this.postInYourNetwork && this.audienceTypesDisplay) || this.isLinkedKudos;
     }
   },
   methods: {
