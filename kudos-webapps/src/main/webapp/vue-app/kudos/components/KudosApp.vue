@@ -308,6 +308,11 @@ export default {
       if (newVal === 'yourNetwork') {
         this.removeAudience();
       }
+    },
+    entityType(newVal) {
+      if (newVal === 'USER_TIPTIP') {
+        this.spaceId = null;
+      }
     }
   },
   created() {
