@@ -54,6 +54,9 @@
             <field name="bundlePath">
               <string>locale.addon.Kudos</string>
             </field>
+            <field name="mutable">
+              <boolean>false</boolean>
+            </field>
           </object>
         </object-param>
       </init-params>
@@ -89,6 +92,9 @@
             </field>
             <field name="bundlePath">
               <string>locale.notification.KudosNotification</string>
+            </field>
+            <field name="mutable">
+              <boolean>false</boolean>
             </field>
           </object>
         </object-param>
