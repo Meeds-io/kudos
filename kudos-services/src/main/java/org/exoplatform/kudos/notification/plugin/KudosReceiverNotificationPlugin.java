@@ -23,8 +23,11 @@ import java.util.List;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.Kudos;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
 public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
@@ -56,9 +59,15 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
     if (toList == null || toList.isEmpty()) {
       return null;
     }
+    ActivityManager activityManager = ExoContainerContext.getService(ActivityManager.class);
+    ExoSocialActivity activity = activityManager.getActivity(String.valueOf(kudos.getActivityId()));
+    if (activity.isComment()) {
+      activity = activityManager.getActivity(activity.getParentId());
+    }
 
     return NotificationInfo.instance()
                            .to(toList)
+                           .setSpaceId(activity == null ? 0l : Long.parseLong(activity.getSpaceId()))
                            .with(SocialNotificationUtils.ACTIVITY_ID.getKey(), String.valueOf(kudos.getActivityId()))
                            .with("ENTITY_ID", kudos.getEntityId())
                            .with("ENTITY_TYPE", kudos.getEntityType())
