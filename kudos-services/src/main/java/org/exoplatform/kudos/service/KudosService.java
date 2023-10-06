@@ -32,8 +32,6 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.*;
-import org.exoplatform.kudos.statistic.ExoKudosStatistic;
-import org.exoplatform.kudos.statistic.ExoKudosStatisticService;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -50,7 +48,7 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 /**
  * A service to manage kudos
  */
-public class KudosService implements ExoKudosStatisticService, Startable {
+public class KudosService implements Startable {
 
   private static final Log    LOG                             = ExoLogger.getLogger(KudosService.class);
 
@@ -173,7 +171,6 @@ public class KudosService implements ExoKudosStatisticService, Startable {
    * @return created {@link Kudos}
    * @throws Exception when receiver or sender aren't allowed.
    */
-  @ExoKudosStatistic(local = true, service = "kudos", operation = "create_kudos")
   public Kudos createKudos(Kudos kudos, String currentUser) throws Exception {
     if (!StringUtils.equals(currentUser, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + currentUser + "' is not authorized to send kudos on behalf of "
@@ -540,30 +537,6 @@ public class KudosService implements ExoKudosStatisticService, Startable {
 
     // Disable kudos for users not member of the permitted space members
     return spaceService.isSuperManager(username) || (space != null && spaceService.isMember(space, username));
-  }
-
-  @Override
-  public Map<String, Object> getStatisticParameters(String operation, Object result, Object... methodArgs) {
-    if (result == null) {
-      return Collections.emptyMap();
-    }
-    Map<String, Object> parameters = new HashMap<>();
-
-    Kudos savedKudos = (Kudos) result;
-    parameters.put("kudos_id", savedKudos.getTechnicalId());
-    parameters.put("sender_identity_id", savedKudos.getSenderIdentityId());
-    parameters.put("receiver_identity_id", savedKudos.getReceiverIdentityId());
-    parameters.put("kudos_entity_type", savedKudos.getEntityType());
-    parameters.put("kudos_entity_id", savedKudos.getEntityId());
-
-    String issuer = (String) methodArgs[methodArgs.length - 1];
-    if (StringUtils.isNotBlank(issuer)) {
-      Identity identity = getIdentityByTypeAndId(OrganizationIdentityProvider.NAME, issuer);
-      if (identity != null) {
-        parameters.put("user_social_id", identity.getId());
-      }
-    }
-    return parameters;
   }
 
   public KudosPeriodType getDefaultKudosPeriodType() {
