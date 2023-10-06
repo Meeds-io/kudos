@@ -205,4 +205,19 @@
     </component-plugin>
   </external-component-plugins>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.social.notification.service.SpaceWebNotificationService</target-component>
+    <component-plugin>
+      <name>ActivitySpaceWebNotificationPlugin</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.social.notification.plugin.ActivitySpaceWebNotificationPlugin</type>
+      <init-params>
+        <values-param>
+          <name>notification.plugin.ids</name>
+          <value>KudosActivityReceiverNotificationPlugin</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
 </configuration>

@@ -79,4 +79,5 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
                            .key(getId())
                            .end();
   }
+
 }
