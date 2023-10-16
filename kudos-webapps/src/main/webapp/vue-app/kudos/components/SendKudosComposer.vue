@@ -17,7 +17,7 @@
 <template>
   <v-card
     id="sendKudosComposerButton"
-    class="mx-4 mb-3 px-6 py-3"
+    class="mx-4 mb-3 px-6 py-3 card-border-radius"
     outlined 
     flat 
     hover>
