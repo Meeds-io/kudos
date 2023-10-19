@@ -3,10 +3,13 @@
     :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'"
     class="white">
     <widget-wrapper
-      v-if="!isOverviewDisplay"
       id="kudosOverviewHeader"
-      :title="$t('exoplatform.kudos.button.rewardedKudos')">
-      <template #action>
+      :default-padding="isOverviewDisplay && 'px-0' || 'px-5 pb-5'"
+      :hide-padding-top="isOverviewDisplay">
+      <template v-if="!isOverviewDisplay" #title>
+        <span class="widget-text-header text-truncate">{{ $t('exoplatform.kudos.button.rewardedKudos') }}</span>
+      </template>
+      <template v-if="!isOverviewDisplay" #action>
         <select
           v-model="periodType"
           class="kudosOverviewPeriodSelect fill-height col-auto my-auto py-0 subtitle-1 ignore-vuetify-classes">
@@ -52,40 +55,6 @@
         </v-col>
       </v-row>
     </widget-wrapper>
-    <v-row
-      v-else
-      id="kudosOverviewCardsParent"
-      class="white border-box-sizing px-4 py-0 ma-0 align-center">
-      <v-col class="kudosOverviewCard">
-        <kudos-overview-card
-          :clickable="owner && receivedKudosCount > 0"
-          class="kudosReceivedOverviewPeriod mx-n4"
-          @open-drawer="openDrawer('received')">
-          <template slot="count">
-            {{ receivedKudosCount || '0' }}
-          </template>
-          <template slot="label">
-            {{ $t('exoplatform.kudos.label.received') }}
-          </template> 
-        </kudos-overview-card>
-      </v-col>
-      <v-divider
-        class="my-9 mx-8 me-md-1 ms-md-5"
-        vertical />
-      <v-col class="kudosOverviewCard">
-        <kudos-overview-card
-          :clickable="owner && sentKudosCount > 0"
-          class="kudosSentOverviewPeriod mx-n4"
-          @open-drawer="openDrawer('sent')">
-          <template slot="count">
-            {{ sentKudosCount || '0' }}
-          </template>
-          <template slot="label">
-            {{ $t('exoplatform.kudos.label.sent') }}
-          </template>
-        </kudos-overview-card>
-      </v-col>
-    </v-row>
     <kudos-overview-drawer
       v-if="owner"
       ref="kudosOverviewDrawer" />
