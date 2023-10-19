@@ -3,10 +3,13 @@
     :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'"
     class="white">
     <widget-wrapper
-      v-if="!isOverviewDisplay"
       id="kudosOverviewHeader"
-      :title="$t('exoplatform.kudos.button.rewardedKudos')">
-      <template #action>
+      :default-padding="isOverviewDisplay && 'px-0' || 'px-5 pb-5'"
+      :hide-padding-top="isOverviewDisplay">
+      <template v-if="!isOverviewDisplay" #title>
+        <span class="widget-text-header text-truncate">{{ $t('exoplatform.kudos.button.rewardedKudos') }}</span>
+      </template>
+      <template v-if="!isOverviewDisplay" #action>
         <select
           v-model="periodType"
           class="kudosOverviewPeriodSelect fill-height col-auto my-auto py-0 subtitle-1 ignore-vuetify-classes">
@@ -52,7 +55,6 @@
         </v-col>
       </v-row>
     </widget-wrapper>
-
     <kudos-overview-drawer
       v-if="owner"
       ref="kudosOverviewDrawer" />
