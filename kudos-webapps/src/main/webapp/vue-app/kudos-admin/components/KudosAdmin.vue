@@ -10,13 +10,14 @@
           </div>
           <v-tabs
             v-model="selectedTab"
+            class="card-border-radius overflow-hidden"
             slider-size="4">
             <v-tabs-slider color="primary" />
             <v-tab key="general" href="#general">{{ $t('exoplatform.kudos.label.settings') }}</v-tab>
             <v-tab key="kudosList" href="#kudosList">{{ $t('exoplatform.kudos.label.kudosList') }}</v-tab>
           </v-tabs>
 
-          <v-tabs-items v-model="selectedTab" class="mt-2">
+          <v-tabs-items v-model="selectedTab" class="mt-2 card-border-radius overflow-hidden">
             <v-tab-item
               id="general"
               value="general"
