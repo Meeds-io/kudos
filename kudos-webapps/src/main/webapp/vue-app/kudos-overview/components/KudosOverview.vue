@@ -52,7 +52,40 @@
         </v-col>
       </v-row>
     </widget-wrapper>
-
+    <v-row
+      v-else
+      id="kudosOverviewCardsParent"
+      class="white border-box-sizing px-4 py-0 ma-0 align-center">
+      <v-col class="kudosOverviewCard">
+        <kudos-overview-card
+          :clickable="owner && receivedKudosCount > 0"
+          class="kudosReceivedOverviewPeriod mx-n4"
+          @open-drawer="openDrawer('received')">
+          <template slot="count">
+            {{ receivedKudosCount || '0' }}
+          </template>
+          <template slot="label">
+            {{ $t('exoplatform.kudos.label.received') }}
+          </template> 
+        </kudos-overview-card>
+      </v-col>
+      <v-divider
+        class="my-9 mx-8 me-md-1 ms-md-5"
+        vertical />
+      <v-col class="kudosOverviewCard">
+        <kudos-overview-card
+          :clickable="owner && sentKudosCount > 0"
+          class="kudosSentOverviewPeriod mx-n4"
+          @open-drawer="openDrawer('sent')">
+          <template slot="count">
+            {{ sentKudosCount || '0' }}
+          </template>
+          <template slot="label">
+            {{ $t('exoplatform.kudos.label.sent') }}
+          </template>
+        </kudos-overview-card>
+      </v-col>
+    </v-row>
     <kudos-overview-drawer
       v-if="owner"
       ref="kudosOverviewDrawer" />
