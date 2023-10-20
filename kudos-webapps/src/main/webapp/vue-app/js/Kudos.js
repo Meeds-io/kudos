@@ -214,7 +214,7 @@ export function registerExternalExtensions(title) {
 export function registerOverviewExtension() {
   extensionRegistry.registerComponent('my-reputation-overview-kudos', 'my-reputation-item', {
     id: 'kudos-reputation-overview',
-    vueComponent: Vue.options.components['kudos-overview'],
+    vueComponent: Vue.options.components['kudos-overview-row'],
     rank: 10,
   }); 
 }
