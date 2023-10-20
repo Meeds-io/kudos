@@ -30,6 +30,7 @@
 <script>
 
 export default {
+
   data: () => ({
     owner: eXo.env.portal.profileOwner === eXo.env.portal.userName,
     periodType: 'WEEK',
