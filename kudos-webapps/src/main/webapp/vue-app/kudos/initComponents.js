@@ -13,6 +13,7 @@ import KudosOverviewItem from './components/common/KudosOverviewItem.vue';
 import ActivityKudosReactionCount from './components/ActivityKudosReactionCount.vue';
 import KudosOverview from '../kudos-overview/components/KudosOverview.vue';
 import KudosOverviewCard from '../kudos-overview/components/KudosOverviewCard.vue';
+import KudosOverviewRow from '../kudos-overview/components/KudosOverviewRow.vue';
 
 const components = {
   'kudos-api': KudosAPI,
@@ -28,6 +29,7 @@ const components = {
   'activity-kudos-reaction-count': ActivityKudosReactionCount,
   'kudos-overview': KudosOverview,
   'kudos-overview-card': KudosOverviewCard,
+  'kudos-overview-row': KudosOverviewRow,
   'send-kudos-composer': SendKudosComposer,
   'send-kudos-toolbar-action': SendKudosToolbarAction,
 };
