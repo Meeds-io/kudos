@@ -14,48 +14,49 @@
   Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <v-row
-    id="kudosOverviewCardsParent"
-    class="white border-box-sizing ma-0 align-center">
-    <v-col class="kudosOverviewCard">
-      <kudos-overview-card
-        :clickable="isOwner && receivedKudosCount > 0"
-        class="kudosReceivedOverviewPeriod mx-n4"
-        @open-drawer="openDrawer('received')">
-        <template slot="count">
-          {{ receivedKudosCount || '0' }}
-        </template>
-        <template slot="label">
-          {{ $t('exoplatform.kudos.label.received') }}
-        </template> 
-      </kudos-overview-card>
-    </v-col>
-    <v-divider
-      class="my-9 mx-8 me-md-1 ms-md-5"
-      vertical />
-    <v-col class="kudosOverviewCard">
-      <kudos-overview-card
-        :clickable="isOwner && sentKudosCount > 0"
-        class="kudosSentOverviewPeriod mx-n4"
-        @open-drawer="openDrawer('sent')">
-        <template slot="count">
-          {{ sentKudosCount || '0' }}
-        </template>
-        <template slot="label">
-          {{ $t('exoplatform.kudos.label.sent') }}
-        </template>
-      </kudos-overview-card>
-    </v-col>
-  </v-row>
+  <div>
+    <v-row
+      id="kudosOverviewCardsParent"
+      class="white border-box-sizing ma-0 align-center">
+      <v-col class="kudosOverviewCard">
+        <kudos-overview-card
+          :clickable="isOwner && receivedKudosCount > 0"
+          class="kudosReceivedOverviewPeriod mx-n4"
+          @open-drawer="openDrawer('received')">
+          <template slot="count">
+            {{ receivedKudosCount || '0' }}
+          </template>
+          <template slot="label">
+            {{ $t('exoplatform.kudos.label.received') }}
+          </template> 
+        </kudos-overview-card>
+      </v-col>
+      <v-divider
+        class="my-9 mx-8 me-md-1 ms-md-5"
+        vertical />
+      <v-col class="kudosOverviewCard">
+        <kudos-overview-card
+          :clickable="isOwner && sentKudosCount > 0"
+          class="kudosSentOverviewPeriod mx-n4"
+          @open-drawer="openDrawer('sent')">
+          <template slot="count">
+            {{ sentKudosCount || '0' }}
+          </template>
+          <template slot="label">
+            {{ $t('exoplatform.kudos.label.sent') }}
+          </template>
+        </kudos-overview-card>
+      </v-col>
+    </v-row>
+    <kudos-overview-drawer
+      v-if="isOwner"
+      ref="kudosOverviewDrawer" />
+  </div>
 </template>
 <script>
 import {getKudosSent, getKudosReceived} from '../../js/Kudos.js'; 
 export default {
   props: {
-    isOwner: {
-      type: Boolean,
-      default: false
-    }, 
     periodType: {
       type: String,
       default: ''
@@ -71,6 +72,7 @@ export default {
     receivedKudosCount: 0,
     sentKudos: [],
     receivedKudos: [],
+    isOwner: eXo.env.portal.profileOwner === eXo.env.portal.userName
   }),
   watch: {
     periodType() {
