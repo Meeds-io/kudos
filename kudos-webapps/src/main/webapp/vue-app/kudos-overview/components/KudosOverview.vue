@@ -17,13 +17,9 @@
           </option>
         </select>
       </template>
-      <kudos-overview-row 
-        :is-owner="owner" 
+      <kudos-overview-row
         :period-type="periodType" />
     </widget-wrapper>
-    <kudos-overview-drawer
-      v-if="owner"
-      ref="kudosOverviewDrawer" />
   </v-app>
 </template>
 
