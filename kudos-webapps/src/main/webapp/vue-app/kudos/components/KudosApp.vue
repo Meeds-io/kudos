@@ -306,11 +306,6 @@ export default {
       this.spaceURL = this.audience?.remoteId || null;
       this.spaceId = this.audience?.spaceId || null;
     },
-    spaceURL() {
-      // Clear suggester cache
-      document.dispatchEvent(new CustomEvent('suggester-clear-people-cache'));
-      this.resetRichEditorData();
-    },
     audienceChoice(newVal) {
       if (newVal === 'yourNetwork') {
         this.removeAudience();
@@ -588,7 +583,7 @@ export default {
     send() {
       this.error = null;
 
-      const kudosMessage = this.ckEditorInstance.updateMessageBeforPost();
+      const kudosMessage = this.ckEditorInstance.getMessage();
       this.$refs.activityKudosDrawer.startLoading();
       const kudos = {
         entityType: this.entityType,
@@ -668,14 +663,7 @@ export default {
     },
     removeReceiver() {
       this.selectedReceiver = '';
-    },
-    resetRichEditorData() {
-      const message = this.ckEditorInstance.getMessage(); 
-      const mentionedUsers = message.match(/@([A-Za-z0-9_'.+-]+)/g)?.map(a => a.replace('@', '')) || null;
-      if (mentionedUsers?.length) {
-        this.ckEditorInstance?.replaceSuggestedUsers?.(message, mentionedUsers, this.spaceId);
-      }
-    },
+    }
   }
 };
 </script>
