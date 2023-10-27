@@ -504,6 +504,9 @@ export default {
                     this.entityId = receiverDetails.entityId;
                   } else {
                     this.noReceiverIdentityId = true;
+                    if(!receiverDetails.identityId) {
+                      this.selectedReceiver = null;
+                    }
                   }
                   if (receiverDetails.notAuthorized) {
                     this.error = this.$t('exoplatform.kudos.warning.userNotAuthorizedToReceiveKudos');
