@@ -500,7 +500,7 @@ export default {
                     this.entityId = receiverDetails.entityId;
                   } else {
                     this.noReceiverIdentityId = true;
-                    if(!receiverDetails.identityId) {
+                    if (!receiverDetails.identityId) {
                       this.selectedReceiver = null;
                     }
                   }
