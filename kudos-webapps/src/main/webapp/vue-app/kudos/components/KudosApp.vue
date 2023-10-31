@@ -453,7 +453,8 @@ export default {
           this.error = e;
         });
     },
-    resetEditor() {
+    closeDrawer() {
+      this.resetAudienceChoice();
       this.ckEditorInstance.destroyCKEditor();
     },
     initDrawer() {
