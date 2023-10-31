@@ -16,7 +16,7 @@
       id="activityKudosDrawer"
       right
       disable-pull-to-refresh
-      @closed="resetEditor">
+      @closed="closeDrawer">
       <template slot="title">
         <span class="text-header-title">
           {{ $t('exoplatform.kudos.title.sendAKudos') }}
@@ -453,7 +453,8 @@ export default {
           this.error = e;
         });
     },
-    resetEditor() {
+    closeDrawer() {
+      this.resetAudienceChoice();
       this.ckEditorInstance.destroyCKEditor();
     },
     initDrawer() {
