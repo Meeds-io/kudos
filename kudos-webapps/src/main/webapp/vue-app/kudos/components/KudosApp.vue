@@ -169,7 +169,7 @@
             <exo-user-avatar
               v-if="displaySenderAvatar"
               :profile-id="username"
-              extra-class="text-truncate ms-2 me-1"
+              extra-class="text-truncate"
               link-style
               small-font-size
               username-class />
