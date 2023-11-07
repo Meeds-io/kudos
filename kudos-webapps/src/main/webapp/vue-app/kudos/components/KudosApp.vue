@@ -9,6 +9,7 @@
 
     <exo-drawer
       ref="activityKudosDrawer"
+      v-model="drawer"
       v-draggable="enabled"
       width="500px"
       hide-actions
@@ -174,8 +175,8 @@
               username-class />
             <div class="d-flex flex-row pt-8">
               <rich-editor
+                v-if="drawer"
                 :ref="ckEditorId"
-                :key="spaceURL"
                 v-model="kudosMessage"
                 :max-length="MESSAGE_MAX_LENGTH"
                 :ck-editor-type="ckEditorType"
@@ -423,7 +424,10 @@ export default {
     },
     displaySenderAvatar() {
       return (this.postInYourNetwork && this.audienceTypesDisplay) || this.isLinkedKudos;
-    }
+    },
+    ckEditorInstance() {
+      return this.drawer && this.$refs.kudosContent || null;
+    },
   },
   methods: {
     init() {
@@ -451,7 +455,7 @@ export default {
     },
     closeDrawer() {
       this.resetAudienceChoice();
-      this.$refs[this.ckEditorId].destroyCKEditor();
+      this.ckEditorInstance.destroyCKEditor();
     },
     initDrawer() {
       this.kudosMessage = '';
@@ -565,7 +569,7 @@ export default {
             this.$refs.activityKudosDrawer.startLoading();
             this.initDrawer()
               .then(() => this.$nextTick())
-              .then(() => this.$refs[this.ckEditorId].initCKEditor())
+              .then(() => this.ckEditorInstance.initCKEditor())
               .finally( () => {
                 this.loading = false;
                 this.$refs.activityKudosDrawer.endLoading();
@@ -583,6 +587,7 @@ export default {
     send() {
       this.error = null;
 
+      const kudosMessage = this.ckEditorInstance.getMessage();
       this.$refs.activityKudosDrawer.startLoading();
       const kudos = {
         entityType: this.entityType,
@@ -590,7 +595,7 @@ export default {
         parentEntityId: this.parentEntityId,
         receiverType: this.receiverType,
         receiverId: this.receiverId,
-        message: this.kudosMessage,
+        message: kudosMessage,
         spacePrettyName: this.audience?.remoteId || this.spaceId
       };
       sendKudos(kudos)
@@ -602,7 +607,7 @@ export default {
           document.dispatchEvent(new CustomEvent('exo-kudos-sent', {detail: kudosSent}));
           return this.$nextTick();
         })
-        .then(() => this.$refs[this.ckEditorId].saveAttachments())
+        .then(() => this.ckEditorInstance.saveAttachments())
         .then(() => {
           return this.init()
             .catch(e => {
