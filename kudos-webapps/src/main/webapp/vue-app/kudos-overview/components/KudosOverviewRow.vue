@@ -49,8 +49,14 @@
     <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
       <v-icon color="secondary" size="54">fa-award</v-icon>
       <span
+        v-if="isOverviewDisplay || isOwner"
         v-html="emptyKudosSummaryText"
         class="subtitle-1 font-weight-bold mt-7"></span>
+      <span
+        v-else
+        class="subtitle-1 mt-3 text-wrap">
+        {{ noKudosThisPeriodLabel }}
+      </span>
     </div>
     <kudos-overview-drawer
       v-if="isOwner"
@@ -89,6 +95,9 @@ export default {
         0: !this.isExternal && `<a class="primary--text font-weight-bold" href="javascript:void(0)" onclick="document.dispatchEvent(new CustomEvent('${this.emptyKudosActionName}'))">` || '',
         1: !this.isExternal && '</a>' || '',
       });
+    },
+    noKudosThisPeriodLabel() {
+      return this.periodType && this.$t(`gamification.overview.emptyKudosMessage.${this.periodType.toLowerCase()}`);
     },
   },
   watch: {
