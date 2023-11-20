@@ -10,6 +10,7 @@ const config = {
     kudosOverview: './src/main/webapp/vue-app/kudos-overview/main.js',
     engagementCenterExtensions: './src/main/webapp/vue-app/engagementCenterExtensions/extensions.js',
     notificationExtension: './src/main/webapp/vue-app/notification-extension/main.js',
+    recognitionSetup: './src/main/webapp/vue-app/recognition-setup/main.js',
   },
   module: {
     rules: [

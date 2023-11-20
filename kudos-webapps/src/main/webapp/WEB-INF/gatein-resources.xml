@@ -93,6 +93,32 @@
     </module>
   </portlet>
 
+  <portlet>
+    <name>RecognitionSetup</name>
+    <module>
+      <load-group>recognition-setup-extensions</load-group>
+      <script>
+        <minify>false</minify>
+        <path>/js/recognitionSetup.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+    </module>
+  </portlet>
+
   <module>
     <name>kudos</name>
     <load-group>popoverGRP</load-group>

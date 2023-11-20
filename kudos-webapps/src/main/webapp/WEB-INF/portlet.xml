@@ -90,4 +90,26 @@
       </security-role-ref>
    </portlet>
 
+   <portlet>
+     <portlet-name>RecognitionSetup</portlet-name>
+     <display-name xml:lang="EN">Recognition Setup Application</display-name>
+     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+     <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/html/recognitionSetup.html</value>
+     </init-param>
+     <init-param>
+       <name>preload.resource.bundles</name>
+       <value>locale.portlet.RecognitionSetup</value>
+     </init-param>
+     <supports>
+       <mime-type>text/html</mime-type>
+     </supports>
+     <supported-locale>en</supported-locale>
+     <portlet-info>
+       <title>Recognition Setup Application</title>
+       <keywords>Recognition Setup Application</keywords>
+     </portlet-info>
+   </portlet>
+
 </portlet-app>
