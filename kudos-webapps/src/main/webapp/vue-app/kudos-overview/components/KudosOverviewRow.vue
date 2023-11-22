@@ -16,6 +16,7 @@
 <template>
   <div>
     <v-row
+      v-if="hasKudos"
       id="kudosOverviewCardsParent"
       class="white border-box-sizing ma-0 align-center">
       <v-col class="kudosOverviewCard">
@@ -31,9 +32,6 @@
           </template> 
         </kudos-overview-card>
       </v-col>
-      <v-divider
-        class="my-9 mx-8 me-md-1 ms-md-5"
-        vertical />
       <v-col class="kudosOverviewCard">
         <kudos-overview-card
           :clickable="isOwner && sentKudosCount > 0"
@@ -48,6 +46,18 @@
         </kudos-overview-card>
       </v-col>
     </v-row>
+    <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
+      <v-icon color="secondary" size="54">fa-award</v-icon>
+      <span
+        v-if="isOverviewDisplay || isOwner"
+        v-html="emptyKudosSummaryText"
+        class="subtitle-1 font-weight-bold mt-7"></span>
+      <span
+        v-else
+        class="subtitle-1 mt-3 text-wrap">
+        {{ noKudosThisPeriodLabel }}
+      </span>
+    </div>
     <kudos-overview-drawer
       v-if="isOwner"
       ref="kudosOverviewDrawer" />
@@ -59,7 +69,7 @@ export default {
   props: {
     periodType: {
       type: String,
-      default: ''
+      default: () => '',
     },
     isOverviewDisplay: {
       type: Boolean,
@@ -67,20 +77,48 @@ export default {
     },
   },
   data: () => ({
+    emptyKudosActionName: 'kudos-check-actions',
     identityId: eXo.env.portal.profileOwnerIdentityId,
     sentKudosCount: 0,
     receivedKudosCount: 0,
+    loading: true,
     sentKudos: [],
     receivedKudos: [],
     isOwner: eXo.env.portal.profileOwner === eXo.env.portal.userName
   }),
+  computed: {
+    hasKudos() {
+      return this.sentKudosCount || this.receivedKudosCount;
+    },
+    emptyKudosSummaryText() {
+      return this.$t('gamification.overview.emptyKudosMessage', {
+        0: !this.isExternal && `<a class="primary--text font-weight-bold" href="javascript:void(0)" onclick="document.dispatchEvent(new CustomEvent('${this.emptyKudosActionName}'))">` || '',
+        1: !this.isExternal && '</a>' || '',
+      });
+    },
+    noKudosThisPeriodLabel() {
+      return this.periodType && this.$t(`gamification.overview.emptyKudosMessage.${this.periodType.toLowerCase()}`);
+    },
+  },
   watch: {
     periodType() {
       this.refresh();
-    }
+    },
+    loading() {
+      this.$emit('loading', this.loading);
+    },
+    hasKudos() {
+      this.$emit('has-kudos', this.hasKudos);
+    },
   },
   created() {
     this.refresh();
+    document.addEventListener(this.emptyKudosActionName, this.clickOnKudosEmptyActionLink);
+    document.addEventListener('exo-kudos-sent', this.refresh);
+  },
+  beforeDestroy() {
+    document.removeEventListener('exo-kudos-sent', this.refresh);
+    document.removeEventListener(this.emptyKudosActionName, this.clickOnKudosEmptyActionLink);
   },
   methods: {
     openDrawer(kudosType) {
@@ -92,25 +130,34 @@ export default {
       }
     },
     refresh() {
-      const dateInSeconds = parseInt(Date.now() / 1000);
       document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
-      getKudosSent(this.identityId, 0, true, this.periodType, dateInSeconds)
+      this.loading = true;
+      getKudosSent(this.identityId, 0, true, this.periodType, 0)
         .then(kudosList => {
           this.sentKudosCount = kudosList && kudosList.size || 0;
           this.sentKudos = kudosList && kudosList.kudos || [];
         })
-        .then(() => getKudosReceived(this.identityId, 0, true, this.periodType, dateInSeconds))
+        .then(() => getKudosReceived(this.identityId, 0, true, this.periodType, 0))
         .then(kudosList => {
           this.receivedKudosCount = kudosList && kudosList.size || 0;
           this.receivedKudos = kudosList && kudosList.kudos || [];
           return this.$nextTick();
         })
         .finally(() => {
+          this.loading = false;
           this.$root.$emit('application-loaded');
           // Decrement 'loading' effect in top of the page
           document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
           document.dispatchEvent(new CustomEvent('kudosCount', {detail: this.sentKudosCount + this.receivedKudosCount}));
         });
+    },
+    clickOnKudosEmptyActionLink() {
+      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
+        id: eXo.env.portal.userIdentityId,
+        type: 'USER_PROFILE',
+        parentId: '',
+        owner: eXo.env.portal.userName,
+      }}));
     },
   },
 };
