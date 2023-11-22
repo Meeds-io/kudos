@@ -10,7 +10,6 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :disabled="buttonDisabled"
             :class="textColorClass"
             :small="!isComment"
             :x-small="isComment"
@@ -38,7 +37,7 @@
         </div>
       </template>
       <span>
-        {{ buttonDisabled && $t('exoplatform.kudos.info.onlyOtherCanSendYouKudos') || $t('exoplatform.kudos.title.sendAKudos') }}
+        {{ $t('exoplatform.kudos.title.sendAKudos') }}
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
@@ -116,10 +115,10 @@ export default {
     textColorClass() {
       return this.hasSentKudos && 'primary--text' || '';
     },
-    inactiveCommentOwner() {
+    isCommentOwner() {
       return !this.comment.identity.profile.dataEntity.enabled || this.comment.identity.deleted;
     },
-    inactiveActivityOwner() {
+    isActivityOwner() {
       return  !this.activity.identity.profile.dataEntity.enabled || this.activity.identity.deleted;
     },   
     userIdentityId() {
@@ -128,13 +127,13 @@ export default {
     sharedInSpace() {
       return this.activity?.activityStream?.type === 'space';
     },
-    buttonDisabled() {
+    isOwner() {
       if (this.comment) {
         const commentOwnerId = this.comment.identity && this.comment.identity.id;
-        return commentOwnerId === this.userIdentityId || this.inactiveCommentOwner || (this.sharedInSpace && !this.comment.owner.isMember);
+        return commentOwnerId === this.userIdentityId || this.isCommentOwner || (this.sharedInSpace && !this.comment.owner.isMember);
       } else if (this.activity) {
         const activityOwnerId = this.activity.identity && this.activity.identity.id;
-        return activityOwnerId === this.userIdentityId || this.inactiveActivityOwner || (this.sharedInSpace && !this.activity.owner.isMember);
+        return activityOwnerId === this.userIdentityId || this.isActivityOwner || (this.sharedInSpace && !this.activity.owner.isMember);
       }
       return false;
     },
@@ -182,7 +181,7 @@ export default {
         id: this.entityId,
         parentId: this.parentId,
         type: this.entityType,
-        owner: this.entityOwner,
+        owner: !this.isOwner && this.entityOwner || null,
         spaceURL: this.spaceURL
       }}));
     },
