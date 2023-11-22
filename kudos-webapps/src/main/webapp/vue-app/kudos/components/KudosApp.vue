@@ -296,9 +296,6 @@ export default {
       if (selectedReceiver) {
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
-          if (this.isLinkedKudos) {
-            this.displayAlert(this.$t('exoplatform.kudos.success.receiverChanged'));
-          }
         }
       }
     },
@@ -524,9 +521,10 @@ export default {
                     }
                   });
                 } else {
-                  throw new Error(this.$t('exoplatform.kudos.warning.cantSendKudosToYourSelf'));
+                  this.entityOwner = null;
                 }
               } else {
+                this.entityOwner = null;
                 console.error('Receiver not found for entity type/id', this.entityType, this.entityId, receiverDetails);
                 throw new Error(this.$t('exoplatform.kudos.error.errorGettingReceiverInformation'));
               }
