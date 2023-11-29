@@ -26,7 +26,7 @@ export function init() {
       icon: 'fas fa-award',
       match: (actionLabel) => kudosUserActions.includes(actionLabel),
       getLink: (realization) => {
-        realization.link = `${eXo.env.portal.context}/${eXo.env.portal.defaultPortal}/activity?id=${realization?.objectId}`;
+        realization.link = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${realization?.objectId}`;
         return realization.link;
       }
     },
