@@ -17,16 +17,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import KudosAdminSetup from './components/KudosAdminSetup.vue';
-import AdminDrawer from './components/settings/AdminDrawer.vue';
-import AdminForm from './components/settings/AdminForm.vue';
+import * as kudosSettings from '../js/KudosSettings.js';
 
-const components = {
-  'kudos-admin-setup': KudosAdminSetup,
-  'kudos-admin-drawer': AdminDrawer,
-  'kudos-admin-form': AdminForm,
-};
-
-for (const key in components) {
-  Vue.component(key, components[key]);
+if (!Vue.prototype.$kudosSettings) {
+  window.Object.defineProperty(Vue.prototype, '$kudosSettings', {
+    value: kudosSettings,
+  });
 }
