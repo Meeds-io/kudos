@@ -232,11 +232,6 @@ public class SpaceServiceMock implements SpaceService {
 
   }
 
-  public List<Space> getSpacesByFirstCharacterOfName(String firstCharacterOfName) throws SpaceException {
-    throw new UnsupportedOperationException();
-
-  }
-
   public List<Space> getSpacesBySearchCondition(String condition) throws Exception {
     throw new UnsupportedOperationException();
 
@@ -571,18 +566,6 @@ public class SpaceServiceMock implements SpaceService {
 
   public boolean isSuperManager(String userId) {
     return false;
-  }
-
-  public List<MembershipEntry> getSuperManagersMemberships() {
-    throw new UnsupportedOperationException();
-  }
-
-  public void addSuperManagersMembership(String permissionExpression) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void removeSuperManagersMembership(String permissionExpression) {
-    throw new UnsupportedOperationException();
   }
 
 }
