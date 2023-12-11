@@ -38,7 +38,7 @@ export function getReceiver(entityType, entityId) {
         console.error('Error retrieving activity details with id', entityId, e);
       });
   } else {
-    console.error('Unkown entity type', entityType, entityId);
+    return Promise.resolve();
   }
 }
 
