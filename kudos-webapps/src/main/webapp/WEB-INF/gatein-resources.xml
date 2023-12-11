@@ -165,6 +165,9 @@
     <depends>
       <module>extensionRegistry</module>
     </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
   </module>
 
 </gatein-resources>
