@@ -132,9 +132,9 @@ export default {
         document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
         return this.$kudosService.deleteKudos(event.detail).catch(e => {
           if (e.message === 'KudosAlreadyLinked') {
-            document.dispatchEvent(new CustomEvent('notification-alert', {detail: {
-              message: this.$t('kudos.cancel.error.alreadyLinked'),
-              type: 'error',
+            document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+              alertMessage: this.$t('kudos.cancel.error.alreadyLinked'),
+              alertType: 'error',
             }}));
           }})
           .finally(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')));
