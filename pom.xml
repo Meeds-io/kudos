@@ -71,15 +71,20 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>kudos-services</artifactId>
         <version>${project.version}</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>kudos-webapps</artifactId>
         <version>${project.version}</version>
-        <scope>provided</scope>
         <type>war</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>kudos-packaging</artifactId>
+        <version>${project.version}</version>
+        <type>zip</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
