@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.kudos.exception.KudosAlreadyLinkedException;
 import org.picocontainer.Startable;

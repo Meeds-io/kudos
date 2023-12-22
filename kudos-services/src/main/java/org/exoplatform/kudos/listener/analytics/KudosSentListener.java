@@ -21,7 +21,7 @@ package org.exoplatform.kudos.listener.analytics;
 import static org.exoplatform.analytics.utils.AnalyticsUtils.addSpaceStatistics;
 import static org.exoplatform.analytics.utils.AnalyticsUtils.getIdentity;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.analytics.model.StatisticData;
 import org.exoplatform.analytics.utils.AnalyticsUtils;

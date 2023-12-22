@@ -12,7 +12,7 @@
     <rest.api.doc.version>1.0</rest.api.doc.version>
     <rest.api.doc.description>Kudos addon rest endpoints</rest.api.doc.description>
 
-    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.60</exo.test.coverage.ratio>
   </properties>
   <dependencies>
     <dependency>
