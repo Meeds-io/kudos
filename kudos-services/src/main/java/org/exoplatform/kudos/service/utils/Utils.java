@@ -3,7 +3,7 @@ package org.exoplatform.kudos.service.utils;
 import java.time.*;
 import java.util.*;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
@@ -165,7 +165,7 @@ public class Utils {
       kudos.setReceiverId(receiverIdentity.getRemoteId());
       kudos.setReceiverIdentityId(getIdentityIdByType(receiverIdentity));
       kudos.setReceiverType(USER_ACCOUNT_TYPE);
-      kudos.setReceiverPosition(StringEscapeUtils.unescapeHtml(receiverIdentity.getProfile().getPosition()));
+      kudos.setReceiverPosition(StringEscapeUtils.unescapeHtml4(receiverIdentity.getProfile().getPosition()));
       kudos.setExternalReceiver(receiverIdentity.getProfile() != null
           && receiverIdentity.getProfile().getProperty("external") != null
           && receiverIdentity.getProfile().getProperty("external").equals("true"));
@@ -250,9 +250,9 @@ public class Utils {
 
   public static void computeKudosActivityProperties(ExoSocialActivity activity, Kudos kudos) {
     String senderLink = "<a href='" + kudos.getSenderURL() + "'>" + kudos.getSenderFullName() + "</a>";
-    senderLink = StringEscapeUtils.unescapeHtml(senderLink);
+    senderLink = StringEscapeUtils.unescapeHtml4(senderLink);
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
-    receiverLink = StringEscapeUtils.unescapeHtml(receiverLink);
+    receiverLink = StringEscapeUtils.unescapeHtml4(receiverLink);
 
     String kudosMessage = kudos.getMessage();
     String message = StringUtils.isBlank(kudosMessage) ? "." : ": " + kudosMessage;
