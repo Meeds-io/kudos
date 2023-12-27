@@ -32,6 +32,7 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.storage.KudosStorage;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
