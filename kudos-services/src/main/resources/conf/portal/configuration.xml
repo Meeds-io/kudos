@@ -8,10 +8,6 @@
   </component>
 
   <component>
-    <type>org.exoplatform.kudos.service.KudosStorage</type>
-  </component>
-
-  <component>
     <type>org.exoplatform.kudos.service.KudosService</type>
     <init-params>
       <value-param>
