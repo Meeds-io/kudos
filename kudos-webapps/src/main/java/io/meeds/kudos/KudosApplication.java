@@ -32,6 +32,7 @@ exclude = {
   LiquibaseAutoConfiguration.class,
 })
 @PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-common.properties")
 public class KudosApplication extends PortalApplicationContextInitializer {
 
   public static final String MODULE_NAME = "org.exoplatform.kudos";
