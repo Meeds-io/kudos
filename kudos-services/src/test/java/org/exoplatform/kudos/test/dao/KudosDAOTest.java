@@ -233,7 +233,7 @@ public class KudosDAOTest extends BaseKudosTest {
     kudos.setActivityId(activityId);
     kudosDAO.create(kudos);
     KudosEntity newKudos = kudosDAO.getKudosByActivityId(activityId);
-    compareResults(newKudos, fromEntity(kudos, DEFAULT_PORTAL));
+    compareResults(newKudos, fromEntity(kudos));
 
   }
 }
