@@ -2,7 +2,7 @@ package org.exoplatform.kudos.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.hibernate.annotations.DynamicUpdate;
 

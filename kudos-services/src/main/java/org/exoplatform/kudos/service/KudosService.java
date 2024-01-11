@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.kudos.exception.KudosAlreadyLinkedException;
 import org.picocontainer.Startable;
@@ -32,6 +32,7 @@ import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.storage.KudosStorage;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;

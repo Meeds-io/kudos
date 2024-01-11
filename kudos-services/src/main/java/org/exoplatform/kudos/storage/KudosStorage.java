@@ -1,16 +1,28 @@
-package org.exoplatform.kudos.service;
+package org.exoplatform.kudos.storage;
 
-import static org.exoplatform.kudos.service.utils.Utils.*;
+import static org.exoplatform.kudos.service.utils.Utils.USER_ACCOUNT_TYPE;
+import static org.exoplatform.kudos.service.utils.Utils.fromEntity;
+import static org.exoplatform.kudos.service.utils.Utils.getSpace;
+import static org.exoplatform.kudos.service.utils.Utils.toEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.picocontainer.Startable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.kudos.dao.KudosDAO;
 import org.exoplatform.kudos.entity.KudosEntity;
-import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.model.Kudos;
+import org.exoplatform.kudos.model.KudosEntityType;
+import org.exoplatform.kudos.model.KudosPeriod;
 import org.exoplatform.kudos.service.utils.Utils;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
@@ -21,18 +33,43 @@ import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 
-public class KudosStorage {
+import jakarta.annotation.PostConstruct;
+
+@Service // FIXME Should be @Repository instead, but Kept with @Service to expose it 
+         // into Kernel Container
+public class KudosStorage implements Startable {
+
   private static final Log LOG = ExoLogger.getLogger(KudosStorage.class);
 
+  @Autowired
   private KudosDAO         kudosDAO;
 
+  @Autowired
   private IdentityManager  identityManager;
 
-  private String           defaultPortal;
+  @Autowired
+  private UserPortalConfigService userPortalConfigService;
 
-  public KudosStorage(KudosDAO kudosDAO, UserPortalConfigService userPortalConfigService) {
-    this.kudosDAO = kudosDAO;
-    this.defaultPortal = userPortalConfigService.getDefaultPortal();
+  private String                  defaultPortal;
+
+  @PostConstruct
+  public void init() {
+    this.defaultPortal = userPortalConfigService.getMetaPortal();
+  }
+
+  /**
+   * @deprecated kept to be able to use this service as Kernel Service in Unit
+   *             Tests To delete once the Unit Tests migrated
+   *             with Spring and JUnit 5
+   */
+  @Override
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public void start() {
+    PortalContainer container = PortalContainer.getInstance();
+    this.kudosDAO = container.getComponentInstanceOfType(KudosDAO.class);
+    this.identityManager = container.getComponentInstanceOfType(IdentityManager.class);
+    this.defaultPortal = container.getComponentInstanceOfType(UserPortalConfigService.class)
+                                  .getDefaultPortal();
   }
 
   public Kudos getKudoById(long id) {
