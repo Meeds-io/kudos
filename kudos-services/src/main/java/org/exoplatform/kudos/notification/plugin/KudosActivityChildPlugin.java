@@ -54,8 +54,7 @@ public class KudosActivityChildPlugin extends AbstractNotificationChildPlugin {
       return "";
     }
     String language = getLanguage(notification);
-    String message = MentionUtils.substituteRoleWithLocale(kudos.getMessage(),
-                                                           Locale.forLanguageTag(language));
+    String message = MentionUtils.substituteUsernames(kudos.getMessage(), Locale.forLanguageTag(language));
     TemplateContext templateContext = new TemplateContext(getId(), language);
     templateContext.put("MESSAGE", message);
     return TemplateUtils.processGroovy(templateContext);

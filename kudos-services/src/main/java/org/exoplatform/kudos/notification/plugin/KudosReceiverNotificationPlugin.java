@@ -28,6 +28,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
 public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
@@ -75,7 +76,8 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
                            .with("RECEIVER_ID", receiverId)
                            .with("RECEIVER_TYPE", receiverType)
                            .with("KUDOS_ID", String.valueOf(kudos.getTechnicalId()))
-                           .with("KUDOS_MESSAGE", kudos.getMessage() == null ? "" : kudos.getMessage())
+                           .with("KUDOS_MESSAGE",
+                                 kudos.getMessage() == null ? "" : MentionUtils.substituteUsernames(kudos.getMessage()))
                            .key(getId())
                            .end();
   }

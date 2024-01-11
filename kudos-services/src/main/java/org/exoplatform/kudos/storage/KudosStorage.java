@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.picocontainer.Startable;
@@ -24,7 +23,6 @@ import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.model.KudosEntityType;
 import org.exoplatform.kudos.model.KudosPeriod;
 import org.exoplatform.kudos.service.utils.Utils;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -32,8 +30,6 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
-
-import jakarta.annotation.PostConstruct;
 
 @Service // FIXME Should be @Repository instead, but Kept with @Service to expose it 
          // into Kernel Container
@@ -47,16 +43,6 @@ public class KudosStorage implements Startable {
   @Autowired
   private IdentityManager  identityManager;
 
-  @Autowired
-  private UserPortalConfigService userPortalConfigService;
-
-  private String                  defaultPortal;
-
-  @PostConstruct
-  public void init() {
-    this.defaultPortal = userPortalConfigService.getMetaPortal();
-  }
-
   /**
    * @deprecated kept to be able to use this service as Kernel Service in Unit
    *             Tests To delete once the Unit Tests migrated
@@ -68,8 +54,6 @@ public class KudosStorage implements Startable {
     PortalContainer container = PortalContainer.getInstance();
     this.kudosDAO = container.getComponentInstanceOfType(KudosDAO.class);
     this.identityManager = container.getComponentInstanceOfType(IdentityManager.class);
-    this.defaultPortal = container.getComponentInstanceOfType(UserPortalConfigService.class)
-                                  .getDefaultPortal();
   }
 
   public Kudos getKudoById(long id) {
@@ -78,7 +62,7 @@ public class KudosStorage implements Startable {
       LOG.warn("Can't find Kudos with id {}", id);
       return null;
     } else {
-      return fromEntity(kudosEntity, defaultPortal);
+      return fromEntity(kudosEntity);
     }
   }
 
@@ -86,7 +70,7 @@ public class KudosStorage implements Startable {
     KudosEntity kudosEntity = toEntity(kudos);
     kudosEntity.setId(null);
     kudosEntity = kudosDAO.create(kudosEntity);
-    return fromEntity(kudosEntity, defaultPortal);
+    return fromEntity(kudosEntity);
   }
 
   public void deleteKudosById(long kudosId) {
@@ -113,7 +97,7 @@ public class KudosStorage implements Startable {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity, defaultPortal));
+          kudosList.add(fromEntity(kudosEntity));
         }
       }
     }
@@ -128,7 +112,7 @@ public class KudosStorage implements Startable {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity, defaultPortal));
+          kudosList.add(fromEntity(kudosEntity));
         }
       }
     }
@@ -173,7 +157,7 @@ public class KudosStorage implements Startable {
       List<Kudos> kudosList = new ArrayList<>();
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity, defaultPortal));
+          kudosList.add(fromEntity(kudosEntity));
         }
       }
       return kudosList;
@@ -187,7 +171,7 @@ public class KudosStorage implements Startable {
     if (kudosEntities != null) {
       for (KudosEntity kudosEntity : kudosEntities) {
         if (kudosEntity != null) {
-          kudosList.add(fromEntity(kudosEntity, defaultPortal));
+          kudosList.add(fromEntity(kudosEntity));
         }
       }
     }
@@ -225,15 +209,15 @@ public class KudosStorage implements Startable {
 
   public Kudos getKudosByActivityId(Long activityId) {
     KudosEntity kudosEntity = kudosDAO.getKudosByActivityId(activityId);
-    return fromEntity(kudosEntity, defaultPortal);
+    return fromEntity(kudosEntity);
   }
 
   public List<Kudos> getKudosListOfActivity(Long activityId) {
     List<KudosEntity> kudosEntities = kudosDAO.getKudosListOfActivity(activityId);
     return CollectionUtils.isEmpty(kudosEntities) ? Collections.emptyList()
                                                   : kudosEntities.stream()
-                                                                 .map(entity -> Utils.fromEntity(entity, defaultPortal))
-                                                                 .collect(Collectors.toList());
+                                                                 .map(Utils::fromEntity)
+                                                                 .toList();
   }
 
   public long countKudosOfActivity(Long activityId) {
@@ -243,7 +227,7 @@ public class KudosStorage implements Startable {
   public Kudos updateKudos(Kudos kudos) {
     KudosEntity kudosEntity = toEntity(kudos);
     kudosEntity = kudosDAO.update(kudosEntity);
-    return fromEntity(kudosEntity, defaultPortal);
+    return fromEntity(kudosEntity);
   }
 
 }

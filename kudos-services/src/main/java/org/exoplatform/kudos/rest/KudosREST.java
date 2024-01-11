@@ -537,8 +537,7 @@ public class KudosREST implements ResourceContainer {
     Locale userLocale = LocalizationFilter.getCurrentLocale();
     for (Kudos kudos : kudosList) {
       if (kudos != null) {
-        kudos.setMessage(MentionUtils.substituteRoleWithLocale(kudos.getMessage(),
-                                                               userLocale));
+        kudos.setMessage(MentionUtils.substituteUsernames(kudos.getMessage(), userLocale));
       }
     }
   }
