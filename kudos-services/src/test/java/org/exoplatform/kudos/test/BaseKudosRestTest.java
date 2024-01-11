@@ -107,7 +107,7 @@ public abstract class BaseKudosRestTest extends AbstractResourceTest {
 
   protected Kudos newKudosDTO() {
     KudosEntity entity = newKudosInstance(parentEntityId, entityId, entityType, receiverId, senderId, createdTimestamp, message);
-    return Utils.fromEntity(entity, DEFAULT_PORTAL);
+    return Utils.fromEntity(entity);
   }
 
   protected KudosEntity newKudos() {

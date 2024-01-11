@@ -183,7 +183,7 @@
                 :ck-editor-id="ckEditorId"
                 :placeholder="$t('exoplatform.kudos.label.kudosMessagePlaceholder')"
                 :suggestor-type-of-relation="typeOfRelation"
-                :suggester-space-u-r-l="spaceURL"
+                :suggester-space-pretty-name="spacePrettyName"
                 :object-id="metadataObjectId"
                 :object-type="objectType"
                 class="flex"
@@ -267,7 +267,6 @@ export default {
       identity: null,
       currentUserId: eXo.env.portal.userIdentityId,
       selectedReceiver: null,
-      spaceURL: null,
       audience: '',
       objectType: 'activity',
       readOnlySpace: false,
@@ -308,7 +307,7 @@ export default {
       }
     },
     audience() {
-      this.spaceURL = this.audience?.remoteId || null;
+      this.spacePrettyName = this.audience?.remoteId || null;
       this.spaceId = this.audience?.spaceId || null;
     },
     audienceChoice(newVal) {
@@ -337,7 +336,7 @@ export default {
     searchOptions() {
       return {
         currentUser: this.username,
-        spaceURL: this.spaceURL,
+        spacePrettyName: this.spacePrettyName,
         activityId: this.entityId
       };
     },
@@ -352,7 +351,7 @@ export default {
       return {
         searchPlaceholder: this.$t('exoplatform.kudos.receiver.searchPlaceholder'),
         placeholder: this.$t('exoplatform.kudos.receiver.placeholder'),
-        noDataLabel: this.spaceURL ? this.$t('exoplatform.kudos.receiver.noDataLabelInSpace') : this.$t('exoplatform.kudos.receiver.noDataLabel'),
+        noDataLabel: this.spacePrettyName ? this.$t('exoplatform.kudos.receiver.noDataLabelInSpace') : this.$t('exoplatform.kudos.receiver.noDataLabel'),
       };
     },
     KudosAllowedInfo() {
@@ -562,7 +561,7 @@ export default {
             this.entityOwner = event?.detail?.owner || eXo.env.portal.userName;
             this.parentEntityId = event?.detail?.parentId || '';
             this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-            this.spaceURL = event && event.detail && event.detail.spaceURL || null;
+            this.spacePrettyName = event && event.detail && event.detail.spaceURL || null;
             this.metadataObjectId = null;
             this.$refs.drawer.open();
             this.$refs.drawer.startLoading();
