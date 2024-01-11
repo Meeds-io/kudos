@@ -24,6 +24,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.processor.I18NActivityProcessor;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.social.notification.Utils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
@@ -128,10 +129,10 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     // body construction must be made after subject building
     if (activity != null) {
       if (StringUtils.isNotBlank(activity.getParentCommentId())) {
-        String parentCommentTitle = Utils.getActivityManager().getActivityTitle(activity.getParentCommentId());
+        String parentCommentTitle = getActivityTitle(activity.getParentCommentId(), language);
         templateContext.put("ACTIVITY", parentCommentTitle);
       } else if (StringUtils.isNotBlank(activity.getParentId())) {
-        String parentActivityTitle = Utils.getActivityManager().getActivityTitle(activity.getParentId());
+        String parentActivityTitle = getActivityTitle(activity.getParentId(), language);
         templateContext.put("ACTIVITY", parentActivityTitle);
       } else {
         templateContext.put("ACTIVITY", "");
@@ -157,6 +158,11 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
       activity = i18NActivityProcessor.process(activity, locale);
     }
     return activity;
+  }
+
+  private String getActivityTitle(String activityId, String language) {
+    return MentionUtils.substituteRoleWithLocale(Utils.getActivityManager().getActivityTitle(activityId),
+                                                 Locale.forLanguageTag(language));
   }
 
 }

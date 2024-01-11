@@ -133,7 +133,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     KudosService kudosService = getService(KudosService.class);
 
     KudosEntity kudosEntity = newKudosInstance();
-    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), "root4");
+    Kudos kudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), "root4");
     long activityId = 5;
 
     kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), activityId);
@@ -243,7 +243,7 @@ public class KudosRestTest extends BaseKudosRestTest {
 
     KudosEntity kudosEntity = newKudosInstance();
     kudosEntity.setEntityType(KudosEntityType.SPACE_PROFILE.ordinal());
-    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity, DEFAULT_PORTAL), senderUsername);
+    Kudos parentKudos = kudosService.createKudos(Utils.fromEntity(kudosEntity), senderUsername);
 
     ActivityManager activityManager = getService(ActivityManager.class);
     ExoSocialActivity activity = new ExoSocialActivityImpl();
@@ -257,7 +257,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     childKudosEntity.setEntityType(KudosEntityType.ACTIVITY.ordinal());
     childKudosEntity.setEntityId(250l);
     childKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity, DEFAULT_PORTAL), senderUsername);
+    Kudos childKudos = kudosService.createKudos(Utils.fromEntity(childKudosEntity), senderUsername);
 
     getKudosListOfActivity("%20", senderUsername, 400);
     getKudosListOfActivity(activityId, "root3", 404);
@@ -282,7 +282,7 @@ public class KudosRestTest extends BaseKudosRestTest {
     subCommentKudosEntity.setEntityType(KudosEntityType.COMMENT.ordinal());
     subCommentKudosEntity.setEntityId(255l);
     subCommentKudosEntity.setParentEntityId(parentKudos.getActivityId());
-    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity, DEFAULT_PORTAL), senderUsername);
+    Kudos subCommentKudos = kudosService.createKudos(Utils.fromEntity(subCommentKudosEntity), senderUsername);
 
     kudosList = getKudosListOfActivity(activityId, senderUsername, 200);
 

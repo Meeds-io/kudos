@@ -22,7 +22,7 @@ public class ActivityKudosProcessor extends BaseActivityProcessorPlugin {
                                 InitParams initParams) {
     super(initParams);
     this.kudosService = kudosService;
-    this.defaultPortal = userPortalConfigService.getDefaultPortal();
+    this.defaultPortal = userPortalConfigService.getMetaPortal();
   }
 
   @Override
