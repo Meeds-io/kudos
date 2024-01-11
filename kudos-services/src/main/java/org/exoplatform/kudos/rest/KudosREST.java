@@ -20,6 +20,7 @@ import static org.exoplatform.kudos.service.utils.Utils.getCurrentUserId;
 import static org.exoplatform.kudos.service.utils.Utils.timeFromSeconds;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -33,12 +34,15 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.kudos.exception.KudosAlreadyLinkedException;
 import org.exoplatform.kudos.model.*;
 import org.exoplatform.kudos.service.KudosService;
+import org.exoplatform.portal.application.localization.LocalizationFilter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -46,6 +50,7 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.utils.MentionUtils;
 
 
 @Path("/kudos/api/kudos")
@@ -82,6 +87,7 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriodOfDate(dateInSeconds, getLimit(limit));
+      translateRoleMentions(allKudosByPeriod.toArray(new Kudos[0]));
       return Response.ok(allKudosByPeriod).build();
     } catch (Exception e) {
       LOG.warn("Error getting kudos list of period with date {}", dateInSeconds, e);
@@ -108,6 +114,7 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       List<Kudos> allKudosByEntity = kudosService.getKudosByEntity(entityType, entityId, getLimit(limit));
+      translateRoleMentions(allKudosByEntity.toArray(new Kudos[0]));
       return Response.ok(allKudosByEntity).build();
     } catch (Exception e) {
       LOG.warn("Error getting kudos entity of entity {}/{}", entityType, entityId, e);
@@ -137,6 +144,7 @@ public class KudosREST implements ResourceContainer {
     org.exoplatform.services.security.Identity currentUser = ConversationState.getCurrent().getIdentity();
     try {
       Kudos kudos = kudosService.getKudosByActivityId(getActivityId(activityId), currentUser);
+      translateRoleMentions(kudos);
       return Response.ok(kudos).build();
     } catch (IllegalAccessException e) {
       LOG.error("Access denied to user {} to access Kudos of activity by id {}", currentUser.getUserId(), activityId);
@@ -171,6 +179,7 @@ public class KudosREST implements ResourceContainer {
     org.exoplatform.services.security.Identity currentUser = ConversationState.getCurrent().getIdentity();
     try {
       List<Kudos> kudosList = kudosService.getKudosListOfActivity(activityId, currentUser);
+      translateRoleMentions(kudosList.toArray(new Kudos[0]));
       return Response.ok(kudosList).build();
     } catch (IllegalAccessException e) {
       LOG.error("Access denied to user {} to access Kudos of parent activity by id {}", currentUser.getUserId(), activityId);
@@ -247,6 +256,7 @@ public class KudosREST implements ResourceContainer {
     }
     try {
       List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriod(startDateInSeconds, endDateInSeconds, getLimit(limit));
+      translateRoleMentions(allKudosByPeriod.toArray(new Kudos[0]));
       return Response.ok(allKudosByPeriod).build();
     } catch (Exception e) {
       LOG.warn("Error getting kudos list of period: from {} to {}", startDateInSeconds, endDateInSeconds, e);
@@ -322,6 +332,7 @@ public class KudosREST implements ResourceContainer {
                                                                  period.getStartDateInSeconds(),
                                                                  period.getEndDateInSeconds(),
                                                                  getLimit(limit));
+    translateRoleMentions(kudos.toArray(new Kudos[0]));
     kudosList.setKudos(kudos);
     return Response.ok(kudosList).build();
   }
@@ -394,6 +405,7 @@ public class KudosREST implements ResourceContainer {
                                                                period.getStartDateInSeconds(),
                                                                period.getEndDateInSeconds(),
                                                                getLimit(limit));
+    translateRoleMentions(kudos.toArray(new Kudos[0]));
     kudosList.setKudos(kudos);
     return Response.ok(kudosList).build();
   }
@@ -432,6 +444,7 @@ public class KudosREST implements ResourceContainer {
     try {
       kudos.setSenderId(getCurrentUserId());
       Kudos kudosSent = kudosService.createKudos(kudos, getCurrentUserId());
+      translateRoleMentions(kudosSent);
       return Response.ok(kudosSent).build();
     } catch (Exception e) {
       LOG.warn("Error saving kudos: {}", kudos, e);
@@ -513,8 +526,21 @@ public class KudosREST implements ResourceContainer {
     return limit;
   }
 
-
   private Long getActivityId(String commentId) {
     return (commentId == null || commentId.trim().isEmpty()) ? null : Long.valueOf(commentId.replace("comment", ""));
   }
+
+  private void translateRoleMentions(Kudos ...kudosList) {
+    if (ArrayUtils.isEmpty(kudosList)) {
+      return;
+    }
+    Locale userLocale = LocalizationFilter.getCurrentLocale();
+    for (Kudos kudos : kudosList) {
+      if (kudos != null) {
+        kudos.setMessage(MentionUtils.substituteRoleWithLocale(kudos.getMessage(),
+                                                               userLocale));
+      }
+    }
+  }
+
 }

@@ -19,6 +19,8 @@ package org.exoplatform.kudos.notification.plugin;
 
 import static org.exoplatform.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
 
+import java.util.Locale;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
@@ -27,6 +29,7 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.service.KudosService;
+import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
 public class KudosActivityChildPlugin extends AbstractNotificationChildPlugin {
@@ -50,8 +53,11 @@ public class KudosActivityChildPlugin extends AbstractNotificationChildPlugin {
     if (kudos == null) {
       return "";
     }
-    TemplateContext templateContext = new TemplateContext(getId(), getLanguage(notification));
-    templateContext.put("MESSAGE", kudos.getMessage());
+    String language = getLanguage(notification);
+    String message = MentionUtils.substituteRoleWithLocale(kudos.getMessage(),
+                                                           Locale.forLanguageTag(language));
+    TemplateContext templateContext = new TemplateContext(getId(), language);
+    templateContext.put("MESSAGE", message);
     return TemplateUtils.processGroovy(templateContext);
   }
 
