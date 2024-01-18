@@ -1,17 +1,28 @@
 package org.exoplatform.kudos.service.utils;
 
-import java.time.*;
-import java.util.*;
+import static org.exoplatform.social.core.manager.ActivityManagerImpl.REMOVABLE;
 
-import org.apache.commons.text.StringEscapeUtils;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.kudos.entity.KudosEntity;
-import org.exoplatform.kudos.model.*;
+import org.exoplatform.kudos.model.GlobalSettings;
+import org.exoplatform.kudos.model.Kudos;
+import org.exoplatform.kudos.model.KudosEntityType;
+import org.exoplatform.kudos.model.KudosPeriod;
+import org.exoplatform.kudos.model.KudosPeriodType;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -27,8 +38,6 @@ import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.core.utils.MentionUtils;
-
-import static org.exoplatform.social.core.manager.ActivityManagerImpl.REMOVABLE;
 
 public class Utils {
   private static final Log                   LOG                                   = ExoLogger.getLogger(Utils.class);
@@ -141,17 +150,13 @@ public class Utils {
     return SPACE_ACCOUNT_TYPE.equals(receiverType) ? SPACE_ACCOUNT_TYPE : USER_ACCOUNT_TYPE;
   }
 
-  public static Kudos fromEntity(KudosEntity kudosEntity, String defaultPortal) {
+  public static Kudos fromEntity(KudosEntity kudosEntity) {
     if (kudosEntity == null) {
       return null;
     }
     Kudos kudos = new Kudos();
     kudos.setTechnicalId(kudosEntity.getId());
-    if (defaultPortal == null) {
-      kudos.setMessage(kudosEntity.getMessage());
-    } else {
-      kudos.setMessage(MentionUtils.substituteUsernames(defaultPortal, kudosEntity.getMessage()));
-    }
+    kudos.setMessage(kudosEntity.getMessage());
     kudos.setEntityId(String.valueOf(kudosEntity.getEntityId()));
     kudos.setActivityId(kudosEntity.getActivityId());
     if (kudosEntity.getParentEntityId() != null && kudosEntity.getParentEntityId() != 0) {
@@ -254,7 +259,7 @@ public class Utils {
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
     receiverLink = StringEscapeUtils.unescapeHtml4(receiverLink);
 
-    String kudosMessage = kudos.getMessage();
+    String kudosMessage = MentionUtils.substituteUsernames(kudos.getMessage());
     String message = StringUtils.isBlank(kudosMessage) ? "." : ": " + kudosMessage;
 
     if (activity.getTemplateParams() != null) {
