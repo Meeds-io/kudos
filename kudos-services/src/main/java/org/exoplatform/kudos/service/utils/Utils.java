@@ -174,6 +174,7 @@ public class Utils {
       kudos.setExternalReceiver(receiverIdentity.getProfile() != null
           && receiverIdentity.getProfile().getProperty("external") != null
           && receiverIdentity.getProfile().getProperty("external").equals("true"));
+      kudos.setEnabledReceiver(receiverIdentity.isEnable() && !receiverIdentity.isDeleted());
       kudos.setReceiverFullName(receiverIdentity.getProfile().getFullName());
       kudos.setReceiverURL(LinkProvider.getUserProfileUri(receiverIdentity.getRemoteId()));
       kudos.setReceiverAvatar(getAvatar(receiverIdentity, null));

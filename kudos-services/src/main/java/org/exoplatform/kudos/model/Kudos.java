@@ -43,6 +43,8 @@ public class Kudos implements Serializable {
 
   private boolean           externalReceiver;
 
+  private boolean           enabledReceiver;
+
   private String            message;
 
   private long              timeInSeconds;
