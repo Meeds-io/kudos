@@ -310,6 +310,7 @@ export function registerActivityActionExtension() {
             'avatar': kudos.receiverAvatar,
             'position': kudos.receiverPosition,
             'external': String(kudos.externalReceiver),
+            'enabled': String(kudos.enabledReceiver),
           };
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
