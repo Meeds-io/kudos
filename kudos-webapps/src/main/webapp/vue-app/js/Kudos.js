@@ -193,7 +193,7 @@ export function registerExternalExtensions(title) {
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
     class: 'fas fa-award',
     additionalClass: 'mt-1',
-    order: 20,
+    order: 50,
     enabled: (profile) => profile.enabled && !profile.deleted && profile.username !== eXo.env.portal.userName,
     click: (profile) => {
       const type = profile.prettyName ? 'SPACE_PROFILE' : 'USER_PROFILE';
