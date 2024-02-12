@@ -31,4 +31,11 @@ export function init() {
       }
     },
   });
+
+  extensionRegistry.registerExtension('engagementCenterActions', 'activity-icon', {
+    id: 'kudos-icon',
+    type: 'exokudos:activity',
+    icon: 'fas fa-award',
+    class: 'primary--text',
+  });
 }
