@@ -16,6 +16,7 @@
       id="activityKudosDrawer"
       right
       disable-pull-to-refresh
+      allow-expand
       @closed="closeDrawer">
       <template slot="title">
         <span class="text-header-title">
