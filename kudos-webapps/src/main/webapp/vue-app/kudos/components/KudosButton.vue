@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="!isComment && 'ms-lg-4'"
+    :class="!isComment && 'ms-xl-4 ms-lg-3'"
     class="d-inline-flex">
     <v-tooltip :disabled="isMobile" bottom>
       <template #activator="{ on, attrs }">
@@ -28,7 +28,7 @@
                   :size="isMobile && '20' || '14'">
                   fa-award
                 </v-icon>
-                <span v-if="!isMobile" class="mx-auto mt-1 mt-lg-0 ms-lg-2">
+                <span v-if="!isMobile" class="mx-auto mt-1 mt-lg-0 ms-lg-1">
                   {{ $t('exoplatform.kudos.label.kudos') }}
                 </span>
               </div>
