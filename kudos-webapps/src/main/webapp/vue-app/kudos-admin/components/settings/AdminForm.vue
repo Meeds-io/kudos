@@ -25,7 +25,7 @@
       {{ $t('kudos.administration.label') }}
     </div>
     <div class="d-flex flex-row kudosPeriodConfiguration">
-      <div class="flex-grow-1 flex-shrink-1 col-2 pa-0">
+      <div class="flex-grow-1 flex-shrink-1">
         <v-text-field
           v-model="kudosPerPeriod"
           type="number"
@@ -43,7 +43,7 @@
         <select
           id="applicationToolbarFilterSelect"
           v-model="kudosPeriodType"
-          class="ignore-vuetify-classes my-auto col-12 py-0">
+          class="ignore-vuetify-classes my-auto">
           <option
             v-for="item in periods"
             :key="item.value"
