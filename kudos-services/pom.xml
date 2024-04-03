@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.exoplatform.addons.kudos</groupId>
     <artifactId>kudos</artifactId>
-    <version>2.6.x-meed-SNAPSHOT</version>
+    <version>2.6.0-meed-20240403</version>
   </parent>
   <artifactId>kudos-services</artifactId>
   <name>eXo Add-on:: eXo Kudos - Services</name>
