@@ -336,6 +336,7 @@ export function registerActivityActionExtension() {
       noSummaryEllipsis: true,
       supportsIcon: true,
       useSameViewForMobile: true,
+      isCollapsed: true,
       getDefaultIcon: (activityOrComment) => ({
         icon: 'fa fa-award primary--text',
         size: activityOrComment.activityId && 37 || 72,
