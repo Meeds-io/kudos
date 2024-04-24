@@ -275,7 +275,8 @@ export default {
       spaceId: eXo.env.portal.spaceId,
       spacePrettyName: eXo.env.portal.spaceName,
       audienceChoice: null,
-      noReceiverIdentityId: false
+      noReceiverIdentityId: false,
+      isPublicSite: eXo.env.portal.portalName === 'public',
     };
   },
   watch: {
@@ -323,15 +324,16 @@ export default {
     }
   },
   created() {
-    this.init()
-      .then(() => {
-        if (this.disabled) {
-          return;
-        }
-        this.$refs.kudosAPI.init();
-
-        document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
-      });
+    if (!this.isPublicSite) {
+      this.init()
+        .then(() => {
+          if (this.disabled) {
+            return;
+          }
+          this.$refs.kudosAPI.init();
+          document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
+        });
+    }
   },
   computed: {
     searchOptions() {
