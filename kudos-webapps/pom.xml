@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.exoplatform.addons.kudos</groupId>
     <artifactId>kudos</artifactId>
-    <version>2.6.x-SNAPSHOT</version>
+    <version>7.0.x-SNAPSHOT</version>
   </parent>
   <artifactId>kudos-webapps</artifactId>
   <packaging>war</packaging>
