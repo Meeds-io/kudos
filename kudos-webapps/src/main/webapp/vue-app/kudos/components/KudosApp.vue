@@ -323,15 +323,16 @@ export default {
     }
   },
   created() {
-    this.init()
-      .then(() => {
-        if (this.disabled) {
-          return;
-        }
-        this.$refs.kudosAPI.init();
-
-        document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
-      });
+    if (eXo?.env?.portal?.userName) {
+      this.init()
+        .then(() => {
+          if (this.disabled) {
+            return;
+          }
+          this.$refs.kudosAPI.init();
+          document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
+        });
+    }
   },
   computed: {
     searchOptions() {
