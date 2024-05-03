@@ -331,6 +331,7 @@ export function registerActivityActionExtension() {
                         || '';
         return summary.includes('<oembed>') && summary.split('<oembed>')[0] || summary;
       },
+      regularFontSizeOnSummary: true,
       noTitleEllipsis: true,
       noSummaryEllipsis: true,
       supportsIcon: true,
