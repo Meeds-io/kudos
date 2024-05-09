@@ -1,9 +1,5 @@
 const kudosListByActivity = {};
 
-const activityTypeExtensions = extensionRegistry.loadExtensions('activity', 'type');
-const defaultActivityOptions = activityTypeExtensions.find(extension => extension.type === 'default').options;
-defaultActivityOptions.displayLastCommentsRequiredActions.push('KudosActivityReceiverNotification');
-
 export function resetActivityKudosList(activity) {
   delete activity.kudosList;
   delete kudosListByActivity[activity.id];
@@ -356,9 +352,13 @@ export function registerActivityActionExtension() {
         }
       },
       canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
-      forceCanEditOverwrite: true,
-      displayLastCommentsRequiredActions: defaultActivityOptions.displayLastCommentsRequiredActions,
+      forceCanEditOverwrite: true
     },
+  });
+
+  extensionRegistry.registerExtension('activity', 'expand-action-type', {
+    id: 'KudosActivityReceiverNotification',
+    rank: 30,
   });
 
   extensionRegistry.registerExtension('activity', 'action', {
