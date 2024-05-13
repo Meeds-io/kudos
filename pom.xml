@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>addons-parent-pom</artifactId>
     <groupId>org.exoplatform.addons</groupId>
     <version>18-M02</version>
-    <relativePath/>
+    <relativePath />
   </parent>
   <groupId>org.exoplatform.addons.kudos</groupId>
   <artifactId>kudos</artifactId>
-  <version>7.0.x-exo-SNAPSHOT</version>
+  <version>7.0.0-exo-20240513</version>
   <packaging>pom</packaging>
   <name>eXo Add-on:: Kudos - Parent POM</name>
   <description>eXo Kudos Addon</description>
@@ -23,7 +22,7 @@
     <connection>scm:git:git://github.com/exoplatform/kudos.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/exoplatform/kudos.git</developerConnection>
     <url>https://github.com/exoplatform/kudos</url>
-    <tag>HEAD</tag>
+    <tag>7.0.0-exo-20240513</tag>
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
