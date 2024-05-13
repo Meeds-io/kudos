@@ -352,8 +352,13 @@ export function registerActivityActionExtension() {
         }
       },
       canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
-      forceCanEditOverwrite: true,
+      forceCanEditOverwrite: true
     },
+  });
+
+  extensionRegistry.registerExtension('activity', 'expand-action-type', {
+    id: 'KudosActivityReceiverNotification',
+    rank: 30,
   });
 
   extensionRegistry.registerExtension('activity', 'action', {
