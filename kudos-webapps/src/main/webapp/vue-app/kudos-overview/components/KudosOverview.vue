@@ -1,7 +1,6 @@
 <template>
   <v-app
-    :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'"
-    class="white">
+    :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'">
     <widget-wrapper
       id="kudosOverviewHeader"
       :title="$t('exoplatform.kudos.button.rewardedKudos')">
