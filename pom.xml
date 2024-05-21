@@ -27,9 +27,9 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <org.exoplatform.social.version>7.0.x-meed-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.platform-ui.version>7.0.x-meed-SNAPSHOT</org.exoplatform.platform-ui.version>
-    <addon.exo.analytics.version>7.0.x-meed-SNAPSHOT</addon.exo.analytics.version>
+    <org.exoplatform.social.version>7.0.0-meed-20240521</org.exoplatform.social.version>
+    <org.exoplatform.platform-ui.version>7.0.0-meed-20240521</org.exoplatform.platform-ui.version>
+    <addon.exo.analytics.version>7.0.0-meed-20240521</addon.exo.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
