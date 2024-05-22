@@ -26,7 +26,7 @@
      </init-param>
      <init-param>
        <name>preload.resource.rest</name>
-       <value><![CDATA[/portal/rest/kudos/api/account/settings,/portal/rest/kudos/api/settings]]></value>
+       <value><![CDATA[/kudos/rest/account/settings,/kudos/rest/settings]]></value>
      </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>
