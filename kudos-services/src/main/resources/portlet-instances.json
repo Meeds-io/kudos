@@ -1,0 +1,19 @@
+{
+  "descriptors":[
+    {
+      "nameId":"KudosOverview",
+      "categoryNameId":"profile",
+      "portletName":"KudosOverview",
+      "names":{
+        "en":"layout.portletInstance.KudosOverview.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.KudosOverview.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    }
+  ]
+}
