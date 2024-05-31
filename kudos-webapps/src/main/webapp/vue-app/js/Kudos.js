@@ -339,6 +339,7 @@ export function registerActivityActionExtension() {
       noEmbeddedLinkView: true,
       isCollapsed: true,
       summaryLinesToDisplay: 4,
+      showEmbeddedPreview: true,
       getDefaultIcon: (activityOrComment) => ({
         icon: 'fa fa-award primary--text',
         size: activityOrComment.activityId && 37 || 72,
