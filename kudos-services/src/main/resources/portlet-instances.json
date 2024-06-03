@@ -11,7 +11,8 @@
         "en":"layout.portletInstance.KudosOverview.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     }
