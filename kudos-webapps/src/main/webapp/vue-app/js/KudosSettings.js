@@ -1,5 +1,5 @@
 export function initSettings() {
-  return fetch('/portal/rest/kudos/api/account/settings', {credentials: 'include'})
+  return fetch('/kudos/rest/account/settings', {credentials: 'include'})
     .then((resp) => resp && resp.ok && resp.json())
     .then((settings) => (window.kudosSettings = settings ? settings : {}))
     .then(() => getSettings())
@@ -11,12 +11,12 @@ export function initSettings() {
 }
 
 export function getSettings() {
-  return fetch('/portal/rest/kudos/api/settings', {credentials: 'include'}).then((resp) => resp && resp.ok && resp.json());
+  return fetch('/kudos/rest/settings', {credentials: 'include'}).then((resp) => resp && resp.ok && resp.json());
 }
 
 export function saveSettings(settings) {
   if (settings) {
-    return fetch('/portal/rest/kudos/api/settings/save', {
+    return fetch('/kudos/rest/settings', {
       credentials: 'include',
       method: 'POST',
       headers: {

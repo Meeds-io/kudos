@@ -49,45 +49,40 @@ export function getIdentityDetails(urlId, type, remoteId) {
   };
 
   // check if user is authorized to receive Kudos
-  return (window.kudosSettings.accessPermission && type === 'user' ? fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${urlId}`, {credentials: 'include'}) : Promise.resolve({ok: true}))
-    .then((resp) => {
-      if (!resp || !resp.ok) {
-        ownerDetails.notAuthorized = true;
-        throw new Error();
-      }
-      if (type === 'user') {
-        return fetch(`/portal/rest/v1/social/users/${urlId}`, {credentials: 'include'})
-          .then((resp) => resp && resp.ok && resp.json())
-          .then((identityDetails) => {
-            if (identityDetails) {
-              ownerDetails.id = identityDetails.username;
-              ownerDetails.identityId = identityDetails.id;
-              ownerDetails.fullname = identityDetails.fullname;
-              ownerDetails.avatar = identityDetails.avatar;
-              ownerDetails.username = identityDetails.username;
-              ownerDetails.position = identityDetails.position;
-              ownerDetails.external = identityDetails.external;
-              ownerDetails.enabled = identityDetails.enabled;
-            } else {
-              ownerDetails.notAuthorized = true;
-            }
-            return ownerDetails;
-          });
-      } else {
-        return fetch(`/portal/rest/v1/social/spaces/${urlId}`, {credentials: 'include'})
-          .then((resp) => resp && resp.ok && resp.json())
-          .then((identityDetails) => {
-            if (identityDetails) {
-              ownerDetails.identityId = identityDetails.id;
-              ownerDetails.fullname = identityDetails.displayName;
-              ownerDetails.avatar = identityDetails.avatar;
-            } else {
-              ownerDetails.notAuthorized = true;
-            }
-            return ownerDetails;
-          });
-      }
-    })
+  return Promise.resolve(() => {
+    if (type === 'user') {
+      return fetch(`/portal/rest/v1/social/users/${urlId}`, {credentials: 'include'})
+        .then((resp) => resp && resp.ok && resp.json())
+        .then((identityDetails) => {
+          if (identityDetails) {
+            ownerDetails.id = identityDetails.username;
+            ownerDetails.identityId = identityDetails.id;
+            ownerDetails.fullname = identityDetails.fullname;
+            ownerDetails.avatar = identityDetails.avatar;
+            ownerDetails.username = identityDetails.username;
+            ownerDetails.position = identityDetails.position;
+            ownerDetails.external = identityDetails.external;
+            ownerDetails.enabled = identityDetails.enabled;
+          } else {
+            ownerDetails.notAuthorized = true;
+          }
+          return ownerDetails;
+        });
+    } else {
+      return fetch(`/portal/rest/v1/social/spaces/${urlId}`, {credentials: 'include'})
+        .then((resp) => resp && resp.ok && resp.json())
+        .then((identityDetails) => {
+          if (identityDetails) {
+            ownerDetails.identityId = identityDetails.id;
+            ownerDetails.fullname = identityDetails.displayName;
+            ownerDetails.avatar = identityDetails.avatar;
+          } else {
+            ownerDetails.notAuthorized = true;
+          }
+          return ownerDetails;
+        });
+    }
+  })
     .catch((e) => {
       console.error('Error identity details with remoteId', remoteId, e);
       return ownerDetails;
