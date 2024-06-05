@@ -336,6 +336,10 @@ export function registerActivityActionExtension() {
       noSummaryEllipsis: true,
       supportsIcon: true,
       useSameViewForMobile: true,
+      noEmbeddedLinkView: true,
+      isCollapsed: true,
+      summaryLinesToDisplay: 4,
+      showEmbeddedPreview: true,
       getDefaultIcon: (activityOrComment) => ({
         icon: 'fa fa-award primary--text',
         size: activityOrComment.activityId && 37 || 72,
@@ -351,8 +355,13 @@ export function registerActivityActionExtension() {
         }
       },
       canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
-      forceCanEditOverwrite: true,
+      forceCanEditOverwrite: true
     },
+  });
+
+  extensionRegistry.registerExtension('activity', 'expand-action-type', {
+    id: 'KudosActivityReceiverNotification',
+    rank: 30,
   });
 
   extensionRegistry.registerExtension('activity', 'action', {
