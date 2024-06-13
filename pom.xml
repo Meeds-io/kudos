@@ -29,7 +29,7 @@
     <!-- 3rd party libraries versions -->
     <org.exoplatform.social.version>7.0.x-exo-SNAPSHOT</org.exoplatform.social.version>
     <org.exoplatform.platform-ui.version>7.0.x-exo-SNAPSHOT</org.exoplatform.platform-ui.version>
-    <addon.exo.analytics.version>7.0.x-exo-SNAPSHOT</addon.exo.analytics.version>
+    <addon.meeds.analytics.version>7.0.x-exo-SNAPSHOT</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
@@ -59,9 +59,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.exoplatform.addons.analytics</groupId>
+        <groupId>io.meeds.analytics</groupId>
         <artifactId>analytics-parent</artifactId>
-        <version>${addon.exo.analytics.version}</version>
+        <version>${addon.meeds.analytics.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

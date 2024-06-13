@@ -31,6 +31,9 @@ import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 
 public class KudosTemplateBuilder extends AbstractTemplateBuilder {
+
+  private static final String ACTIVITY_PARAM = "ACTIVITY";
+
   private TemplateProvider templateProvider;
 
   private boolean          pushNotification;
@@ -68,7 +71,7 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     templateContext.put("LAST_UPDATED_TIME",
                         TimeConvertUtils.convertXTimeAgoByTimeServer(cal.getTime(),
                                                                      "EE, dd yyyy",
-                                                                     new Locale(language),
+                                                                     Locale.of(language),
                                                                      TimeConvertUtils.YEAR));
 
     Identity senderIdentity = Utils.getIdentityManager()
@@ -130,16 +133,16 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     if (activity != null) {
       if (StringUtils.isNotBlank(activity.getParentCommentId())) {
         String parentCommentTitle = getActivityTitle(activity.getParentCommentId(), language);
-        templateContext.put("ACTIVITY", parentCommentTitle);
+        templateContext.put(ACTIVITY_PARAM, parentCommentTitle);
       } else if (StringUtils.isNotBlank(activity.getParentId())) {
         String parentActivityTitle = getActivityTitle(activity.getParentId(), language);
-        templateContext.put("ACTIVITY", parentActivityTitle);
+        templateContext.put(ACTIVITY_PARAM, parentActivityTitle);
       } else {
-        templateContext.put("ACTIVITY", "");
+        templateContext.put(ACTIVITY_PARAM, "");
       }
       messageInfo.body(TemplateUtils.processGroovy(templateContext));
     } else {
-      templateContext.put("ACTIVITY", "");
+      templateContext.put(ACTIVITY_PARAM, "");
       messageInfo.body(TemplateUtils.processGroovy(templateContext));
     }
     ctx.setException(templateContext.getException());
