@@ -18,17 +18,17 @@
  */
 package org.exoplatform.kudos.listener.analytics;
 
-import static org.exoplatform.analytics.utils.AnalyticsUtils.addSpaceStatistics;
-import static org.exoplatform.analytics.utils.AnalyticsUtils.getIdentity;
+import static io.meeds.analytics.utils.AnalyticsUtils.addSpaceStatistics;
+import static io.meeds.analytics.utils.AnalyticsUtils.getIdentity;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.analytics.model.StatisticData;
-import org.exoplatform.analytics.utils.AnalyticsUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.kudos.model.Kudos;
 import org.exoplatform.kudos.service.KudosService;
-import org.exoplatform.services.listener.*;
+import org.exoplatform.services.listener.Asynchronous;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.activity.model.ActivityStream;
@@ -41,6 +41,9 @@ import org.exoplatform.social.core.jpa.storage.RDBMSActivityStorageImpl;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+
+import io.meeds.analytics.model.StatisticData;
+import io.meeds.analytics.utils.AnalyticsUtils;
 
 @Asynchronous
 public class KudosSentListener extends Listener<KudosService, Kudos> {
