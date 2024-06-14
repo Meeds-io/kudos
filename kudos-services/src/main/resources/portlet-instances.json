@@ -10,6 +10,7 @@
       "descriptions":{
         "en":"layout.portletInstance.KudosOverview.description"
       },
+      "illustrationPath":"war:/../images/kudosOverview.webp",
       "permissions":[
         "*:/platform/administrators",
         "*:/platform/web-contributors"
