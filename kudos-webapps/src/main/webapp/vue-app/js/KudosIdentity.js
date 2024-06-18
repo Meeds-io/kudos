@@ -49,7 +49,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
   };
 
   // check if user is authorized to receive Kudos
-  return (window.kudosSettings.accessPermission && type === 'user' ? fetch(`/portal/rest/kudos/api/account/isAuthorized?username=${urlId}`, {credentials: 'include'}) : Promise.resolve({ok: true}))
+  return (window.kudosSettings.accessPermission && type === 'user' ? fetch(`/kudos/rest/account/isAuthorized?username=${urlId}`, {credentials: 'include'}) : Promise.resolve({ok: true}))
     .then((resp) => {
       if (!resp || !resp.ok) {
         ownerDetails.notAuthorized = true;
