@@ -194,7 +194,7 @@ export function registerExternalExtensions(title) {
     class: 'fas fa-award',
     additionalClass: 'mt-1',
     order: 50,
-    enabled: (profile) => profile.enabled && !profile.deleted,
+    enabled: (profile) => profile.enabled && !profile.deleted && profile.username !== eXo.env.portal.userName,
     click: (profile) => {
       const type = profile.prettyName ? 'SPACE_PROFILE' : 'USER_PROFILE';
       const id = profile.prettyName ? profile.id : profile.username;
