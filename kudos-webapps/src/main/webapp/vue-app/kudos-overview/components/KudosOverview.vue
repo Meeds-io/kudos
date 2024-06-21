@@ -3,7 +3,8 @@
     :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'">
     <widget-wrapper
       id="kudosOverviewHeader"
-      :title="$t('exoplatform.kudos.button.rewardedKudos')">
+      :title="$t('exoplatform.kudos.button.rewardedKudos')"
+      extra-class="application-body">
       <template #action>
         <select
           v-model="periodType"
