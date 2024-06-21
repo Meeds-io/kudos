@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>io.meeds.addons.kudos</groupId>
+    <groupId>io.meeds.kudos</groupId>
     <artifactId>kudos</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>

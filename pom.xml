@@ -8,7 +8,7 @@
     <version>18-M03</version>
     <relativePath/>
   </parent>
-  <groupId>io.meeds.addons.kudos</groupId>
+  <groupId>io.meeds.kudos</groupId>
   <artifactId>kudos</artifactId>
   <version>7.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>
