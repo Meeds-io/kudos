@@ -11,8 +11,8 @@
           <v-btn
             :id="`KudosActivity${entityId}`"
             :class="textColorClass"
-            :small="!isComment"
             :x-small="isComment"
+            :small="!isComment"
             class="pa-0 mt-0"
             text
             link
@@ -25,10 +25,10 @@
                 <v-icon
                   :class="kudosColorClass"
                   class="baseline-vertical-align"
-                  :size="isMobile && '20' || '14'">
+                  :size="isMobile && '20' || '16'">
                   fa-award
                 </v-icon>
-                <span v-if="!isMobile" class="mx-auto mt-1 mt-lg-0 ms-lg-1">
+                <span v-if="!isMobile" class="mx-auto mt-1 mt-lg-0 ms-lg-1 text-body">
                   {{ $t('exoplatform.kudos.label.kudos') }}
                 </span>
               </div>
