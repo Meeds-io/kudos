@@ -35,9 +35,9 @@
           fa-award
         </v-icon>
       </v-btn>
-      <v-span class="caption font-weight-bold ms-5">
+      <span class="font-weight-bold ms-5">
         {{ $t('exoplatform.kudos.title.sendAKudos') }}
-      </v-span>
+      </span>
     </div>
   </v-card>
 </template>
