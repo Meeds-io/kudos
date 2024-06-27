@@ -47,9 +47,9 @@
       color="primary">
       fa-award
     </v-icon>
-    <v-span class="body-2 font-weight-bold ms-5 dark-grey-color">
+    <span class="font-weight-bold ms-5">
       {{ $t('kudos.title') }}
-    </v-span>
+    </span>
   </v-btn>
 </template>
 <script>

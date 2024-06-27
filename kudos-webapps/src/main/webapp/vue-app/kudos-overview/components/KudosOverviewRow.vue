@@ -47,11 +47,11 @@
       </v-col>
     </v-row>
     <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
-      <v-icon color="secondary" size="54">fa-award</v-icon>
+      <v-icon color="tertiary" size="54">fa-award</v-icon>
       <span
         v-if="isOverviewDisplay || isOwner"
         v-html="emptyKudosSummaryText"
-        class="subtitle-1 font-weight-bold mt-7"></span>
+        class="mt-7"></span>
       <span
         v-else
         class="subtitle-1 mt-3 text-wrap">
