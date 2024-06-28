@@ -21,7 +21,7 @@
 -->
 <template>
   <v-card flat>
-    <div class="subtitle-1 mt-4 mb-2 text-color">
+    <div class="text-header mt-4 mb-2">
       {{ $t('kudos.administration.label') }}
     </div>
     <div class="d-flex flex-row kudosPeriodConfiguration">
