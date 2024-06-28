@@ -18,7 +18,7 @@
 -->
 <template>
   <div v-if="!isEditing">
-    <div class="mb-2">
+    <div class="text-header mb-2">
       {{ $t('gamification.event.display.doItNow') }}
     </div>
     <div class="d-flex justify-center">
