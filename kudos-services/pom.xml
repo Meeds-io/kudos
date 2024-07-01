@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.exoplatform.addons.kudos</groupId>
+    <groupId>io.meeds.kudos</groupId>
     <artifactId>kudos</artifactId>
     <version>7.0.x-SNAPSHOT</version>
   </parent>
   <artifactId>kudos-services</artifactId>
-  <name>eXo Add-on:: eXo Kudos - Services</name>
+  <name>Meeds:: Add-on:: eXo Kudos - Services</name>
   <properties>
     <rest.api.doc.title>Kudos Rest Api</rest.api.doc.title>
     <rest.api.doc.version>1.0</rest.api.doc.version>
@@ -21,22 +21,22 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-service</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-notification</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-service</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-notification</artifactId>
       <type>test-jar</type>
       <scope>test</scope>

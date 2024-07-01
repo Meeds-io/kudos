@@ -4,16 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>addons-parent-pom</artifactId>
-    <groupId>org.exoplatform.addons</groupId>
-    <version>18-M03</version>
+    <groupId>io.meeds.addons</groupId>
+    <version>18-M04</version>
     <relativePath/>
   </parent>
-  <groupId>org.exoplatform.addons.kudos</groupId>
+  <groupId>io.meeds.kudos</groupId>
   <artifactId>kudos</artifactId>
   <version>7.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>eXo Add-on:: Kudos - Parent POM</name>
-  <description>eXo Kudos Addon</description>
+  <name>Meeds:: Add-on:: Kudos - Parent POM</name>
+  <description>Meeds Kudos Addon</description>
   <modules>
     <module>kudos-services</module>
     <module>kudos-webapps</module>
@@ -27,8 +27,8 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <org.exoplatform.social.version>7.0.x-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.platform-ui.version>7.0.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <io.meeds.social.version>7.0.x-SNAPSHOT</io.meeds.social.version>
+    <io.meeds.platform-ui.version>7.0.x-SNAPSHOT</io.meeds.platform-ui.version>
     <addon.meeds.analytics.version>7.0.x-SNAPSHOT</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
@@ -38,22 +38,23 @@
     
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
+    
   </properties>
   <dependencyManagement>
     <dependencies>
       <!-- Import versions from platform project -->
       <dependency>
-        <groupId>org.exoplatform.social</groupId>
+        <groupId>io.meeds.social</groupId>
         <artifactId>social</artifactId>
-        <version>${org.exoplatform.social.version}</version>
+        <version>${io.meeds.social.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
       <dependency>
-        <groupId>org.exoplatform.platform-ui</groupId>
+        <groupId>io.meeds.platform-ui</groupId>
         <artifactId>platform-ui</artifactId>
-        <version>${org.exoplatform.platform-ui.version}</version>
+        <version>${io.meeds.platform-ui.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
