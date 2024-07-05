@@ -1,23 +1,22 @@
 <template>
-  <div
-    :class="clickable && 'clickable' || ''"
-    class="border-box-sizing text-center justify-center align-center d-flex flex-wrap"
-    @click="clickable && $emit('open-drawer')">
-    <div class="px-0 kudosOverviewIcon pa-0">
-      <v-icon class="uiIconKudos tertiary-color" size="40">fa fa-award</v-icon>
+  <v-card
+    class="border-box-sizing text-center justify-center align-center d-flex flex-column"
+    flat
+    v-on="clickable && {
+      click: () => $emit('open-drawer')
+    }">
+    <div class="d-flex">
+      <div class="ms-2 me-1 my-auto kudosOverviewIcon pa-0">
+        <v-icon class="uiIconKudos height-auto tertiary-color" size="32">fa fa-award</v-icon>
+      </div>
+      <div class="kudosOverviewCount mx-2 text-h5 font-weight-bold pa-0 d-flex align-center">
+        <slot name="count"></slot>
+      </div>
     </div>
-    <div class="kudosOverviewCount text-color mx-2 display-1 font-weight-bold pa-0 d-flex align-center">
-      <slot name="count"></slot>
+    <div class="px-0 mx-0 mt-2 d-flex justify-center">
+      <slot name="label"></slot>
     </div>
-    <div class="px-0 mx-0">
-      <v-card
-        :min-width="55"
-        class="d-flex align-center flex-no-wrap"
-        flat>
-        <slot name="label"></slot>
-      </v-card>
-    </div>
-  </div>
+  </v-card>
 </template>
 <script>
 export default {

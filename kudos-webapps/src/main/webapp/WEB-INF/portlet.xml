@@ -28,6 +28,10 @@
        <name>preload.resource.rest</name>
        <value><![CDATA[/kudos/rest/account/settings,/kudos/rest/settings]]></value>
      </init-param>
+     <init-param>
+       <name>layout-css-class</name>
+       <value>no-layout-style</value>
+     </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>
      <supports>
@@ -74,6 +78,10 @@
        <name>preload.resource.bundles</name>
        <value>locale.addon.Kudos</value>
      </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
+    </init-param>
      <expiration-cache>-1</expiration-cache>
      <cache-scope>PUBLIC</cache-scope>
      <supports>
