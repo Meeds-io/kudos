@@ -455,9 +455,7 @@ export default {
               this.allKudosSent = allKudos && allKudos.kudos || [];
             });
         })
-        .catch(e => {
-          this.error = e;
-        });
+        .catch(e => console.debug(e));
     },
     closeDrawer() {
       this.resetAudienceChoice();
@@ -533,7 +531,7 @@ export default {
             this.entityOwner = null;
           })
           .catch(e => {
-            this.error = String(e);
+            this.error = this.$te(e?.message) ? this.$t(e.message) : this.$t('kudos.unkownErrorWhileRetrievingSettings');
             console.error('Error retrieving entity details with type and id', this.entityType, this.entityId, e);
           });
       }
