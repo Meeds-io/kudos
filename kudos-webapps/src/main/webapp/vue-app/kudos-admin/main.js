@@ -31,7 +31,7 @@ if (extensionRegistry) {
 }
 
 const lang = eXo && eXo.env.portal.language || 'en';
-const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.addon.Kudos-${lang}.json`;
+const url = `/kudos/i18n/locale.addon.Kudos?lang=${lang}`;
 const appId = 'KudosAdminApp';
 
 export function init() {
