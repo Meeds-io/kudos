@@ -27,7 +27,7 @@ const appId = 'KudosApp';
 
 //should expose the locale ressources as REST API
 const lang = (eXo && eXo.env && eXo.env.portal && eXo.env.portal.language) || 'en';
-const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.addon.Kudos-${lang}.json`;
+const url = `/kudos/i18n/locale.addon.Kudos?lang=${lang}`;
 
 exoi18n.loadLanguageAsync(lang, url).then(i18n => {
 // init Vue app when locale ressources are ready
