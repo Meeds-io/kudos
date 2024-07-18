@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.meeds.kudos</groupId>
     <artifactId>kudos</artifactId>
-    <version>7.0.x-exo-SNAPSHOT</version>
+    <version>7.0.0-exo-20240718</version>
   </parent>
   <artifactId>kudos-webapps</artifactId>
   <packaging>war</packaging>
