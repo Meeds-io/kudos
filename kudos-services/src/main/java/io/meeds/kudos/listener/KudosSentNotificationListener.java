@@ -36,6 +36,7 @@ import org.exoplatform.services.log.Log;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.service.KudosService;
+import io.meeds.kudos.service.utils.Utils;
 
 import jakarta.annotation.PostConstruct;
 
@@ -52,7 +53,7 @@ public class KudosSentNotificationListener extends Listener<KudosService, Kudos>
 
   @PostConstruct
   public void init() {
-    listenerService.addListener("exo.kudos.sent", this);
+    listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT, this);
   }
 
   @Override
