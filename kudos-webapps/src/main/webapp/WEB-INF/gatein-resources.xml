@@ -1,11 +1,33 @@
-<gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4" xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
+<gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_5 http://www.exoplatform.org/xml/ns/gatein_resources_1_5" xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_5">
 
   <portal-skin>
     <skin-name>Enterprise</skin-name>
     <skin-module>kudos</skin-module>
     <css-path>/skin/css/main.css</css-path>
     <css-priority>120</css-priority>
+    <filtered>true</filtered>
   </portal-skin>
+
+  <portlet-skin>
+    <application-name>kudos</application-name>
+    <portlet-name>Kudos</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <additional-module>kudos</additional-module>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>kudos</application-name>
+    <portlet-name>KudosOverview</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <additional-module>kudos</additional-module>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>kudos</application-name>
+    <portlet-name>KudosAdmin</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <additional-module>kudos</additional-module>
+  </portlet-skin>
 
   <portlet>
     <name>Kudos</name>
