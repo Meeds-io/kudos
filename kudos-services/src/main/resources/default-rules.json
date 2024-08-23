@@ -1,0 +1,19 @@
+{
+  "rules": [
+    {
+      "event": "sendKudos",
+      "score": 75,
+      "appendEmoji": "\uD83D\uDE18",
+      "programTitle": "Community Empowerment",
+      "defaultRealizationStatus": "ACCEPTED"
+    },
+    {
+      "event": "receiveKudos",
+      "score": 100,
+      "appendEmoji": "\uD83D\uDE0D",
+      "programTitle": "Community Empowerment",
+      "defaultRealizationStatus": "ACCEPTED"
+    }
+  ]
+}
+
