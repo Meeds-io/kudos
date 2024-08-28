@@ -8,7 +8,8 @@
       <template #action>
         <select
           v-model="periodType"
-          class="kudosOverviewPeriodSelect fill-height col-auto my-auto py-0 subtitle-1 ignore-vuetify-classes">
+          class="kudosOverviewPeriodSelect header-height my-auto py-0 ignore-vuetify-classes"
+          size="1">
           <option
             v-for="period in periods"
             :key="period.value"
@@ -19,6 +20,7 @@
       </template>
       <kudos-overview-row
         :period-type="periodType"
+        class="my-auto"
         @loading="loading = $event"
         @has-kudos="hasKudos = $event" />
     </widget-wrapper>
