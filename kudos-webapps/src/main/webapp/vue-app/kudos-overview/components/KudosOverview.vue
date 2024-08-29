@@ -6,17 +6,20 @@
       :title="$t('exoplatform.kudos.button.rewardedKudos')"
       extra-class="application-body">
       <template #action>
-        <select
-          v-model="periodType"
-          class="kudosOverviewPeriodSelect header-height width-auto my-auto py-0 ignore-vuetify-classes"
-          size="1">
-          <option
-            v-for="period in periods"
-            :key="period.value"
-            :value="period.value">
-            {{ period.text }}
-          </option>
-        </select>
+        <div class="position-relative">
+          <select
+            v-model="periodType"
+            :class="$vuetify.rtl && 'l-0' || 'r-0'"
+            class="kudosOverviewPeriodSelect absolute-vertical-center header-height width-auto my-auto py-0 ignore-vuetify-classes"
+            size="1">
+            <option
+              v-for="period in periods"
+              :key="period.value"
+              :value="period.value">
+              {{ period.text }}
+            </option>
+          </select>
+        </div>
       </template>
       <kudos-overview-row
         :period-type="periodType"
