@@ -19,7 +19,7 @@
       v-if="hasKudos"
       id="kudosOverviewCardsParent"
       class="white border-box-sizing ma-0 align-center">
-      <v-col class="kudosOverviewCard">
+      <v-col class="kudosOverviewCard col-6 pa-0">
         <kudos-overview-card
           :clickable="isOwner && receivedKudosCount > 0"
           class="kudosReceivedOverviewPeriod mx-n4"
@@ -32,7 +32,7 @@
           </template> 
         </kudos-overview-card>
       </v-col>
-      <v-col class="kudosOverviewCard">
+      <v-col class="kudosOverviewCard col-6 pa-0">
         <kudos-overview-card
           :clickable="isOwner && sentKudosCount > 0"
           class="kudosSentOverviewPeriod mx-n4"
@@ -47,11 +47,11 @@
       </v-col>
     </v-row>
     <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
-      <v-icon color="tertiary" size="54">fa-award</v-icon>
+      <v-icon color="tertiary" size="60">fa-award</v-icon>
       <span
         v-if="isOverviewDisplay || isOwner"
         v-html="emptyKudosSummaryText"
-        class="mt-7"></span>
+        class="mt-5"></span>
       <span
         v-else
         class="subtitle-1 mt-3 text-wrap">
@@ -132,7 +132,7 @@ export default {
     refresh() {
       document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
       this.loading = true;
-      getKudosSent(this.identityId, 0, true, this.periodType, 0)
+      return getKudosSent(this.identityId, 0, true, this.periodType, 0)
         .then(kudosList => {
           this.sentKudosCount = kudosList && kudosList.size || 0;
           this.sentKudos = kudosList && kudosList.kudos || [];
