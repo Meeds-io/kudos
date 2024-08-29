@@ -1,0 +1,33 @@
+{
+  "descriptors": [
+    {
+      "nameId": "sendKudos",
+      "names": {
+        "en": "gamification.defaultProgram.rule.sendKudos.title"
+      },
+      "descriptions": {
+        "en": "gamification.defaultProgram.rule.sendKudos.description"
+      },
+      "event": "sendKudos",
+      "score": 75,
+      "appendEmoji": "\uD83D\uDE18",
+      "programNameId": "communityEmpowerment",
+      "defaultRealizationStatus": "ACCEPTED"
+    },
+    {
+      "nameId": "receiveKudos",
+      "names": {
+        "en": "gamification.defaultProgram.rule.receiveKudos.title"
+      },
+      "descriptions": {
+        "en": "gamification.defaultProgram.rule.receiveKudos.description"
+      },
+      "event": "receiveKudos",
+      "score": 100,
+      "appendEmoji": "\uD83D\uDE0D",
+      "programNameId": "communityEmpowerment",
+      "defaultRealizationStatus": "ACCEPTED"
+    }
+  ]
+}
+
