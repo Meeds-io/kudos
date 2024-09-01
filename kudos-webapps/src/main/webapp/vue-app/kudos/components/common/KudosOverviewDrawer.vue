@@ -18,20 +18,55 @@
 -->
 <template>
   <exo-drawer
-    ref="kudosOverviewDrawer"
+    ref="drawer"
+    v-model="drawer"
+    :loading="loading"
     class="kudosOverviewDrawer"
     right>
-    <template slot="title">
-      {{ title }}
+    <template #title>
+      {{ $t('kudosOverview.drawer.title') }}
     </template>
-    <template slot="content">
-      <v-list v-if="kudosList">
-        <kudos-overview-item
-          v-for="kudos in kudosList"
-          :key="kudos.technicalId"
-          :kudos-item="kudos"
-          class="border-color border-radius" />
-      </v-list>
+    <template v-if="drawer" #content>
+      <v-tabs
+        v-model="tabName"
+        slider-size="4">
+        <v-tab
+          tab-value="sent"
+          href="#sent">
+          {{ $t('kudosOverview.tab.sent') }}
+        </v-tab>
+        <v-tab
+          tab-value="received"
+          href="#received">
+          {{ $t('kudosOverview.tab.received') }}
+        </v-tab>
+      </v-tabs>
+      <v-tabs-items
+        v-model="tabName"
+        class="px-4">
+        <v-tab-item
+          v-show="!loading"
+          value="sent">
+          <kudos-overview-item-list
+            v-if="tabName === 'sent'"
+            :identity-id="identityId"
+            :limit="limit"
+            kudos-type="sent"
+            @has-more="hasMore = $event"
+            @loading="loading = $event" />
+        </v-tab-item>
+        <v-tab-item
+          v-show="!loading"
+          value="received">
+          <kudos-overview-item-list
+            v-if="tabName === 'received'"
+            :identity-id="identityId"
+            :limit="limit"
+            kudos-type="received"
+            @has-more="hasMore = $event"
+            @loading="loading = $event" />
+        </v-tab-item>
+      </v-tabs-items>
     </template>
     <template v-if="hasMore" slot="footer">
       <v-spacer />
@@ -47,58 +82,32 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
-import {getKudosSent, getKudosReceived} from '../../../js/Kudos.js';
-
 export default {
   data: () => ({
-    title: '',
-    kudosType: null,
     identityId: null,
-    kudosRetrievalMethod: null,
-    pageSize: 20,
+    tabName: null,
+    drawer: false,
+    loading: false,
+    hasMore: false,
     limit: 20,
-    size: 0,
-    kudosList: [],
   }),
-  computed: {
-    hasMore() {
-      return this.size > this.limit;
-    },
+  created() {
+    this.$root.$on('kudos-overview-drawer', this.open);
+  },
+  beforeDestroy() {
+    this.$root.$off('kudos-overview-drawer', this.open);
   },
   methods: {
-    reset() {
-      this.limit = 20;
-      this.size = 0;
-      this.kudosList = [];
-    },
-    open(title, kudosType, identityId, periodType) {
-      this.title = title;
+    open(kudosType, identityId, periodType) {
+      this.tabName = kudosType;
       this.identityId = identityId;
       this.periodType = periodType;
-      this.kudosType = kudosType;
-      this.kudosRetrievalMethod = kudosType === 'sent' && getKudosSent || getKudosReceived;
-
-      this.reset();
-      this.retrieveList();
-      this.$refs.kudosOverviewDrawer.open();
+      this.limit = 20;
+      this.$refs.drawer.open();
     },
     loadMore() {
-      this.limit += this.pageSize;
-      this.retrieveList();
-    },
-    retrieveList() {
-      const dateInSeconds = parseInt(Date.now() / 1000);
-      this.$refs.kudosOverviewDrawer.startLoading();
-      return this.kudosRetrievalMethod(this.identityId, this.limit, true, this.periodType, dateInSeconds)
-        .then(data => {
-          this.size = data && data.size || 0;
-          this.kudosList = data && data.kudos || [];
-        })
-        .finally(() => {
-          this.$refs.kudosOverviewDrawer.endLoading();
-        });
+      this.limit += 20;
     },
   }
 };

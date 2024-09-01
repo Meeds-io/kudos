@@ -19,23 +19,30 @@
 <template>
   <v-list-item
     :href="activityUrl"
-    two-line
-    class="ma-4">
+    two-line>
     <v-list-item-avatar :tile="isSpace" :class="isSpace && 'spaceAvatar'">
       <v-img
         :src="avatar" />
     </v-list-item-avatar>
     <v-list-item-content class="py-0">
-      <v-list-item-title :id="id" :href="url">
+      <v-list-item-title :id="id" class="font-weight-bold">
         {{ fullName }}
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ dateTime }}
       </v-list-item-subtitle>
     </v-list-item-content>
-    <v-list-item-icon class="my-auto">
-      <v-icon>mdi-chevron-right</v-icon>
-    </v-list-item-icon>
+    <v-tooltip bottom>
+      <template #activator="{attrs, on}">
+        <v-list-item-icon
+          v-bind="attrs"
+          v-on="on"
+          class="my-auto">
+          <v-icon size="20">fa-eye</v-icon>
+        </v-list-item-icon>
+      </template>
+      <span>{{ $t('kudosOverview.openKudosActivity') }}</span>
+    </v-tooltip>
   </v-list-item>
 </template>
 
@@ -81,9 +88,6 @@ export default {
     },
     identityId() {
       return this.isSender && this.kudosItem.receiverIdentityId || this.kudosItem.senderIdentityId;
-    },
-    url() {
-      return this.isSender && this.kudosItem.receiverURL || this.kudosItem.senderURL;
     },
     dateTime() {
       if (!this.kudosItem || !this.kudosItem.timeInSeconds) {
