@@ -1,60 +1,75 @@
 <template>
-  <v-app
-    :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'">
-    <widget-wrapper
-      id="kudosOverviewHeader"
-      :title="$t('exoplatform.kudos.button.rewardedKudos')"
-      extra-class="application-body">
-      <template #action>
-        <div class="position-relative">
-          <select
-            v-model="periodType"
-            :class="$vuetify.rtl && 'l-0' || 'r-0'"
-            class="kudosOverviewPeriodSelect absolute-vertical-center header-height width-auto my-auto py-0 ignore-vuetify-classes"
-            size="1">
-            <option
-              v-for="period in periods"
-              :key="period.value"
-              :value="period.value">
-              {{ period.text }}
-            </option>
-          </select>
-        </div>
-      </template>
-      <kudos-overview-row
-        :period-type="periodType"
-        class="my-auto"
-        @loading="loading = $event"
-        @has-kudos="hasKudos = $event" />
-    </widget-wrapper>
+  <v-app :class="owner && 'kudosOverviewApplication' || 'kudosOverviewApplicationOther'">
+    <v-hover v-model="hover">
+      <widget-wrapper
+        id="kudosOverviewHeader"
+        extra-class="application-body">
+        <template #title>
+          <div class="d-flex flex-grow-1 full-width position-relative">
+            <div v-if="hasKudos && !loading" class="widget-text-header text-truncate">
+              {{ $t('exoplatform.kudos.button.rewardedKudos') }}
+            </div>
+            <div class="spacer"></div>
+            <div
+              :class="{
+                'mt-2 me-2': !hasKudos,
+                'l-0': $vuetify.rtl,
+                'r-0': !$vuetify.rtl,
+              }"
+              class="position-absolute absolute-vertical-center z-index-one">
+              <v-btn
+                :icon="hoverEdit"
+                :small="hoverEdit"
+                height="auto"
+                min-width="auto"
+                class="pa-0"
+                text
+                @click="$root.$emit('kudos-overview-drawer', 'sent', ownerIdentityId, hasKudos && $root.kudosPeriod || 'year')">
+                <v-icon
+                  v-if="hoverEdit"
+                  size="18"
+                  color="primary">
+                  fa-external-link-alt
+                </v-icon>
+                <span v-else class="primary--text text-none">{{ $t('kudosOverview.seeAll') }}</span>
+              </v-btn>
+              <v-fab-transition hide-on-leave>
+                <v-btn
+                  v-show="hoverEdit"
+                  :title="$t('kudosOverview.settings.editTooltip')"
+                  small
+                  icon
+                  @click="$root.$emit('kudos-overview-settings')">
+                  <v-icon size="18">fa-cog</v-icon>
+                </v-btn>
+              </v-fab-transition>
+            </div>
+          </div>
+        </template>
+        <template #default>
+          <kudos-overview-row
+            :period-type="$root.kudosPeriod"
+            class="my-auto"
+            @loading="loading = $event"
+            @has-kudos="hasKudos = $event" />
+        </template>
+      </widget-wrapper>
+    </v-hover>
+    <kudos-overview-settings-drawer />
   </v-app>
 </template>
 <script>
 export default {
   data: () => ({
     owner: eXo.env.portal.profileOwner === eXo.env.portal.userName,
-    periodType: 'WEEK',
+    ownerIdentityId: eXo.env.portal.profileOwnerIdentityId,
     loading: true,
     hasKudos: false,
+    hover: false,
   }),
   computed: {
-    periods() {
-      return [{
-        text: this.$t('exoplatform.kudos.label.week'),
-        value: 'WEEK',
-      } , {
-        text: this.$t('exoplatform.kudos.label.month'),
-        value: 'MONTH',
-      } , {
-        text: this.$t('exoplatform.kudos.label.quarter'),
-        value: 'QUARTER',
-      } , {
-        text: this.$t('exoplatform.kudos.label.semester'),
-        value: 'SEMESTER',
-      } , {
-        text: this.$t('exoplatform.kudos.label.year'),
-        value: 'YEAR',
-      }];
+    hoverEdit() {
+      return this.$root.canEdit && this.hover;
     },
   },
 };
