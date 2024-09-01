@@ -18,13 +18,14 @@
               }"
               class="position-absolute absolute-vertical-center z-index-one">
               <v-btn
+                v-if="hasKudos"
                 :icon="hoverEdit"
                 :small="hoverEdit"
                 height="auto"
                 min-width="auto"
                 class="pa-0"
                 text
-                @click="$root.$emit('kudos-overview-drawer', 'sent', ownerIdentityId, hasKudos && $root.kudosPeriod || 'year')">
+                @click="$root.$emit('kudos-overview-drawer', 'sent', ownerIdentityId, $root.kudosPeriod)">
                 <v-icon
                   v-if="hoverEdit"
                   size="18"
