@@ -2,7 +2,7 @@
   "descriptors":[
     {
       "nameId":"KudosOverview",
-      "categoryNameId":"profile",
+      "categoryNameId":"contributions",
       "portletName":"KudosOverview",
       "names":{
         "en":"layout.portletInstance.KudosOverview.name"

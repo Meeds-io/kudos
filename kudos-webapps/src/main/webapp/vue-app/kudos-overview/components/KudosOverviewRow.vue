@@ -49,6 +49,11 @@
     <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
       <v-icon color="tertiary" size="60">fa-award</v-icon>
       <span
+        v-if="isOwner"
+        v-html="emptyKudosSummaryText"
+        class="mt-5"></span>
+      <span
+        v-else
         class="subtitle-1 mt-3 text-wrap">
         {{ noKudosThisPeriodLabel }}
       </span>
@@ -66,13 +71,14 @@ export default {
     },
   },
   data: () => ({
+    isOwner: eXo.env.portal.profileOwner === eXo.env.portal.userName,
+    emptyKudosActionName: 'kudos-check-actions',
     identityId: eXo.env.portal.profileOwnerIdentityId,
     sentKudosCount: 0,
     receivedKudosCount: 0,
     loading: true,
     sentKudos: [],
     receivedKudos: [],
-    isOwner: eXo.env.portal.profileOwner === eXo.env.portal.userName
   }),
   computed: {
     hasKudos() {
@@ -80,6 +86,12 @@ export default {
     },
     noKudosThisPeriodLabel() {
       return this.periodType && this.$t(`gamification.overview.emptyKudosMessage.${this.periodType.toLowerCase()}`);
+    },
+    emptyKudosSummaryText() {
+      return this.$t('gamification.overview.emptyKudosMessage', {
+        0: !this.isExternal && `<a class="primary--text font-weight-bold" href="javascript:void(0)" onclick="document.dispatchEvent(new CustomEvent('${this.emptyKudosActionName}'))">` || '',
+        1: !this.isExternal && '</a>' || '',
+      });
     },
   },
   watch: {
@@ -96,9 +108,11 @@ export default {
   created() {
     this.refresh();
     document.addEventListener('exo-kudos-sent', this.refresh);
+    document.addEventListener(this.emptyKudosActionName, this.clickOnKudosEmptyActionLink);
   },
   beforeDestroy() {
     document.removeEventListener('exo-kudos-sent', this.refresh);
+    document.removeEventListener(this.emptyKudosActionName, this.clickOnKudosEmptyActionLink);
   },
   methods: {
     openDrawer(kudosType) {
@@ -127,6 +141,13 @@ export default {
           document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
           document.dispatchEvent(new CustomEvent('kudosCount', {detail: this.sentKudosCount + this.receivedKudosCount}));
         });
+    },
+    clickOnKudosEmptyActionLink() {
+      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
+        type: 'USER_PROFILE',
+        parentId: '',
+        owner: eXo.env.portal.userName,
+      }}));
     },
   },
 };
