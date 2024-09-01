@@ -9,7 +9,7 @@
       <div class="ms-2 me-1 my-2 kudosOverviewIcon pa-0">
         <v-icon class="uiIconKudos height-auto tertiary-color" size="32">fa fa-award</v-icon>
       </div>
-      <div class="kudosOverviewCount mx-2 text-h5 font-weight-bold pa-0 d-flex align-center">
+      <div v-if="$slots.count" class="kudosOverviewCount mx-2 text-h5 font-weight-bold pa-0 d-flex align-center">
         <slot name="count"></slot>
       </div>
     </div>
