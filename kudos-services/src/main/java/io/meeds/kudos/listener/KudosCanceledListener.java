@@ -20,6 +20,8 @@
 package io.meeds.kudos.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.services.listener.Event;
@@ -33,6 +35,7 @@ import io.meeds.kudos.service.KudosService;
 import jakarta.annotation.PostConstruct;
 
 @Component
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class KudosCanceledListener extends Listener<KudosService, Kudos> {
 
   @Autowired
@@ -47,7 +50,7 @@ public class KudosCanceledListener extends Listener<KudosService, Kudos> {
   }
 
   @Override
-  public void onEvent(Event<KudosService, Kudos> event) throws Exception {
+  public void onEvent(Event<KudosService, Kudos> event) {
     Kudos kudos = event.getData();
     if (kudos != null && kudos.getActivityId() > 0) {
       activityManager.deleteActivity(String.valueOf(kudos.getActivityId()));

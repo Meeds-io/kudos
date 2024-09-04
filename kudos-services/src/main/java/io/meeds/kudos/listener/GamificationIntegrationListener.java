@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.api.persistence.ExoTransactional;
-import org.exoplatform.services.listener.Asynchronous;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.listener.ListenerService;
@@ -47,7 +46,6 @@ import jakarta.annotation.PostConstruct;
 /**
  * A listener to add comment or activity
  */
-@Asynchronous
 @Component
 @Profile("gamification")
 public class GamificationIntegrationListener extends Listener<KudosService, Kudos> {
@@ -63,7 +61,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
 
   @ExoTransactional
   @Override
-  public void onEvent(Event<KudosService, Kudos> event) throws Exception {
+  public void onEvent(Event<KudosService, Kudos> event) {
     Kudos kudos = event.getData();
     String eventName = event.getEventName();
 
@@ -71,7 +69,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
     saveRecieveKudosAchievement(kudos, eventName);
   }
 
-  private void saveSendKudosAchievement(Kudos kudos, String eventName) throws Exception {
+  private void saveSendKudosAchievement(Kudos kudos, String eventName) {
     Map<String, String> gam = buildGamificationEventDetails(GAMIFICATION_SEND_KUDOS_EVENT_NAME,
                                                             kudos.getSenderId(),
                                                             kudos.getReceiverId(),
@@ -79,7 +77,7 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
     listenerService.broadcast(getGamificationEventName(eventName), gam, String.valueOf(kudos.getTechnicalId()));
   }
 
-  private void saveRecieveKudosAchievement(Kudos kudos, String eventName) throws Exception {
+  private void saveRecieveKudosAchievement(Kudos kudos, String eventName) {
     Map<String, String> gam = buildGamificationEventDetails(GAMIFICATION_RECEIVE_KUDOS_EVENT_NAME,
                                                             kudos.getReceiverId(),
                                                             kudos.getSenderId(),
