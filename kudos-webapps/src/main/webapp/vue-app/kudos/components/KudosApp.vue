@@ -641,7 +641,7 @@ export default {
     },
     openSentKudos() {
       if (this.currentUserId) {
-        this.$refs.kudosOverviewDrawer.open(this.$t('exoplatform.kudos.button.sentKudos'), 'sent', this.currentUserId, this.kudosPeriodType);
+        this.$refs.kudosOverviewDrawer.open('sent', this.currentUserId, this.kudosPeriodType);
       }
     },
     handler(evt) {
