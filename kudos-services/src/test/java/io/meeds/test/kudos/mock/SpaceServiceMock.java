@@ -21,6 +21,9 @@ package io.meeds.test.kudos.mock;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.social.core.application.PortletPreferenceRequiredPlugin;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -33,8 +36,19 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceLifeCycleListener;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @SuppressWarnings("all")
 public class SpaceServiceMock implements SpaceService {
+
+  @Getter
+  @Setter
+  private static String redactor;
+
+  @Getter
+  @Setter
+  private static String member;
 
   public Space getSpaceByDisplayName(String spaceDisplayName) {
     throw new UnsupportedOperationException();
@@ -129,11 +143,11 @@ public class SpaceServiceMock implements SpaceService {
     throw new UnsupportedOperationException();
   }
 
-  public Space updateSpaceAvatar(Space existingSpace) {
+  public Space updateSpaceAvatar(Space existingSpace, String username) {
     throw new UnsupportedOperationException();
   }
 
-  public Space updateSpaceBanner(Space existingSpace) {
+  public Space updateSpaceBanner(Space existingSpace, String username) {
     throw new UnsupportedOperationException();
   }
 
@@ -299,7 +313,7 @@ public class SpaceServiceMock implements SpaceService {
 
   }
 
-  public void renameSpace(String remoteId, Space space, String newDisplayName) throws SpaceException {
+  public void renameSpace(Space space, String newDisplayName, String remoteId) throws SpaceException {
     throw new UnsupportedOperationException();
 
   }
@@ -371,6 +385,16 @@ public class SpaceServiceMock implements SpaceService {
 
   public boolean isOnlyLeader(String spaceId, String userId) throws SpaceException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean canRedactOnSpace(Space space, String username) {
+    return space != null && redactor != null && StringUtils.equals(username, redactor);
+  }
+
+  @Override
+  public boolean canViewSpace(Space space, String username) {
+    return space != null && member != null && StringUtils.equals(username, member);
   }
 
   public boolean isMember(String spaceId, String userId) throws SpaceException {
@@ -552,14 +576,6 @@ public class SpaceServiceMock implements SpaceService {
   public void unregisterSpaceLifeCycleListener(SpaceLifeCycleListener listener) {
     throw new UnsupportedOperationException();
 
-  }
-
-  public void setPortletsPrefsRequired(PortletPreferenceRequiredPlugin portletPrefsRequiredPlugin) {
-    // Nothing to do
-  }
-
-  public String[] getPortletsPrefsRequired() {
-    throw new UnsupportedOperationException();
   }
 
   public ListAccess<Space> getVisitedSpaces(String remoteId, String appId) {
