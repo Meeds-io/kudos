@@ -72,8 +72,7 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
     Kudos kudos = event.getData();
     KudosService kudosService = event.getSource();
 
-    if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
-        || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT) {
+    if (kudosService.isActivityComment(kudos)) {
       String activityId = kudos.getEntityId();
       try {
         String parentCommentId = null;
