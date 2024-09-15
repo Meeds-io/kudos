@@ -48,6 +48,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 import io.meeds.kudos.BaseKudosTest;
 import io.meeds.kudos.dao.KudosDAO;
@@ -60,6 +61,7 @@ import io.meeds.kudos.model.KudosPeriod;
 import io.meeds.kudos.model.KudosPeriodType;
 import io.meeds.kudos.service.utils.Utils;
 import io.meeds.kudos.storage.KudosStorage;
+import io.meeds.test.kudos.mock.SpaceServiceMock;
 
 import lombok.SneakyThrows;
 
@@ -87,6 +89,9 @@ public class KudosServiceTest extends BaseKudosTest {
 
   @Autowired
   KudosService                kudosService;
+
+  @Autowired
+  SpaceService                spaceService;
 
   @Autowired
   ActivityManager             activityManager;
@@ -358,21 +363,36 @@ public class KudosServiceTest extends BaseKudosTest {
   public void testSendKudosToSpace() {
     String spaceRemoteId = "space3";
 
-    Kudos kudos = newKudosDTO();
-    kudos.setReceiverType(SpaceIdentityProvider.NAME);
-    kudos.setReceiverId(spaceRemoteId);
-    kudos.setReceiverIdentityId(null);
+    Identity spaceIdentity = identityManager.getOrCreateSpaceIdentity(spaceRemoteId);
+    KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
+
+    Kudos kudosToSend = newKudosDTO();
+    kudosToSend.setReceiverType(SpaceIdentityProvider.NAME);
+    kudosToSend.setReceiverId(spaceRemoteId);
+    kudosToSend.setReceiverIdentityId(null);
 
     restartTransaction();
 
-    kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
 
-    KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
-    Identity identity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, spaceRemoteId);
-    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(identity.getId()),
+    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(spaceIdentity.getId()),
                                                                 currentKudosPeriod.getStartDateInSeconds(),
                                                                 currentKudosPeriod.getEndDateInSeconds(),
                                                                 10);
+    assertNotNull(list);
+    assertEquals(0, list.size());
+
+    SpaceServiceMock.setRedactor(SENDER_REMOTE_ID);
+    Kudos kudos;
+    try {
+      kudos = kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID);
+    } finally {
+      SpaceServiceMock.setRedactor(null);
+    }
+    list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(spaceIdentity.getId()),
+                                                    currentKudosPeriod.getStartDateInSeconds(),
+                                                    currentKudosPeriod.getEndDateInSeconds(),
+                                                    10);
     assertNotNull(list);
     assertEquals(1, list.size());
     Kudos retrievedKudos = list.get(0);
@@ -380,6 +400,32 @@ public class KudosServiceTest extends BaseKudosTest {
     assertEquals(kudos.getTechnicalId(), retrievedKudos.getTechnicalId());
     assertEquals(kudos.getTimeInSeconds(), retrievedKudos.getTimeInSeconds());
     assertEquals(kudos.hashCode(), retrievedKudos.hashCode());
+
+    Kudos kudosToSendOnActivity = newKudosDTO();
+    kudosToSendOnActivity.setReceiverType(SpaceIdentityProvider.NAME);
+    kudosToSendOnActivity.setReceiverId(spaceRemoteId);
+    kudosToSendOnActivity.setReceiverIdentityId(null);
+    kudosToSendOnActivity.setReceiverIdentityId(null);
+    kudosToSendOnActivity.setEntityType(KudosEntityType.ACTIVITY.name());
+    kudosToSendOnActivity.setEntityId(String.valueOf(retrievedKudos.getActivityId()));
+
+    SpaceServiceMock.setMember(SENDER_REMOTE_ID);
+    try {
+      kudosService.createKudos(kudosToSendOnActivity, SENDER_REMOTE_ID);
+    } finally {
+      SpaceServiceMock.setMember(null);
+    }
+
+    list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(spaceIdentity.getId()),
+                                                    currentKudosPeriod.getStartDateInSeconds(),
+                                                    currentKudosPeriod.getEndDateInSeconds(),
+                                                    10);
+    assertNotNull(list);
+    assertEquals(2, list.size());
+
+    retrievedKudos = list.get(0);
+    assertEquals(kudosToSendOnActivity.getEntityType(), retrievedKudos.getEntityType());
+    assertEquals(kudosToSendOnActivity.getEntityId(), retrievedKudos.getEntityId());
   }
 
   @Test

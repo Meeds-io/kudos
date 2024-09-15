@@ -60,6 +60,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 import io.meeds.kudos.model.AccountSettings;
 import io.meeds.kudos.model.GlobalSettings;
@@ -96,6 +97,9 @@ public class KudosService {
 
   @Autowired
   private KudosStorage        kudosStorage;
+
+  @Autowired
+  private SpaceService        spaceService;
 
   @Autowired
   private SettingService      settingService;
@@ -179,6 +183,14 @@ public class KudosService {
     if (StringUtils.equals(currentUser, kudos.getReceiverId())) {
       throw new IllegalAccessException("User with username '" + currentUser + "' is not authorized to send kudos to himseld!");
     }
+    if (StringUtils.isNotBlank(kudos.getSpacePrettyName())) {
+      Space space = getSpace(kudos.getSpacePrettyName());
+      if (space == null) {
+        throw new ObjectNotFoundException("Space not found");
+      } else if (!canSendKudosInSpace(kudos, space, currentUser)) {
+        throw new IllegalAccessException("User cannot redact on space");
+      }
+    }
     KudosPeriod currentPeriod = getCurrentKudosPeriod();
 
     Identity senderIdentity = (Identity) checkStatusAndGetReceiver(OrganizationIdentityProvider.NAME, currentUser);
@@ -196,7 +208,11 @@ public class KudosService {
       if (receiverObject instanceof Identity identity) {
         kudos.setReceiverIdentityId(identity.getId());
       } else if (receiverObject instanceof Space space) {
-        kudos.setReceiverIdentityId(space.getId());
+        if (canSendKudosInSpace(kudos, space, currentUser)) {
+          kudos.setReceiverIdentityId(space.getId());
+        } else {
+          throw new IllegalAccessException("User cannot redact on space");
+        }
       }
     }
 
@@ -207,6 +223,17 @@ public class KudosService {
     listenerService.broadcast(KUDOS_SENT_EVENT, this, createdKudos);
 
     return kudosStorage.getKudoById(createdKudos.getTechnicalId());
+  }
+
+  /**
+   * @param kudos {@link Kudos} to create
+   * @param space target {@link Space}
+   * @param username user making the action
+   * @return true if can redact on space or if is a comment/reply on an existing activity
+   */
+  public boolean canSendKudosInSpace(Kudos kudos, Space space, String username) {
+    return (isActivityComment(kudos) && spaceService.canViewSpace(space, username))
+           || spaceService.canRedactOnSpace(space, username);
   }
 
   /**
@@ -260,14 +287,22 @@ public class KudosService {
   }
 
   /**
+   * @param kudos {@link Kudos}
+   * @return true if the associated Activity to generate is a comment or a reply
+   *         to a comment, else false
+   */
+  public boolean isActivityComment(Kudos kudos) {
+    return KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY
+        || KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.COMMENT;
+  }
+
+  /**
    * Stores generated activity for created {@link Kudos}
    * 
    * @param kudosId {@link Kudos} technical identifier
    * @param activityId {@link ExoSocialActivity} technical identifier
-   * @throws Exception when an error happens when broadcasting event or saving
-   *           activityId of Kudos
    */
-  public void updateKudosGeneratedActivityId(long kudosId, long activityId) throws Exception {
+  public void updateKudosGeneratedActivityId(long kudosId, long activityId) {
     kudosStorage.saveKudosActivityId(kudosId, activityId);
     Kudos kudos = kudosStorage.getKudoById(kudosId);
     listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
