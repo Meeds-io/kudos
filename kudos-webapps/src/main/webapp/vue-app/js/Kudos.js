@@ -208,7 +208,6 @@ export function registerExternalExtensions(title) {
     },
   };
   extensionRegistry.registerExtension('profile-extension', 'action', profileExtensionAction);
-  document.dispatchEvent(new CustomEvent('profile-extension-updated', { detail: profileExtensionAction}));
 }
 
 export function registerOverviewExtension() {
