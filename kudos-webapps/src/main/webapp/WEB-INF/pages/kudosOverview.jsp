@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 %>
+<%@ page import="org.exoplatform.services.security.ConversationState"%>
 <%@ page import="org.exoplatform.social.webui.Utils"%>
 <%@ page import="org.exoplatform.portal.config.model.Page"%>
 <%@ page import="org.exoplatform.portal.application.PortalRequestContext"%>
@@ -28,7 +29,7 @@
   String portletStorageId = ((String) request.getAttribute("portletStorageId"));
   String kudosPeriod = request.getAttribute("kudosPeriod") == null ? "week" : ((String[]) request.getAttribute("kudosPeriod"))[0];
   Page currentPage = PortalRequestContext.getCurrentInstance().getPage();
-  boolean canEdit = ExoContainerContext.getService(UserACL.class).hasEditPermission(currentPage);
+  boolean canEdit = ExoContainerContext.getService(UserACL.class).hasEditPermission(currentPage, ConversationState.getCurrent().getIdentity());
   String pageRef = currentPage.getPageKey().format();
 %>
 <div class="VuetifyApp">
