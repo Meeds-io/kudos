@@ -1,8 +1,8 @@
 <template>
   <user-notification-activity-base
     :notification="notification"
-    message-key="Notification.kudos.received"
-    icon="fa-award"
+    :message-key="messageKey"
+    icon="fa-award pt-2px"
     reply-icon="far fa-handshake"
     reply-key="kudos.notification.button"
     reply />
@@ -15,5 +15,10 @@ export default {
       default: null,
     },
   },
+  computed: {
+    messageKey() {
+      return this.notification?.parameters?.RECEIVER_TYPE === 'space' ? 'Notification.kudos.spaceReceived.web' : 'Notification.kudos.received';
+    },
+  }
 };
 </script>

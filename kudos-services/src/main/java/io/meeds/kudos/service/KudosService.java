@@ -25,6 +25,7 @@ import static io.meeds.kudos.service.utils.Utils.KUDOS_CONTEXT;
 import static io.meeds.kudos.service.utils.Utils.KUDOS_SCOPE;
 import static io.meeds.kudos.service.utils.Utils.KUDOS_SENT_EVENT;
 import static io.meeds.kudos.service.utils.Utils.SETTINGS_KEY_NAME;
+import static io.meeds.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
 import static io.meeds.kudos.service.utils.Utils.USER_ACCOUNT_TYPE;
 import static io.meeds.kudos.service.utils.Utils.getActivityId;
 import static io.meeds.kudos.service.utils.Utils.getCurrentPeriod;
@@ -189,7 +190,14 @@ public class KudosService {
         throw new ObjectNotFoundException("Space not found");
       } else if (!canSendKudosInSpace(kudos, space, currentUser)) {
         throw new IllegalAccessException("User cannot redact on space");
+      } else if (!isActivityComment(kudos)
+                 && SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType())
+                 && !isReceiverSpaceTargetAudience(kudos, space)) {
+        throw new IllegalAccessException("Target space isn't the space receiving the kudos");
       }
+    } else if (!isActivityComment(kudos)
+               && SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType())) {
+      throw new IllegalAccessException("Target space isn't the space receiving the kudos");
     }
     KudosPeriod currentPeriod = getCurrentKudosPeriod();
 
@@ -232,8 +240,8 @@ public class KudosService {
    * @return true if can redact on space or if is a comment/reply on an existing activity
    */
   public boolean canSendKudosInSpace(Kudos kudos, Space space, String username) {
-    return (isActivityComment(kudos) && spaceService.canViewSpace(space, username))
-           || spaceService.canRedactOnSpace(space, username);
+    return spaceService.canRedactOnSpace(space, username)
+        || (isActivityComment(kudos) && spaceService.canViewSpace(space, username));
   }
 
   /**
@@ -569,6 +577,13 @@ public class KudosService {
 
   public KudosPeriod getKudosPeriodOfTime(KudosPeriodType periodType, long dateInSeconds) {
     return periodType.getPeriodOfTime(timeFromSeconds(dateInSeconds));
+  }
+
+  private boolean isReceiverSpaceTargetAudience(Kudos kudos, Space space) {
+    String receiverId = kudos.getReceiverId();
+    Space targetSpaceAudience = getSpace(receiverId);
+    return targetSpaceAudience != null
+        && StringUtils.equals(space.getId(), targetSpaceAudience.getId());
   }
 
   private Object checkStatusAndGetReceiver(String type, String id) {
