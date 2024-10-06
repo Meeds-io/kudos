@@ -18,6 +18,8 @@
  */
 package io.meeds.kudos.activity;
 
+import static io.meeds.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,6 +62,7 @@ public class KudosActivityTypePlugin extends ActivityTypePlugin {
     } else {
       Kudos kudos = this.kudosService.getKudosByActivityId(Long.parseLong(activity.getId().replace("comment", "")));
       return kudos != null
+             && !SPACE_ACCOUNT_TYPE.equals(kudos.getReceiverType())
              && !StringUtils.equals(kudos.getReceiverId(), username)
              && !StringUtils.equals(kudos.getSenderId(), username);
     }

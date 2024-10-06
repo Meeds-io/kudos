@@ -163,11 +163,11 @@ public class KudosStorage {
       return Collections.emptyList();
     }
     List<KudosEntity> kudosEntities =
-                                    kudosDAO.findByCreatedDateBetweenAndReceiverIdAndIsReceiverUserOrderByCreatedDateDesc(kudosPeriod.getStartDateInSeconds(),
-                                                                                                                          kudosPeriod.getEndDateInSeconds(),
-                                                                                                                          identityId,
-                                                                                                                          isReceiverUser,
-                                                                                                                          Limit.of(limit));
+                                    kudosDAO.findByCreatedDateBetweenAndReceiverIdAndIsReceiverUserOrderByIdDesc(kudosPeriod.getStartDateInSeconds(),
+                                                                                                                 kudosPeriod.getEndDateInSeconds(),
+                                                                                                                 identityId,
+                                                                                                                 isReceiverUser,
+                                                                                                                 Limit.of(limit));
     if (kudosEntities != null) {
       List<Kudos> kudosList = new ArrayList<>();
       for (KudosEntity kudosEntity : kudosEntities) {

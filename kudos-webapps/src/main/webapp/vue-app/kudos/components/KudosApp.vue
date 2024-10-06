@@ -66,6 +66,8 @@
                   :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
                   :type-of-relations="typeOfRelation"
+                  :include-spaces="!spaceId || postInYourSpacesChoice"
+                  only-redactor
                   include-users
                   name="kudosReceiver"
                   width="220"
@@ -130,7 +132,6 @@
                   <v-list-item-title class="font-weight-bold d-flex body-2 mb-0">
                     <exo-space-avatar
                       :space-id="spaceId"
-                      :space="space"
                       extra-class="text-truncate"
                       fullname
                       bold-title
@@ -228,7 +229,6 @@
       ref="kudosOverviewDrawer" />
   </v-app>
 </template>
-
 <script>
 import {getReceiver} from '../../js/KudosIdentity.js';
 import {getEntityKudos, sendKudos, getKudosSent} from '../../js/Kudos.js';
@@ -275,6 +275,7 @@ export default {
       spaceId: eXo.env.portal.spaceId,
       spacePrettyName: eXo.env.portal.spaceName,
       audienceChoice: null,
+      space: null,
       noReceiverIdentityId: false
     };
   },
@@ -304,6 +305,13 @@ export default {
       if (selectedReceiver) {
         if (this.receiverId !== selectedReceiver.remoteId) {
           this.receiverId = selectedReceiver.remoteId;
+          const isSpace = selectedReceiver.providerId === 'space';
+          this.receiverType = isSpace ? 'space' : 'user';
+          this.audience = null;
+          this.$nextTick().then(() => {
+            this.audienceChoice = 'oneOfYourSpaces';
+            this.$nextTick().then(() => this.audience = selectedReceiver);
+          });
         }
       }
     },
@@ -317,7 +325,7 @@ export default {
       }
     },
     entityType(newVal) {
-      if (newVal === 'USER_TIPTIP') {
+      if (newVal === 'USER_TIPTIP' || newVal === 'USER_PROFILE') {
         this.spaceId = null;
       }
     }
@@ -469,9 +477,11 @@ export default {
       let kudosToSend = null;
       this.allKudos = this.allKudosSent.slice(0);
       if (this.remainingKudos > 0) {
-        return (this.entityId && this.entityType && getReceiver(this.entityType, this.entityId) || Promise.resolve(null))
+        return (this.entityId
+          && this.entityType
+          && getReceiver(this.entityType, this.entityId) || Promise.resolve(null))
           .then(receiverDetails => {
-            this.noReceiverIdentityId = !receiverDetails;
+            this.noReceiverIdentityId = !receiverDetails?.identityId;
             if (receiverDetails?.id && receiverDetails?.type) {
               receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
               if (!receiverDetails.isUserType || receiverDetails.id !== this.username) {
@@ -493,15 +503,14 @@ export default {
                 }
                 this.receiverId = receiverDetails.id;
                 this.receiverType = receiverDetails.type;
-                const receiverId = receiverDetails.id;
                 kudosToSend = {
-                  receiverId: receiverId,
+                  receiverId: this.receiverId,
                   receiverType: receiverDetails.type,
-                  avatar: receiverDetails.avatar,
-                  profileUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${receiverId}`,
+                  avatar: receiverDetails.avatar || receiverDetails.avatarUrl,
+                  profileUrl: receiverDetails.isUserType ? `/portal/${eXo.env.portal.metaPortalName}/profile/${receiverDetails.id}` : `/portal/s/${this.receiverId}`,
                   receiverIdentityId: receiverDetails.identityId,
-                  receiverURL: receiverDetails.isUserType ? `/portal/intranet/profile/${receiverDetails.id}` : `/portal/g/:spaces:${receiverDetails.id}`,
-                  receiverFullName: receiverDetails.fullname,
+                  receiverURL: receiverDetails.isUserType ? `/portal/${eXo.env.portal.metaPortalName}/profile/${receiverDetails.id}` : `/portal/s/${this.receiverId}`,
+                  receiverFullName: receiverDetails.fullname || receiverDetails.displayName,
                   isCurrent: true
                 };
                 if (receiverDetails.entityId) {
@@ -552,7 +561,7 @@ export default {
     },
     openDrawer(event) {
       if (!this.disabled) {
-        if ( this.remainingKudos > 0 ) {
+        if (this.remainingKudos > 0) {
           this.loading = true;
           this.$nextTick(() => {
             this.readOnlySpace = event?.detail?.readOnlySpace;
@@ -560,8 +569,9 @@ export default {
             this.entityId = event?.detail?.id || 0;
             this.entityOwner = event?.detail?.owner || eXo.env.portal.userName;
             this.parentEntityId = event?.detail?.parentId || '';
-            this.ignoreRefresh = event && event.detail && event.detail.ignoreRefresh;
-            this.spacePrettyName = event && event.detail && event.detail.spaceURL || null;
+            this.ignoreRefresh = event?.detail?.ignoreRefresh;
+            this.spacePrettyName = event.detail.spacePrettyName || event?.detail?.spaceURL || this.spacePrettyName;
+            this.spaceId = event?.detail?.spaceId || this.spaceId;
             this.metadataObjectId = null;
             this.$refs.drawer.open();
             this.$refs.drawer.startLoading();

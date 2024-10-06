@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.service.KudosService;
@@ -70,7 +71,9 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
   private void saveSendKudosAchievement(Kudos kudos, String eventName) {
     Map<String, String> gam = buildGamificationEventDetails(GAMIFICATION_SEND_KUDOS_EVENT_NAME,
                                                             kudos.getSenderId(),
+                                                            OrganizationIdentityProvider.NAME,
                                                             kudos.getReceiverId(),
+                                                            kudos.getReceiverType(),
                                                             String.valueOf(kudos.getActivityId()));
     listenerService.broadcast(getGamificationEventName(eventName), gam, String.valueOf(kudos.getTechnicalId()));
   }
@@ -78,7 +81,9 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
   private void saveRecieveKudosAchievement(Kudos kudos, String eventName) {
     Map<String, String> gam = buildGamificationEventDetails(GAMIFICATION_RECEIVE_KUDOS_EVENT_NAME,
                                                             kudos.getReceiverId(),
+                                                            kudos.getReceiverType(),
                                                             kudos.getSenderId(),
+                                                            OrganizationIdentityProvider.NAME,
                                                             String.valueOf(kudos.getActivityId()));
     listenerService.broadcast(getGamificationEventName(eventName), gam, String.valueOf(kudos.getTechnicalId()));
   }
@@ -93,15 +98,18 @@ public class GamificationIntegrationListener extends Listener<KudosService, Kudo
 
   private Map<String, String> buildGamificationEventDetails(String gamificationEventName,
                                                             String earnerId,
+                                                            String earnerType,
                                                             String receiverId,
+                                                            String receiverType,
                                                             String objectId) {
     Map<String, String> gam = new HashMap<>();
     gam.put("objectType", GAMIFICATION_OBJECT_TYPE);
     gam.put("objectId", objectId);
     gam.put("ruleTitle", gamificationEventName);
-    gam.put("senderId", earnerId); // matches the gamification's
-                                   // earner id
+    gam.put("senderId", earnerId); // matches the gamification's earner id
+    gam.put("senderType", earnerType);
     gam.put("receiverId", receiverId);
+    gam.put("receiverType", receiverType);
     return gam;
   }
 
