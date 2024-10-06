@@ -40,11 +40,11 @@ public interface KudosDAO extends JpaRepository<KudosEntity, Long> {
 
   List<KudosEntity> findByEntityTypeAndEntityIdOrderByCreatedDateDesc(int entityType, long entityId, Limit limit);
 
-  List<KudosEntity> findByCreatedDateBetweenAndReceiverIdAndIsReceiverUserOrderByCreatedDateDesc(long startDateInSeconds,
-                                                                                                 long endDateInSeconds,
-                                                                                                 long receiverId,
-                                                                                                 boolean isReceiverUser,
-                                                                                                 Limit limit);
+  List<KudosEntity> findByCreatedDateBetweenAndReceiverIdAndIsReceiverUserOrderByIdDesc(long startDateInSeconds,
+                                                                                        long endDateInSeconds,
+                                                                                        long receiverId,
+                                                                                        boolean isReceiverUser,
+                                                                                        Limit limit);
 
   List<KudosEntity> findByCreatedDateBetweenAndSenderIdOrderByCreatedDateDesc(long startDateInSeconds,
                                                                               long endDateInSeconds,
