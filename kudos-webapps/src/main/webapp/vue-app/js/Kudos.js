@@ -187,7 +187,7 @@ export function getPeriodDates(date, periodType) {
 }
 
 export function registerExternalExtensions(title) {
-  const profileExtensionAction = {
+  extensionRegistry.registerExtension('profile-extension', 'action', {
     id: 'profile-kudos',
     title: title,
     icon: 'fa fa-award uiIconKudos uiIconLightBlue',
@@ -206,8 +206,26 @@ export function registerExternalExtensions(title) {
           }}));
       }
     },
-  };
-  extensionRegistry.registerExtension('profile-extension', 'action', profileExtensionAction);
+  });
+  extensionRegistry.registerExtension('profile-extension', 'action', {
+    id: 'space-kudos',
+    title: title,
+    icon: 'fa-award',
+    order: 10,
+    iconOnly: true,
+    enabled: space => !space.username && space.canRedactOnSpace,
+    click: space => {
+      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
+        id: space.id,
+        type: 'SPACE_PROFILE',
+        parentId: '',
+        readOnlySpace: true,
+        owner: eXo.env.portal.userName,
+        spacePrettyName: space.prettyName,
+        spaceId: space.id,
+      }}));
+    },
+  });
 }
 
 export function registerOverviewExtension() {
@@ -280,6 +298,12 @@ export function registerActivityActionExtension() {
     rank: 30,
   });
 
+  extensionRegistry.registerComponent('SpacePopover', 'space-popover-action', {
+    id: 'kudos',
+    vueComponent: Vue.options.components['popover-kudos-button'],
+    rank: 30,
+  });
+
   // Register predefined activity types
   extensionRegistry.registerExtension('activity', 'type', {
     type: 'exokudos:activity',
@@ -302,19 +326,29 @@ export function registerActivityActionExtension() {
       getTitle: activityOrComment => {
         const kudos = activityOrComment && activityOrComment.kudos;
         if (kudos) {
-          const receiverIdentity = {
-            'id': kudos.receiverIdentityId,
-            'username': kudos.receiverId,
-            'fullName': kudos.receiverFullName,
-            'avatar': kudos.receiverAvatar,
-            'position': kudos.receiverPosition,
-            'external': String(kudos.externalReceiver),
-            'enabled': String(kudos.enabledReceiver),
+          const receiverIdentity = kudos.receiverType === 'user' && {
+            id: kudos.receiverIdentityId,
+            username: kudos.receiverId,
+            fullName: kudos.receiverFullName,
+            avatar: kudos.receiverAvatar,
+            position: kudos.receiverPosition,
+            external: String(kudos.externalReceiver),
+            enabled: String(kudos.enabledReceiver),
+            identityType: kudos.receiverType,
+          } || {
+            id: kudos.receiverIdentityId,
+            prettyName: kudos.receiverId,
+            displayName: kudos.receiverFullName,
+            avatarUrl: kudos.receiverAvatar,
+            external: String(kudos.externalReceiver),
+            enabled: String(kudos.enabledReceiver),
+            identityType: kudos.receiverType,
           };
+          const url = kudos.receiverType === 'user' ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${kudos.receiverId}` : `${eXo.env.portal.context}/s/${kudos.technicalId}`;
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
-              0: `<a class="primary--text" href="${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${kudos.receiverId}" v-identity-popover="${JSON.stringify(receiverIdentity).replace(/'/g, '\\\'').replace(/"/g, '\'')}">${kudos.receiverFullName}</a>`
+              0: `<a class="primary--text" href="${url}" v-identity-popover="${JSON.stringify(receiverIdentity).replace(/'/g, '\\\'').replace(/"/g, '\'')}">${kudos.receiverFullName}</a>`
             },
           };
         }
@@ -325,8 +359,8 @@ export function registerActivityActionExtension() {
         return activityOrComment.body;
       },
       getSummary: activityOrComment => {
-        const summary = (activityOrComment.templateParams && activityOrComment.templateParams.kudosMessage)
-                        || (activityOrComment.kudos && activityOrComment.kudos.message)
+        const summary = activityOrComment?.templateParams?.kudosMessage
+                        || activityOrComment?.kudos?.message
                         || '';
         return summary.includes('<oembed>') && summary.split('<oembed>')[0] || summary;
       },

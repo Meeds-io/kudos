@@ -66,7 +66,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
               ownerDetails.avatar = identityDetails.avatar;
               ownerDetails.username = identityDetails.username;
               ownerDetails.position = identityDetails.position;
-              ownerDetails.external = identityDetails.external;
+              ownerDetails.external = identityDetails.external === 'true';
               ownerDetails.enabled = identityDetails.enabled;
             } else {
               ownerDetails.notAuthorized = true;
@@ -80,7 +80,9 @@ export function getIdentityDetails(urlId, type, remoteId) {
             if (identityDetails) {
               ownerDetails.identityId = identityDetails.id;
               ownerDetails.fullname = identityDetails.displayName;
-              ownerDetails.avatar = identityDetails.avatar;
+              ownerDetails.avatar = identityDetails.avatarUrl;
+              ownerDetails.external = false;
+              ownerDetails.enabled = true;
             } else {
               ownerDetails.notAuthorized = true;
             }
