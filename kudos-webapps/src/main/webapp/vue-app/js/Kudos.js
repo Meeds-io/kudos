@@ -344,7 +344,7 @@ export function registerActivityActionExtension() {
             enabled: String(kudos.enabledReceiver),
             identityType: kudos.receiverType,
           };
-          const url = kudos.receiverType === 'user' ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${kudos.receiverId}` : `${eXo.env.portal.context}/s/${kudos.technicalId}`;
+          const url = kudos.receiverType === 'user' ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${kudos.receiverId}` : `${eXo.env.portal.context}/s/${kudos.receiverIdentityId}`;
           return {
             key: 'NewKudosSentActivityComment.activity_kudos_title',
             params: {
