@@ -62,8 +62,8 @@ export default {
   methods: {
     openSendKudosDrawer() {
       document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        spaceURL: eXo.env.portal.spaceUrl,
-        readOnlySpace: eXo.env.portal.spaceUrl ? true : false
+        spacePrettyName: eXo.env.portal.spaceName,
+        readOnlySpace: !!eXo.env.portal.spaceId
       }}));
     },
   },

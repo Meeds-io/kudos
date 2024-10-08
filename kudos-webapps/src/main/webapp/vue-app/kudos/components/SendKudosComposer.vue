@@ -47,10 +47,11 @@ export default {
     openSendKudosDrawer() {
       document.dispatchEvent(new CustomEvent('activity-composer-closed'));
       document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
-        parentId: '',
-        owner: eXo.env.portal.userName,
-        spaceURL: eXo.env.portal.spaceUrl,
-        readOnlySpace: eXo.env.portal.spaceUrl ? true : false
+        id: this.identityId,
+        type: this.isSpace ? 'SPACE_TIPTIP' : this.identityType,
+        spacePrettyName: this.isSpace ? this.spacePrettyName || eXo.env.portal.spaceName : null,
+        spaceId: this.isSpace ? this.identityId : null,
+        readOnlySpace: this.isSpace,
       }}));
     },
   },

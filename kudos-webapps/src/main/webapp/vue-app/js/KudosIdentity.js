@@ -1,5 +1,5 @@
 export function getReceiver(entityType, entityId) {
-  if (entityType === 'USER_PROFILE' || entityType === 'USER_TIPTIP') {
+  if (entityType === 'USER_PROFILE' || entityType === 'USER_TIPTIP' || entityType === 'user') {
     return getIdentityDetails(entityId, 'user', entityId).then((identityDetails) => {
       // Change entity id to use long instead of string
       if (identityDetails) {
@@ -7,7 +7,7 @@ export function getReceiver(entityType, entityId) {
       }
       return identityDetails;
     });
-  } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP') {
+  } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP' || entityType === 'space') {
     return getIdentityDetails(entityId, 'space', entityId).then((identityDetails) => {
       // Change entity id to use long instead of string
       if (identityDetails) {

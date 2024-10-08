@@ -62,7 +62,7 @@ export default {
         new CustomEvent('exo-kudos-open-send-modal', { detail: {
           id: this.identityId,
           type: this.isSpace ? 'SPACE_TIPTIP' : this.identityType,
-          spacePrettyName: this.isSpace ? this.spacePrettyName || eXo.env.portal.prettyName : null,
+          spacePrettyName: this.isSpace ? this.spacePrettyName || eXo.env.portal.spaceName : null,
           spaceId: this.isSpace ? this.identityId : null,
           readOnlySpace: this.isSpace,
         }}));

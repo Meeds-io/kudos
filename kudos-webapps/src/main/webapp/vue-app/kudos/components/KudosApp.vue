@@ -66,7 +66,7 @@
                   :labels="receiverSuggesterLabels"
                   :search-options="searchOptions"
                   :type-of-relations="typeOfRelation"
-                  :include-spaces="!spaceId || postInYourSpacesChoice"
+                  :include-spaces="canChooseSpaceAudience"
                   only-redactor
                   include-users
                   name="kudosReceiver"
@@ -148,7 +148,7 @@
                       username-class />
                   </v-list-item-subtitle>
                 </v-list-item-content>
-                <v-list-item-action v-if="!readOnlySpace" class="my-0">
+                <v-list-item-action v-if="canChooseAudience" class="my-0">
                   <v-tooltip bottom>
                     <template #activator="{ on, attrs }">
                       <v-btn
@@ -307,11 +307,25 @@ export default {
           this.receiverId = selectedReceiver.remoteId;
           const isSpace = selectedReceiver.providerId === 'space';
           this.receiverType = isSpace ? 'space' : 'user';
-          this.audience = null;
-          this.$nextTick().then(() => {
-            this.audienceChoice = 'oneOfYourSpaces';
-            this.$nextTick().then(() => this.audience = selectedReceiver);
-          });
+          if (selectedReceiver.fullName && !selectedReceiver.fullname) {
+            selectedReceiver.fullname = selectedReceiver.fullName;
+          }
+          if (selectedReceiver.displayName && !selectedReceiver.fullname) {
+            selectedReceiver.fullname = selectedReceiver.displayName;
+          }
+          if (selectedReceiver.fullname && !selectedReceiver.profile.fullname) {
+            selectedReceiver.profile.fullname = selectedReceiver.fullname;
+          }
+          if (selectedReceiver.profile.avatarUrl && !selectedReceiver.profile.avatar) {
+            selectedReceiver.profile.avatar = selectedReceiver.profile.avatarUrl;
+          }
+          if (isSpace) {
+            this.audience = null;
+            this.$nextTick().then(() => {
+              this.audienceChoice = 'oneOfYourSpaces';
+              this.$nextTick().then(() => this.audience = selectedReceiver);
+            });
+          }
         }
       }
     },
@@ -343,6 +357,12 @@ export default {
     }
   },
   computed: {
+    canChooseAudience() {
+      return !this.readOnlySpace && this.selectedReceiver?.providerId !== 'space';
+    },
+    canChooseSpaceAudience() {
+      return !this.readOnlySpace && this.postInYourSpacesChoice;
+    },
     searchOptions() {
       return {
         currentUser: this.username,
@@ -380,7 +400,10 @@ export default {
       return this.numberOfKudosAllowed - this.remainingKudos;
     },
     sendButtonDisabled() {
-      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH || this.kudosMessageValidityLabel || (this.postInYourSpacesChoice && !this.audience) || (this.noReceiverIdentityId && !this.selectedReceiver);
+      return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH
+        || this.kudosMessageValidityLabel
+        || (this.postInYourSpacesChoice && !this.audience)
+        || (this.noReceiverIdentityId && !this.selectedReceiver);
     },
     remainingPeriodLabel() {
       return this.remainingDaysToReset === 1 ? this.$t('exoplatform.kudos.label.day') : this.$t('exoplatform.kudos.label.days') ;
@@ -434,7 +457,10 @@ export default {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
     },
     audienceTypesDisplay() {
-      return (!this.spaceId && !this.isLinkedKudos) || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos) || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience) || (!this.isLinkedKudos && !this.noReceiverIdentityId && !this.audienceAvatarDisplay);
+      return (!this.spaceId && !this.isLinkedKudos)
+        || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos)
+        || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience)
+        || (!this.isLinkedKudos && !this.noReceiverIdentityId && !this.audienceAvatarDisplay);
     },
     displaySenderAvatar() {
       return (this.postInYourNetwork && this.audienceTypesDisplay) || this.isLinkedKudos;
@@ -471,8 +497,6 @@ export default {
     },
     initDrawer() {
       this.kudosMessage = '';
-      this.kudosToSend = null;
-      this.error = null;
       this.requiredField = false;
       let kudosToSend = null;
       this.allKudos = this.allKudosSent.slice(0);
@@ -480,7 +504,8 @@ export default {
         return (this.entityId
           && this.entityType
           && getReceiver(this.entityType, this.entityId) || Promise.resolve(null))
-          .then(receiverDetails => {
+          .then(async receiverDetails => {
+            await this.$nextTick();
             this.noReceiverIdentityId = !receiverDetails?.identityId;
             if (receiverDetails?.id && receiverDetails?.type) {
               receiverDetails.isUserType = receiverDetails.type === 'organization' || receiverDetails.type === 'user';
@@ -498,13 +523,29 @@ export default {
                     providerId: 'organization',
                     remoteId: receiverDetails.id
                   };
+                } else if (receiverDetails.type === 'space') {
+                  this.identity = receiverDetails;
+                  this.selectedReceiver = {
+                    receiverId: receiverDetails.id,
+                    id: `space:${receiverDetails.id}`,
+                    identityId: receiverDetails.identityId,
+                    spaceId: receiverDetails.id,
+                    displayName: receiverDetails.fullname,
+                    profile: {
+                      fullName: receiverDetails.fullname,
+                      avatarUrl: receiverDetails.avatar,
+                      external: false,
+                    },
+                    providerId: 'space',
+                    remoteId: receiverDetails.id
+                  };
                 } else {
                   this.identity = receiverDetails;
                 }
                 this.receiverId = receiverDetails.id;
                 this.receiverType = receiverDetails.type;
                 kudosToSend = {
-                  receiverId: this.receiverId,
+                  receiverId: receiverDetails.id,
                   receiverType: receiverDetails.type,
                   avatar: receiverDetails.avatar || receiverDetails.avatarUrl,
                   profileUrl: receiverDetails.isUserType ? `/portal/${eXo.env.portal.metaPortalName}/profile/${receiverDetails.id}` : `/portal/s/${this.receiverId}`,
@@ -563,6 +604,12 @@ export default {
       if (!this.disabled) {
         if (this.remainingKudos > 0) {
           this.loading = true;
+          this.kudosToSend = null;
+          this.selectedReceiver = null;
+          this.identity = null;
+          this.audience = '';
+          this.error = null;
+          this.spaceId = null;
           this.$nextTick(() => {
             this.readOnlySpace = event?.detail?.readOnlySpace;
             this.entityType = event?.detail?.type || 'NONE';
@@ -573,6 +620,32 @@ export default {
             this.spacePrettyName = event.detail.spacePrettyName || event?.detail?.spaceURL || this.spacePrettyName;
             this.spaceId = event?.detail?.spaceId || this.spaceId;
             this.metadataObjectId = null;
+            if (this.readOnlySpace) {
+              this.audienceChoice = 'oneOfYourSpaces';
+              if (this.spacePrettyName) {
+                this.audience = {
+                  id: `space:${this.spacePrettyName}`,
+                  spaceId: this.spaceId || eXo.env.portal.spaceId,
+                  providerId: 'space',
+                  remoteId: this.spacePrettyName,
+                  displayName: eXo.env.portal.spaceDisplayName || event.detail.spaceDisplayName,
+                  profile: {
+                    fullName: eXo.env.portal.spaceDisplayName || event.detail.spaceDisplayName,
+                  }
+                };
+              } else if (this.spaceId) {
+                this.audience = {
+                  id: `space:${this.spaceId}`,
+                  remoteId: this.spaceId,
+                  spaceId: this.spaceId,
+                  providerId: 'space',
+                  displayName: eXo.env.portal.spaceDisplayName || event.detail.spaceDisplayName,
+                  profile: {
+                    fullName: eXo.env.portal.spaceDisplayName || event.detail.spaceDisplayName,
+                  }
+                };
+              }
+            }
             this.$refs.drawer.open();
             this.$refs.drawer.startLoading();
             Promise.resolve(this.initDrawer())
@@ -603,7 +676,8 @@ export default {
         receiverType: this.receiverType || 'user',
         receiverId: this.receiverId,
         message: kudosMessage,
-        spacePrettyName: this.audience?.remoteId || this.spacePrettyName,
+        spacePrettyName: (this.audience?.providerId === 'space' && this.audience?.remoteId)
+          || this.spacePrettyName || null,
       };
       sendKudos(kudos)
         .then(kudosSent => {
