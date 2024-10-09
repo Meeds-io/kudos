@@ -383,9 +383,21 @@ public class KudosServiceTest extends BaseKudosTest {
     assertEquals(0, list.size());
 
     SpaceServiceMock.setRedactor(SENDER_REMOTE_ID);
+    assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
+
+    kudosToSend.setSpacePrettyName(spaceRemoteId);
+
+    kudosToSend.setReceiverId("space2");
+    assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
+
+    kudosToSend.setReceiverId("NotFoundSpace");
+    assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
+
+    kudosToSend.setReceiverId(spaceRemoteId);
     Kudos kudos;
     try {
       kudos = kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID);
+      assertNotNull(kudos);
     } finally {
       SpaceServiceMock.setRedactor(null);
     }
@@ -401,17 +413,18 @@ public class KudosServiceTest extends BaseKudosTest {
     assertEquals(kudos.getTimeInSeconds(), retrievedKudos.getTimeInSeconds());
     assertEquals(kudos.hashCode(), retrievedKudos.hashCode());
 
+    restartTransaction();
     Kudos kudosToSendOnActivity = newKudosDTO();
     kudosToSendOnActivity.setReceiverType(SpaceIdentityProvider.NAME);
     kudosToSendOnActivity.setReceiverId(spaceRemoteId);
-    kudosToSendOnActivity.setReceiverIdentityId(null);
     kudosToSendOnActivity.setReceiverIdentityId(null);
     kudosToSendOnActivity.setEntityType(KudosEntityType.ACTIVITY.name());
     kudosToSendOnActivity.setEntityId(String.valueOf(retrievedKudos.getActivityId()));
 
     SpaceServiceMock.setMember(SENDER_REMOTE_ID);
     try {
-      kudosService.createKudos(kudosToSendOnActivity, SENDER_REMOTE_ID);
+      kudos = kudosService.createKudos(kudosToSendOnActivity, SENDER_REMOTE_ID);
+      assertNotNull(kudos);
     } finally {
       SpaceServiceMock.setMember(null);
     }

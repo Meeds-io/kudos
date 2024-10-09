@@ -1,5 +1,5 @@
 export function getReceiver(entityType, entityId) {
-  if (entityType === 'USER_PROFILE' || entityType === 'USER_TIPTIP') {
+  if (entityType === 'USER_PROFILE' || entityType === 'USER_TIPTIP' || entityType === 'user') {
     return getIdentityDetails(entityId, 'user', entityId).then((identityDetails) => {
       // Change entity id to use long instead of string
       if (identityDetails) {
@@ -7,7 +7,7 @@ export function getReceiver(entityType, entityId) {
       }
       return identityDetails;
     });
-  } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP') {
+  } else if (entityType === 'SPACE_PROFILE' || entityType === 'SPACE_TIPTIP' || entityType === 'space') {
     return getIdentityDetails(entityId, 'space', entityId).then((identityDetails) => {
       // Change entity id to use long instead of string
       if (identityDetails) {
@@ -66,7 +66,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
               ownerDetails.avatar = identityDetails.avatar;
               ownerDetails.username = identityDetails.username;
               ownerDetails.position = identityDetails.position;
-              ownerDetails.external = identityDetails.external;
+              ownerDetails.external = identityDetails.external === 'true';
               ownerDetails.enabled = identityDetails.enabled;
             } else {
               ownerDetails.notAuthorized = true;
@@ -80,7 +80,9 @@ export function getIdentityDetails(urlId, type, remoteId) {
             if (identityDetails) {
               ownerDetails.identityId = identityDetails.id;
               ownerDetails.fullname = identityDetails.displayName;
-              ownerDetails.avatar = identityDetails.avatar;
+              ownerDetails.avatar = identityDetails.avatarUrl;
+              ownerDetails.external = false;
+              ownerDetails.enabled = true;
             } else {
               ownerDetails.notAuthorized = true;
             }

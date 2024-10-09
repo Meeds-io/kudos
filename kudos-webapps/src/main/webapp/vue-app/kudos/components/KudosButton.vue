@@ -100,7 +100,7 @@ export default {
     isComment() {
       return !!this.comment;
     },
-    spaceURL() {
+    spacePrettyName() {
       return this.activity && this.activity.activityStream && this.activity.activityStream.space && this.activity.activityStream.space.prettyName;
     },
     kudosCount() {
@@ -182,7 +182,7 @@ export default {
         parentId: this.parentId,
         type: this.entityType,
         owner: !this.isOwner && this.entityOwner || null,
-        spaceURL: this.spaceURL
+        spacePrettyName: this.spacePrettyName
       }}));
     },
     openKudosList(event) {
