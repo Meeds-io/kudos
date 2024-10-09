@@ -23,8 +23,15 @@ export function getReceiver(entityType, entityId) {
       entityId = `comment${entityId}`;
     }
     return getActivityDetails(entityId)
-      .then((activityDetails) => {
-        if (activityDetails && activityDetails.owner && activityDetails.owner.href) {
+      .then(async (activityDetails) => {
+        if (activityDetails?.type === 'exokudos:activity') {
+          activityDetails.kudos = await getKudosByActivity(entityId);
+        }
+        const kudosReceiverId = activityDetails?.kudos?.receiverId;
+        if (kudosReceiverId) {
+          const kudosReceiverType = activityDetails?.kudos?.receiverType;
+          return getIdentityDetails(kudosReceiverId, kudosReceiverType, kudosReceiverId);
+        } else if (activityDetails?.owner?.href) {
           isSpace = activityDetails.owner.href.indexOf('/spaces/') >= 0;
           ownerType = isSpace ? 'space' : 'user';
           const remoteId = activityDetails.owner.href.substring(activityDetails.owner.href.lastIndexOf('/') + 1);
@@ -74,7 +81,7 @@ export function getIdentityDetails(urlId, type, remoteId) {
             return ownerDetails;
           });
       } else {
-        return fetch(`/portal/rest/v1/social/spaces/${urlId}`, {credentials: 'include'})
+        return fetch(`/portal/rest/v1/social/spaces/byPrettyName/${urlId}`, {credentials: 'include'})
           .then((resp) => resp && resp.ok && resp.json())
           .then((identityDetails) => {
             if (identityDetails) {
@@ -108,6 +115,19 @@ export function getActivityDetails(activityId) {
   } else {
     return Promise.resolve(null);
   }
+}
+
+export function getKudosByActivity(activityId) {
+  return fetch(`/kudos/rest/kudos/byActivity/${activityId}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
 }
 
 /*
