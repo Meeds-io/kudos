@@ -27,9 +27,9 @@
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <io.meeds.social.version>7.0.x-SNAPSHOT</io.meeds.social.version>
-    <io.meeds.platform-ui.version>7.0.x-SNAPSHOT</io.meeds.platform-ui.version>
-    <addon.meeds.analytics.version>7.0.x-SNAPSHOT</addon.meeds.analytics.version>
+    <io.meeds.social.version>7.0.0-M16</io.meeds.social.version>
+    <io.meeds.platform-ui.version>7.0.0-M16</io.meeds.platform-ui.version>
+    <addon.meeds.analytics.version>7.0.0-M16</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
