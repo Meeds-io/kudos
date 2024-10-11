@@ -8,7 +8,6 @@
           <v-btn
             :ripple="false"
             icon
-            color="primary"
             @click="sendKudos($event)">
             <v-icon size="18">fa-award</v-icon>
           </v-btn>
