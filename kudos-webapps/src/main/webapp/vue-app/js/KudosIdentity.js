@@ -81,7 +81,8 @@ export function getIdentityDetails(urlId, type, remoteId) {
             return ownerDetails;
           });
       } else {
-        return fetch(`/portal/rest/v1/social/spaces/byPrettyName/${urlId}`, {credentials: 'include'})
+        const url = Number.isFinite(Number(urlId)) ? `/portal/rest/v1/social/spaces/${urlId}` : `/portal/rest/v1/social/spaces/byPrettyName/${urlId}`;
+        return fetch(url, {credentials: 'include'})
           .then((resp) => resp && resp.ok && resp.json())
           .then((identityDetails) => {
             if (identityDetails) {
