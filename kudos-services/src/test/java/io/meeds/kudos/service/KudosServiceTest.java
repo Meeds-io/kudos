@@ -442,6 +442,45 @@ public class KudosServiceTest extends BaseKudosTest {
   }
 
   @Test
+  @SneakyThrows
+  public void testSendKudosUsingSpaceId() {
+    String spaceRemoteId = "space4";
+
+    Identity spaceIdentity = identityManager.getOrCreateSpaceIdentity(spaceRemoteId);
+    KudosPeriod currentKudosPeriod = kudosService.getCurrentKudosPeriod();
+
+    Kudos kudosToSend = newKudosDTO();
+    kudosToSend.setReceiverType(SpaceIdentityProvider.NAME);
+    kudosToSend.setReceiverId(spaceService.getSpaceByPrettyName(spaceIdentity.getRemoteId()).getId());
+    kudosToSend.setReceiverIdentityId(null);
+    kudosToSend.setSpacePrettyName(spaceRemoteId);
+
+    restartTransaction();
+
+    List<Kudos> list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(spaceIdentity.getId()),
+                                                                currentKudosPeriod.getStartDateInSeconds(),
+                                                                currentKudosPeriod.getEndDateInSeconds(),
+                                                                10);
+    assertNotNull(list);
+    assertEquals(0, list.size());
+
+    SpaceServiceMock.setRedactor(SENDER_REMOTE_ID);
+    try {
+      Kudos kudos = kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID);
+      assertNotNull(kudos);
+    } finally {
+      SpaceServiceMock.setRedactor(null);
+    }
+
+    list = kudosService.getKudosByPeriodAndReceiver(Long.parseLong(spaceIdentity.getId()),
+                                                    currentKudosPeriod.getStartDateInSeconds(),
+                                                    currentKudosPeriod.getEndDateInSeconds(),
+                                                    10);
+    assertNotNull(list);
+    assertEquals(1, list.size());
+  }
+
+  @Test
   public void testGetKudosByPeriodType() {
     long startTime = getCurrentTimeInSeconds();
 
