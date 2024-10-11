@@ -207,17 +207,25 @@ public class KudosService {
       throw new IllegalAccessException("User having username'" + currentUser + "' is not authorized to send more kudos");
     }
 
-    if (kudos.getSenderIdentityId() == null) {
-      kudos.setSenderIdentityId(senderIdentity.getId());
-    }
+    kudos.setSenderId(senderIdentity.getRemoteId());
+    kudos.setSenderIdentityId(senderIdentity.getId());
     Object receiverObject = checkStatusAndGetReceiver(kudos.getReceiverType(), kudos.getReceiverId());
 
     if (kudos.getReceiverIdentityId() == null) {
-      if (receiverObject instanceof Identity identity) {
+      if (receiverObject instanceof Identity identity && identity.isUser()) {
+        kudos.setReceiverId(identity.getRemoteId());
+        kudos.setReceiverType(USER_ACCOUNT_TYPE);
         kudos.setReceiverIdentityId(identity.getId());
+      } else if (receiverObject instanceof Identity identity && identity.isSpace()) {
+        Space space = getSpace(identity.getRemoteId());
+        kudos.setReceiverIdentityId(space.getId());
+        kudos.setReceiverId(space.getPrettyName());
+        kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
       } else if (receiverObject instanceof Space space) {
         if (canSendKudosInSpace(kudos, space, currentUser)) {
+          kudos.setReceiverId(space.getPrettyName());
           kudos.setReceiverIdentityId(space.getId());
+          kudos.setReceiverType(SPACE_ACCOUNT_TYPE);
         } else {
           throw new IllegalAccessException("User cannot redact on space");
         }
