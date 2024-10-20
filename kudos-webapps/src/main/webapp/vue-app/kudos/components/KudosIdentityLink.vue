@@ -48,7 +48,7 @@ export default {
       if (this.type === 'user' || this.type === 'organization') {
         return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.id}`;
       } else {
-        return `${eXo.env.portal.context}/g/:spaces:${this.id}/`;
+        return `${eXo.env.portal.context}/s/${this.technicalId}`;
       }
     }
   },
