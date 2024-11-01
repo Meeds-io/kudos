@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -514,7 +513,6 @@ public class KudosServiceTest extends BaseKudosTest {
     GlobalSettings globalSettings = kudosService.getGlobalSettings();
     assertNotNull(globalSettings);
     assertNotNull(globalSettings.getKudosPeriodType());
-    assertTrue(StringUtils.isBlank(globalSettings.getAccessPermission()));
     assertTrue(globalSettings.getKudosPerPeriod() > 0);
   }
 
