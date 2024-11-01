@@ -51,6 +51,7 @@
             v-if="tabName === 'sent'"
             :identity-id="identityId"
             :limit="limit"
+            :period-type="periodType"
             kudos-type="sent"
             @has-more="hasMore = $event"
             @loading="loading = $event" />
@@ -62,6 +63,7 @@
             v-if="tabName === 'received'"
             :identity-id="identityId"
             :limit="limit"
+            :period-type="periodType"
             kudos-type="received"
             @has-more="hasMore = $event"
             @loading="loading = $event" />
@@ -86,6 +88,7 @@
 export default {
   data: () => ({
     identityId: null,
+    periodType: null,
     tabName: null,
     drawer: false,
     loading: false,

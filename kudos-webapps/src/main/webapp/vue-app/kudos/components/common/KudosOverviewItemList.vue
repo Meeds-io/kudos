@@ -44,6 +44,10 @@ export default {
       type: String,
       default: null,
     },
+    periodType: {
+      type: String,
+      default: null,
+    },
     kudosType: {
       type: String,
       default: null,
