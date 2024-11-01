@@ -216,6 +216,7 @@
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
           <v-btn
+            :loading="sending"
             :disabled="sendButtonDisabled"
             :aria-label="$t('exoplatform.kudos.button.send')"
             class="btn btn-primary me-2"
@@ -263,6 +264,7 @@ export default {
       kudosToSend: null,
       kudosMessage: '',
       kudosPeriodType: '',
+      sending: false,
       loading: false,
       requiredField: false,
       identity: null,
@@ -601,6 +603,7 @@ export default {
         );
     },
     openDrawer(event) {
+      this.sending = false;
       if (!this.disabled) {
         if (this.remainingKudos > 0) {
           this.loading = true;
@@ -679,6 +682,7 @@ export default {
         spacePrettyName: (this.audience?.providerId === 'space' && this.audience?.remoteId)
           || this.spacePrettyName || null,
       };
+      this.sending = true;
       sendKudos(kudos)
         .then(kudosSent => {
           if (!kudosSent) {
@@ -713,6 +717,7 @@ export default {
           this.error = String(e);
         })
         .finally(() => {
+          window.setTimeout(() => this.sending = false, 200);
           this.$refs.drawer.endLoading();
         });
     },
