@@ -124,12 +124,6 @@ public class Utils {
       space = spaceService.getSpaceByPrettyName(id);
       if (space == null) {
         space = spaceService.getSpaceByGroupId("/spaces/" + id);
-        if (space == null) {
-          space = spaceService.getSpaceByDisplayName(id);
-          if (space == null) {
-            space = spaceService.getSpaceByUrl(id);
-          }
-        }
       }
     }
     return space;
