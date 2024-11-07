@@ -9,6 +9,7 @@
   <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
 
   <changeSet author="kudos" id="1.0.0-1">
+    <validCheckSum>ANY</validCheckSum>
     <createTable tableName="ADDONS_KUDOS">
       <column name="KUDOS_ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ADDONS_KUDOS"/>
@@ -24,7 +25,7 @@
       <column name="CREATED_DATE" type="BIGINT"/>
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci"/>
     </modifySql>
   </changeSet>
 
@@ -99,6 +100,11 @@
 
   <changeSet author="kudos" id="1.0.0-9" dbms="hsqldb">
     <createSequence sequenceName="SEQ_ADDONS_KUDOS_ID" startValue="1"/>
+  </changeSet>
+  <changeSet author="kudos" id="1.0.0-10" >
+    <sql dbms="mysql">
+      ALTER TABLE ADDONS_KUDOS CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+    </sql>
   </changeSet>
 
 </databaseChangeLog>
