@@ -19,6 +19,7 @@
  */
 package io.meeds.test.kudos.mock;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -70,7 +71,6 @@ public class SpaceServiceMock implements SpaceService {
     return space != null && redactor != null && StringUtils.equals(username, redactor);
   }
 
-  @Override
   public boolean canViewSpace(Space space, String username) {
     return space != null && member != null && StringUtils.equals(username, member);
   }
@@ -79,4 +79,13 @@ public class SpaceServiceMock implements SpaceService {
     return false;
   }
 
+  public List<String> findExternalInvitationsSpacesByEmail(String email) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public void deleteExternalUserInvitations(String email) {
+    //
+  }
+  
 }

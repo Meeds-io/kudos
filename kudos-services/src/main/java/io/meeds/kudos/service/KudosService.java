@@ -35,26 +35,22 @@ import static io.meeds.kudos.service.utils.Utils.getSpace;
 import static io.meeds.kudos.service.utils.Utils.timeFromSeconds;
 import static io.meeds.kudos.service.utils.Utils.timeToSeconds;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.services.listener.ListenerService;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
-import org.exoplatform.services.rpc.RPCService;
-import org.exoplatform.services.rpc.RemoteCommand;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -72,7 +68,6 @@ import io.meeds.kudos.model.KudosPeriodType;
 import io.meeds.kudos.model.exception.KudosAlreadyLinkedException;
 import io.meeds.kudos.storage.KudosStorage;
 
-import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 
 /**
@@ -80,12 +75,6 @@ import lombok.SneakyThrows;
  */
 @Service
 public class KudosService {
-
-  private static final Log    LOG                             = ExoLogger.getLogger(KudosService.class);
-
-  private static final String CLUSTER_GLOBAL_SETTINGS_UPDATED = "KudosService-GlobalSettings-Updated";
-
-  private static final String CLUSTER_NODE_ID                 = UUID.randomUUID().toString();
 
   @Autowired
   private ActivityManager     activityManager;
@@ -105,11 +94,6 @@ public class KudosService {
   @Autowired
   private SettingService      settingService;
 
-  @Autowired(required = false)
-  private RPCService          rpcService;
-
-  private GlobalSettings      globalSettings;
-
   @Value("${kudos.defaultAccessPermission:}") // NOSONAR
   private String              defaultAccessPermission;
 
@@ -117,30 +101,16 @@ public class KudosService {
   private long                defaultKudosPerPeriod;
 
   /**
-   * The generic command used to replicate changes over the cluster
-   */
-  private RemoteCommand       reloadSettingsCommand;
-
-  @PostConstruct
-  public void init() {
-    GlobalSettings loadedGlobalSettings = loadGlobalSettings();
-    if (loadedGlobalSettings == null) {
-      this.globalSettings = new GlobalSettings();
-      this.globalSettings.setKudosPerPeriod(defaultKudosPerPeriod);
-    } else {
-      this.globalSettings = loadedGlobalSettings;
-    }
-    installClusterListener();
-  }
-
-  /**
    * @return {@link GlobalSettings} of Kudos module
    */
+  @Cacheable("Kudos.globalSettings")
   public GlobalSettings getGlobalSettings() {
-    if (this.globalSettings == null) {
-      this.globalSettings = loadGlobalSettings();
+    SettingValue<?> globalSettingsValue = settingService.get(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME);
+    if (globalSettingsValue == null || StringUtils.isBlank(globalSettingsValue.getValue().toString())) {
+      return new GlobalSettings(defaultKudosPerPeriod, KudosPeriodType.DEFAULT);
+    } else {
+      return GlobalSettings.parseStringToObject(globalSettingsValue.getValue().toString());
     }
-    return this.globalSettings;
   }
 
   /**
@@ -148,10 +118,9 @@ public class KudosService {
    * 
    * @param settings {@link GlobalSettings}
    */
+  @CacheEvict(cacheNames = "Kudos.globalSettings", allEntries = true)
   public void saveGlobalSettings(GlobalSettings settings) {
     settingService.set(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME, SettingValue.create(settings.toStringToPersist()));
-    this.globalSettings = null;
-    clearCacheClusterWide();
   }
 
   /**
@@ -613,46 +582,6 @@ public class KudosService {
   private long getAllowedKudosPerPeriod() {
     GlobalSettings storedGlobalSettings = getGlobalSettings();
     return storedGlobalSettings == null ? 0 : storedGlobalSettings.getKudosPerPeriod();
-  }
-
-  private GlobalSettings loadGlobalSettings() {
-    SettingValue<?> globalSettingsValue = settingService.get(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME);
-    if (globalSettingsValue == null || StringUtils.isBlank(globalSettingsValue.getValue().toString())) {
-      return null;
-    } else {
-      return GlobalSettings.parseStringToObject(globalSettingsValue.getValue().toString());
-    }
-  }
-
-  private void installClusterListener() {
-    if (rpcService != null) {
-      // Clear global settings in current node
-      // to force reload it from store
-      // if another cluster node had changed
-      // the settings
-      this.reloadSettingsCommand = rpcService.registerCommand(new RemoteCommand() {
-        public String getId() {
-          return CLUSTER_GLOBAL_SETTINGS_UPDATED;
-        }
-
-        public Serializable execute(Serializable[] args) throws Throwable {
-          if (!CLUSTER_NODE_ID.equals(args[0])) {
-            KudosService.this.globalSettings = null;
-          }
-          return true;
-        }
-      });
-    }
-  }
-
-  private void clearCacheClusterWide() {
-    if (this.reloadSettingsCommand != null) {
-      try {
-        rpcService.executeCommandOnAllNodes(this.reloadSettingsCommand, false, CLUSTER_NODE_ID);
-      } catch (Exception e) {
-        LOG.warn("An error occurred while clearing global settings cache on other nodes", e);
-      }
-    }
   }
 
 }
