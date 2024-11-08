@@ -262,8 +262,7 @@ public class Utils {
   public static KudosPeriodType getPeriodType(GlobalSettings globalSettings) {
     KudosPeriodType kudosPeriodType = null;
     if (globalSettings == null || globalSettings.getKudosPeriodType() == null) {
-      LOG.warn("Provided globalSettings doesn't have a parametred kudos period type, using MONTH period type: " + globalSettings,
-               new RuntimeException());
+      LOG.warn("Provided globalSettings doesn't have a parametred kudos period type, using MONTH period type: {}", globalSettings);
       kudosPeriodType = KudosPeriodType.DEFAULT;
     } else {
       kudosPeriodType = globalSettings.getKudosPeriodType();
