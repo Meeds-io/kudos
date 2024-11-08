@@ -389,7 +389,7 @@ public class KudosServiceTest extends BaseKudosTest {
     kudosToSend.setReceiverId("space2");
     assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
 
-    kudosToSend.setReceiverId("NotFoundSpace");
+    kudosToSend.setReceiverId("NotFoundSpace0");
     assertThrows(IllegalAccessException.class, () -> kudosService.createKudos(kudosToSend, SENDER_REMOTE_ID));
 
     kudosToSend.setReceiverId(spaceRemoteId);
