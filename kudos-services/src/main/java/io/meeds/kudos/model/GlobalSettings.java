@@ -31,6 +31,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GlobalSettings implements Cloneable {
+
   private static final String END_PERIOD_DATE_IN_SECONDS_PARAM   = "endPeriodDateInSeconds";
 
   private static final String START_PERIOD_DATE_IN_SECONDS_PARAM = "startPeriodDateInSeconds";
@@ -39,10 +40,6 @@ public class GlobalSettings implements Cloneable {
 
   private static final String KUDOS_PER_PERIOD_PARAM             = "kudosPerPeriod";
 
-  private static final String ACCESS_PERMISSION_PARAM            = "accessPermission";
-
-  String                      accessPermission;
-
   long                        kudosPerPeriod;
 
   KudosPeriodType             kudosPeriodType                    = KudosPeriodType.DEFAULT;
@@ -50,9 +47,6 @@ public class GlobalSettings implements Cloneable {
   public JSONObject toJSONObject(boolean includeTransient) {
     JSONObject jsonObject = new JSONObject();
     try {
-      if (accessPermission != null) {
-        jsonObject.put(ACCESS_PERMISSION_PARAM, accessPermission);
-      }
       jsonObject.put(KUDOS_PER_PERIOD_PARAM, kudosPerPeriod);
       jsonObject.put(KUDOS_PERIOD_TYPE_PARAM, kudosPeriodType.name());
       if (includeTransient) {
@@ -96,10 +90,7 @@ public class GlobalSettings implements Cloneable {
 
   @Override
   public GlobalSettings clone() { // NOSONAR
-    try {
-      return (GlobalSettings) super.clone();
-    } catch (CloneNotSupportedException e) {
-      return new GlobalSettings(accessPermission, kudosPerPeriod, kudosPeriodType);
-    }
+    return new GlobalSettings(kudosPerPeriod, kudosPeriodType);
   }
+
 }
