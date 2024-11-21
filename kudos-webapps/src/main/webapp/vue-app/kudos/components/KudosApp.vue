@@ -90,6 +90,7 @@
             <div v-if="audienceTypesDisplay" class="pt-4">
               <span class="subtitle-1 text-color"> {{ $t('exoplatform.kudos.visibility.title') }} </span>
               <v-radio-group
+                v-if="postToNetwork"
                 v-model="audienceChoice"
                 class="mt-0 mb-7"
                 mandatory>
@@ -276,7 +277,8 @@ export default {
       username: eXo.env.portal.userName,
       spaceId: eXo.env.portal.spaceId,
       spacePrettyName: eXo.env.portal.spaceName,
-      audienceChoice: null,
+      postToNetwork: eXo.env.portal.postToNetworkEnabled,
+      audienceChoice: eXo.env.portal.postToNetworkEnabled && 'yourNetwork' ||  'oneOfYourSpaces',
       space: null,
       noReceiverIdentityId: false
     };
@@ -453,7 +455,7 @@ export default {
       return this.audienceChoice === 'yourNetwork';
     },
     spaceSuggesterDisplay() {
-      return this.postInYourSpacesChoice && !this.audience;
+      return (this.postToNetwork && this.postInYourSpacesChoice && !this.spaceId) || !this.postToNetwork ;
     },
     audienceAvatarDisplay() {
       return (this.audience && this.postInYourSpacesChoice) || this.readOnlySpace;
