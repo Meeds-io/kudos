@@ -73,6 +73,10 @@ export default {
       type: Object,
       default: null,
     },
+    isMobile: {
+      type: Boolean,
+      default: () => false
+    },
   },
   data: () => ({
     linkedKudosList: [],
@@ -136,9 +140,6 @@ export default {
         return activityOwnerId === this.userIdentityId || this.isActivityOwner || (this.sharedInSpace && !this.activity.owner.isMember);
       }
       return false;
-    },
-    isMobile() {
-      return this.$vuetify.breakpoint.name === 'sm' || this.$vuetify.breakpoint.name === 'xs';
     },
   },
   created() {
