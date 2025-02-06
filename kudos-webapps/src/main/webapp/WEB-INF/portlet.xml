@@ -25,10 +25,6 @@
        <value>SHARED/kudos</value>
      </init-param>
      <init-param>
-       <name>preload.resource.rest</name>
-       <value><![CDATA[/kudos/rest/account/settings,/kudos/rest/settings]]></value>
-     </init-param>
-     <init-param>
        <name>layout-css-class</name>
        <value>no-layout-style</value>
      </init-param>
