@@ -245,6 +245,7 @@ export default {
       ignoreRefresh: false,
       kudosList: false,
       disabled: false,
+      initialized: false,
       noKudosLeft: false,
       remainingKudos: 0,
       remainingDaysToReset: 0,
@@ -346,18 +347,6 @@ export default {
       if (newVal === 'USER_TIPTIP' || newVal === 'USER_PROFILE') {
         this.spaceId = null;
       }
-    }
-  },
-  created() {
-    if (eXo?.env?.portal?.userName) {
-      this.init()
-        .then(() => {
-          if (this.disabled) {
-            return;
-          }
-          this.$refs.kudosAPI.init();
-          document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
-        });
     }
   },
   computed: {
@@ -473,27 +462,35 @@ export default {
       return this.drawer && this.$refs.kudosContent || null;
     },
   },
+  created() {
+    if (eXo?.env?.portal?.userName) {
+      document.addEventListener('exo-kudos-open-send-modal', this.openDrawer);
+    }
+  },
   methods: {
-    init() {
-      return initSettings()
-        .then(() => {
-          this.disabled = window.kudosSettings && window.kudosSettings.disabled;
+    async init() {
+      try {
+        await initSettings();
+        this.disabled = window.kudosSettings && window.kudosSettings.disabled;
+        if (!this.disabled) {
           this.numberOfKudosAllowed = Number(window.kudosSettings && window.kudosSettings.kudosPerPeriod);
           this.remainingKudos = Number(window.kudosSettings && window.kudosSettings.remainingKudos);
           this.kudosPeriodType = window.kudosSettings && window.kudosSettings.kudosPeriodType.toLowerCase();
-        })
-        .then(() => {
           const remainingDaysToReset = Number(this.getRemainingDays());
           this.remainingDaysToReset = remainingDaysToReset ? remainingDaysToReset : 0;
 
           // Get Kudos in an async way
           const limit = Math.max(20, window.kudosSettings.kudosPerPeriod);
-          getKudosSent(this.currentUserId, limit)
-            .then(allKudos => {
-              this.allKudosSent = allKudos && allKudos.kudos || [];
-            });
-        })
-        .catch(e => console.debug(e));
+          const allKudos = await getKudosSent(this.currentUserId, limit);
+          this.allKudosSent = allKudos && allKudos.kudos || [];
+          if (!this.initialized) {
+            this.$refs.kudosAPI.init();
+            this.initialized = true;
+          }
+        }
+      } catch (e) {
+        console.debug(e);
+      }
     },
     closeDrawer() {
       this.resetAudienceChoice();
@@ -604,8 +601,11 @@ export default {
         .finally(() =>  this.$refs.drawer.endLoading()
         );
     },
-    openDrawer(event) {
+    async openDrawer(event) {
       this.sending = false;
+      if (!this.initialized) {
+        await this.init();
+      }
       if (!this.disabled) {
         if (this.remainingKudos > 0) {
           this.loading = true;
