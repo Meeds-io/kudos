@@ -35,6 +35,7 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.TimeConvertUtils;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.social.common.xmlprocessor.XMLProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -47,7 +48,6 @@ import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.social.notification.Utils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
-import org.exoplatform.webui.utils.TimeConvertUtils;
 
 public class KudosTemplateBuilder extends AbstractTemplateBuilder {
 
