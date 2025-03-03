@@ -11,6 +11,7 @@ const config = {
     engagementCenterExtensions: './src/main/webapp/vue-app/engagementCenterExtensions/extensions.js',
     connectorEventExtensions: './src/main/webapp/vue-app/connectorEventExtensions/extensions.js',
     notificationExtension: './src/main/webapp/vue-app/notification-extension/main.js',
+    kudosQuickAction: './src/main/webapp/vue-app/quick-actions/main.js',
   },
   module: {
     rules: [
