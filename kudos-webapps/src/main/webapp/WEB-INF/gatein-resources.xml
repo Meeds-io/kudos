@@ -215,4 +215,15 @@
     </depends>
   </module>
 
+  <module>
+    <name>kudosQuickActionExtension</name>
+    <load-group>QuickActionsGrp</load-group>
+    <script>
+      <path>/js/kudosQuickAction.bundle.js</path>
+    </script>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
+
 </gatein-resources>

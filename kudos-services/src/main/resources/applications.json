@@ -1,0 +1,26 @@
+{
+    "descriptors": [
+        {
+            "name": "sendKudos",
+            "overrideMode": "merge",
+            "override": false,
+            "enabled": true,
+            "application": {
+                "title": "Give a Kudos",
+                "description": "Send a kudos to congratulate others",
+                "icon": "fa-award",
+                "type": "DRAWER",
+                "url": "kudos",
+                "mandatory": false,
+                "active": true,
+                "mobile": true,
+                "default": true,
+                "pwa": false,
+                "permissions": [
+                    "*:/platform/users",
+                    "*:/platform/externals"
+                ]
+            }
+        }
+    ]
+}
