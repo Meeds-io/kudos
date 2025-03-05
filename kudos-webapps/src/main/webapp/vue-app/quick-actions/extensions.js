@@ -22,5 +22,14 @@ extensionRegistry.registerExtension('QuickAction', 'Extension', {
   icon: 'fa-award',
   name: 'quickActions.kudos.name',
   description: 'quickActions.kudos.description',
-  keystroke: 'k',
+  click: () => new Promise(resolve => {
+    window.require(['SHARED/kudos'], () => {
+      document.dispatchEvent(new CustomEvent('exo-kudos-open-send-modal', {detail: {
+        type: 'USER_PROFILE',
+        parentId: '',
+        owner: eXo.env.portal.userName,
+      }}));
+      resolve();
+    });
+  }),
 });
