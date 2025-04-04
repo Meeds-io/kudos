@@ -452,7 +452,7 @@ export default {
     audienceTypesDisplay() {
       return (!this.spaceId && !this.isLinkedKudos)
         || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos)
-        || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience)
+        || (!this.readOnlySpace  && this.postInYourSpacesChoice && this.spaceId)
         || (!this.isLinkedKudos && !this.noReceiverIdentityId && !this.audienceAvatarDisplay);
     },
     displaySenderAvatar() {
