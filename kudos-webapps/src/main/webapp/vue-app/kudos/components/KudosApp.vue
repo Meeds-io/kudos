@@ -395,7 +395,7 @@ export default {
     sendButtonDisabled() {
       return !this.kudosMessageText|| this.kudosMessageTextLength > this.MESSAGE_MAX_LENGTH
         || this.kudosMessageValidityLabel
-        || (this.postInYourSpacesChoice && !this.audience)
+        || (this.postInYourSpacesChoice && this.spaceId && !this.audience)
         || (this.noReceiverIdentityId && !this.selectedReceiver);
     },
     remainingPeriodLabel() {
@@ -452,7 +452,7 @@ export default {
     audienceTypesDisplay() {
       return (!this.spaceId && !this.isLinkedKudos)
         || (!this.spaceId && !this.readOnlySpace && !this.isLinkedKudos)
-        || (!this.readOnlySpace  && this.postInYourSpacesChoice && !this.audience)
+        || (!this.readOnlySpace  && this.postInYourSpacesChoice && this.spaceId && !this.audience)
         || (!this.isLinkedKudos && !this.noReceiverIdentityId && !this.audienceAvatarDisplay);
     },
     displaySenderAvatar() {
