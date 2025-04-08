@@ -75,4 +75,14 @@ files: [
     "escape_special_characters": 0,
     "escape_quotes" : 0,
   },
+  {
+    "source" : "/kudos-services/src/main/resources/locale/addon/appcenter_en.properties",
+
+    "translation" : "%original_path%/%file_name%!_%locale_with_underscore%.%file_extension%",
+    "translation_replace" : {YML_CROWDIN_LANGUAGES_ARG},
+    "dest" : "hub/kudos/appcenter.properties",
+    "update_option" : "update_as_unapproved",
+    "escape_special_characters": 0,
+    "escape_quotes" : 0,
+  },
 ]
