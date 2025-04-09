@@ -4,12 +4,12 @@
   <parent>
     <artifactId>addons-parent-pom</artifactId>
     <groupId>io.meeds.addons</groupId>
-    <version>18-M06</version>
+    <version>18</version>
     <relativePath />
   </parent>
   <groupId>io.meeds.kudos</groupId>
   <artifactId>kudos</artifactId>
-  <version>7.0.0-M38</version>
+  <version>7.0.x-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Meeds:: Add-on:: Kudos - Parent POM</name>
   <description>Meeds Kudos Addon</description>
@@ -22,13 +22,13 @@
     <connection>scm:git:git://github.com/exoplatform/kudos.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/exoplatform/kudos.git</developerConnection>
     <url>https://github.com/exoplatform/kudos</url>
-    <tag>7.0.0-M38</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <!-- 3rd party libraries versions -->
-    <io.meeds.social.version>7.0.0-M38</io.meeds.social.version>
-    <io.meeds.platform-ui.version>7.0.0-M38</io.meeds.platform-ui.version>
-    <addon.meeds.analytics.version>7.0.0-M38</addon.meeds.analytics.version>
+    <io.meeds.social.version>7.0.x-SNAPSHOT</io.meeds.social.version>
+    <io.meeds.platform-ui.version>7.0.x-SNAPSHOT</io.meeds.platform-ui.version>
+    <addon.meeds.analytics.version>7.0.x-SNAPSHOT</addon.meeds.analytics.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
