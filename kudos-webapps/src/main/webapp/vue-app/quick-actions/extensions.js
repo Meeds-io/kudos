@@ -33,3 +33,56 @@ extensionRegistry.registerExtension('QuickAction', 'Extension', {
     });
   }),
 });
+
+extensionRegistry.registerExtension('QuickAction', 'Extension', {
+  id: 'kudosList',
+  icon: 'fa-award',
+  name: 'quickActions.kudosList.name',
+  description: 'quickActions.kudosList.description',
+  click: () => new Promise(resolve => {
+    window.require(['SHARED/eXoVueI18n', 'PORTLET/gamification-portlets/myContributions'], exoi18n => initKudosListDrawer(exoi18n, resolve));
+  }),
+});
+
+async function initKudosListDrawer(exoi18n, callback) {
+  const appId = 'achievments-quick-action';
+  if (!document.querySelector(`#${appId}`)) {
+    const parent = document.createElement('div');
+    parent.id = appId;
+    document.querySelector('#vuetify-apps').appendChild(parent);
+    await initKudosListDrawerApp(appId, exoi18n);
+    await Vue.prototype.$utils.importSkin('portal', 'kudos');
+  }
+  document.dispatchEvent(new CustomEvent('quick-action-kudos-list-drawer'));
+  callback();
+}
+
+function initKudosListDrawerApp(appId, exoi18n) {
+  const lang = eXo.env.portal.language;
+  const url = `/kudos/i18n/locale.addon.Kudos?lang=${lang}`;
+  return new Promise(resolve => exoi18n.loadLanguageAsync(lang, url)
+    .then(i18n => Vue.createApp({
+      template: `
+        <kudos-overview-drawer
+          id="${appId}"
+          ref="drawer" />
+      `,
+      created() {
+        document.addEventListener('quick-action-kudos-list-drawer', this.openDrawer);
+      },
+      mounted() {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+        resolve();
+      },
+      beforeDestroy() {
+        document.removeEventListener('quick-action-kudos-list-drawer', this.openDrawer);
+      },
+      methods: {
+        openDrawer() {
+          this.$refs.drawer.open('sent', eXo.env.portal.userIdentityId);
+        },
+      },
+      vuetify: Vue.prototype.vuetifyOptions,
+      i18n,
+    }, `#${appId}`, 'Kudos List Quick Action')));
+}
