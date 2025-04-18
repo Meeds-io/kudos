@@ -15,6 +15,7 @@
                 "active": true,
                 "mobile": true,
                 "default": true,
+                "shortcut": "k",
                 "pwa": false,
                 "permissions": [
                     "*:/platform/users",
