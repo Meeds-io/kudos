@@ -17,6 +17,7 @@
                 "default": true,
                 "shortcut": "k",
                 "pwa": false,
+                "order": 30,
                 "permissions": [
                     "*:/platform/users",
                     "*:/platform/externals"
