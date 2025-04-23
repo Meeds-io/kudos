@@ -7,7 +7,6 @@
             "enabled": true,
             "application": {
                 "title": "Give a Kudos",
-                "description": "Send a kudos to congratulate others",
                 "icon": "fa-award",
                 "type": "DRAWER",
                 "url": "kudos",
