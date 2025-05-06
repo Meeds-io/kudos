@@ -13,6 +13,7 @@
             :class="textColorClass"
             :x-small="isComment"
             :small="!isComment"
+            :aria-label="$t('kudos.aria.kudos')"
             class="pa-0 mt-0"
             text
             link
