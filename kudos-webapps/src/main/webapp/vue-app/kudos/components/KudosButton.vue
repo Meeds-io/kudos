@@ -6,13 +6,18 @@
       <template #activator="{ on, attrs }">
         <div
           class="d-flex"
-          v-bind="attrs"
+          v-bind="{
+              ...attrs,
+              role: null,
+              'aria-haspopup': null,
+              'aria-expanded': null}"
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
             :class="textColorClass"
             :x-small="isComment"
             :small="!isComment"
+            :aria-label="hasSentKudos ? $t('kudos.aria.kudos'): $t('exoplatform.kudos.label.kudos')"
             class="pa-0 mt-0"
             text
             link
