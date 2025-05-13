@@ -32,7 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -65,6 +67,7 @@ import io.meeds.test.kudos.mock.SpaceServiceMock;
 import lombok.SneakyThrows;
 
 @SpringJUnitConfig(BaseKudosTest.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class KudosServiceTest extends BaseKudosTest {
 
   private static final String ENTITY_TYPE        = KudosEntityType.USER_TIPTIP.name();
@@ -621,9 +624,10 @@ public class KudosServiceTest extends BaseKudosTest {
     Kudos kudos = newKudosDTO();
     kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
+    assertTrue(kudos.getActivityId() > 0l);
 
     kudos = kudosStorage.getKudoById(kudos.getTechnicalId());
-    assertTrue(kudos.getActivityId() > 0);
+    assertTrue(kudos.getActivityId() > 0l);
 
     // Wait async listener gets invoked
     int i = 0;
@@ -683,7 +687,7 @@ public class KudosServiceTest extends BaseKudosTest {
 
     try {
       kudosService.getKudosListOfActivity(activity.getId(),
-                                          new org.exoplatform.services.security.Identity("root4"));
+                                          new org.exoplatform.services.security.Identity(SENDER_REMOTE_ID));
       fail();
     } catch (IllegalAccessException e) {
       // Expected
@@ -694,8 +698,8 @@ public class KudosServiceTest extends BaseKudosTest {
 
     assertNotNull(kudosList);
     assertEquals(2, kudosList.size());
-    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == parentKudos.getTechnicalId()));
-    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == childKudos.getTechnicalId()));
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == parentKudos.getTechnicalId()));// NOSONAR
+    assertTrue(kudosList.stream().anyMatch(kudos -> kudos.getTechnicalId() == childKudos.getTechnicalId()));// NOSONAR
 
     ExoSocialActivity comment = new ExoSocialActivityImpl();
     comment.setUserId("root,root4");
@@ -740,10 +744,10 @@ public class KudosServiceTest extends BaseKudosTest {
     kudos = kudosService.createKudos(kudos, SENDER_REMOTE_ID);
     long kudosId = kudos.getTechnicalId();
 
-    assertThrows(IllegalArgumentException.class, () -> kudosService.deleteKudosById(0, "root4"));
-    assertThrows(ObjectNotFoundException.class, () -> kudosService.deleteKudosById(100, "root4"));
+    assertThrows(IllegalArgumentException.class, () -> kudosService.deleteKudosById(0, SENDER_REMOTE_ID));
+    assertThrows(ObjectNotFoundException.class, () -> kudosService.deleteKudosById(100, SENDER_REMOTE_ID));
     assertThrows(IllegalAccessException.class, () -> kudosService.deleteKudosById(kudosId, "root3"));
-    kudosService.deleteKudosById(kudosId, "root4");
+    kudosService.deleteKudosById(kudosId, SENDER_REMOTE_ID);
     Kudos kudos1 = kudosStorage.getKudoById(kudos.getTechnicalId());
     assertNull(kudos1);
   }

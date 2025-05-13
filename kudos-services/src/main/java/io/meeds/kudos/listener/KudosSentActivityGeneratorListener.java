@@ -19,7 +19,11 @@
  */
 package io.meeds.kudos.listener;
 
+import static io.meeds.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
+import static io.meeds.kudos.service.utils.Utils.KUDOS_SENT_EVENT;
 import static io.meeds.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
+import static io.meeds.kudos.service.utils.Utils.computeKudosActivityProperties;
+import static io.meeds.kudos.service.utils.Utils.getActivityId;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +40,9 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.core.storage.cache.CachedActivityStorage;
-import org.exoplatform.social.notification.Utils;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.model.KudosEntityType;
@@ -60,11 +64,14 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
   private ActivityManager  activityManager;
 
   @Autowired
+  private IdentityManager  identityManager;
+
+  @Autowired
   private ListenerService  listenerService;
 
   @PostConstruct
   public void init() {
-    listenerService.addListener("exo.kudos.sent", this);
+    listenerService.addListener(KUDOS_SENT_EVENT, this);
   }
 
   @Override
@@ -95,9 +102,9 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
         }
         ExoSocialActivity activityComment = createActivity(kudos, parentCommentId);
         activityManager.saveComment(activity, activityComment);
-        long commentId = io.meeds.kudos.service.utils.Utils.getActivityId(activityComment.getId());
+        long commentId = getActivityId(activityComment.getId());
         kudos.setActivityId(commentId);
-        kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), kudos.getActivityId());
+        kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(), commentId);
 
         clearActivityCached(activity.getId());
         clearActivityCached(activityComment.getId());
@@ -116,13 +123,13 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
         }
       }
 
-      Identity owner = Utils.getIdentityManager().getOrCreateIdentity(providerId, remoteId);
+      Identity owner = identityManager.getOrCreateIdentity(providerId, remoteId);
       if (owner == null) {
         LOG.warn("Can't find receiver identity with type/id", kudos.getReceiverType(), remoteId);
       } else {
         activityManager.saveActivityNoReturn(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(),
-                                                    io.meeds.kudos.service.utils.Utils.getActivityId(activity.getId()));
+                                                    getActivityId(activity.getId()));
         clearActivityCached(activity.getId());
       }
     }
@@ -131,11 +138,11 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
   private ExoSocialActivity createActivity(Kudos kudos, String parentCommentId) {
     ExoSocialActivityImpl activity = new ExoSocialActivityImpl();
     activity.setParentCommentId(parentCommentId);
-    activity.setType(io.meeds.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE);
+    activity.setType(KUDOS_ACTIVITY_COMMENT_TYPE);
     activity.setTitle(kudos.getMessage());
     activity.setBody("Kudos to " + kudos.getReceiverFullName());
     activity.setUserId(kudos.getSenderIdentityId());
-    io.meeds.kudos.service.utils.Utils.computeKudosActivityProperties(activity, kudos);
+    computeKudosActivityProperties(activity, kudos);
     return activity;
   }
 

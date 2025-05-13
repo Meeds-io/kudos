@@ -190,6 +190,7 @@
                 :object-id="metadataObjectId"
                 :object-type="objectType"
                 class="flex"
+                content-link-enabled
                 autofocus />
             </div>
             <div v-if="kudosMessageValidityLabel" class="d-flex flex-row pt-3">
