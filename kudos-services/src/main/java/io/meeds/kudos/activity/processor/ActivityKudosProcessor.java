@@ -26,14 +26,13 @@ import org.springframework.stereotype.Component;
 
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.social.core.BaseActivityProcessorPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
-import org.exoplatform.social.core.utils.MentionUtils;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.service.KudosService;
+import io.meeds.kudos.service.utils.Utils;
 
 import jakarta.annotation.PostConstruct;
 
@@ -44,12 +43,7 @@ public class ActivityKudosProcessor extends BaseActivityProcessorPlugin {
   private ActivityManager         activityManager;
 
   @Autowired
-  private UserPortalConfigService userPortalConfigService;
-
-  @Autowired
   private KudosService            kudosService;
-
-  private String                  defaultPortal;
 
   public ActivityKudosProcessor() {
     super(initParams());
@@ -62,7 +56,6 @@ public class ActivityKudosProcessor extends BaseActivityProcessorPlugin {
 
   @PostConstruct
   public void init() {
-    defaultPortal = userPortalConfigService.getMetaPortal();
     activityManager.addProcessor(this);
   }
 
@@ -83,7 +76,7 @@ public class ActivityKudosProcessor extends BaseActivityProcessorPlugin {
 
     if (linkedKudosList != null) {
       for (Kudos kudos : linkedKudosList) {
-        kudos.setMessage(MentionUtils.substituteUsernames(defaultPortal, kudos.getMessage()));
+        Utils.transformKudosMessage(kudos);
       }
     }
   }

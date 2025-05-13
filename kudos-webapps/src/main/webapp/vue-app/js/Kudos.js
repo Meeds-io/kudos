@@ -324,7 +324,7 @@ export function registerActivityActionExtension() {
       getSourceLink: () => '#',
       getActivityType: () => 'kudos',
       getTitle: activityOrComment => {
-        const kudos = activityOrComment && activityOrComment.kudos;
+        const kudos = activityOrComment?.kudos;
         if (kudos) {
           const receiverIdentity = kudos.receiverType === 'user' && {
             id: kudos.receiverIdentityId,
