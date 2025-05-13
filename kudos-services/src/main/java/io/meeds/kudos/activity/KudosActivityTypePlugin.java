@@ -29,7 +29,6 @@ import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.social.core.ActivityTypePlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
-import org.exoplatform.social.core.utils.MentionUtils;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.service.KudosService;
@@ -71,7 +70,8 @@ public class KudosActivityTypePlugin extends ActivityTypePlugin {
   @Override
   public String getActivityTitle(ExoSocialActivity activity) {
     Kudos kudos = this.kudosService.getKudosByActivityId(Long.parseLong(activity.getId().replace("comment", "")));
-    return kudos == null ? activity.getTitle() : MentionUtils.substituteUsernames(kudos.getMessage());
+    Utils.transformKudosMessage(kudos);
+    return kudos == null ? activity.getTitle() : kudos.getMessage();
   }
 
   private static InitParams initParams() {
