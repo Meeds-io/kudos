@@ -145,7 +145,7 @@ public class KudosService {
    * @throws IllegalAccessException when receiver or sender aren't allowed.
    */
   @SneakyThrows
-  public Kudos createKudos(Kudos kudos, String currentUser) throws IllegalAccessException {
+  public Kudos createKudos(Kudos kudos, String currentUser) throws IllegalAccessException { // NOSONAR
     if (!StringUtils.equals(currentUser, kudos.getSenderId())) {
       throw new IllegalAccessException("User with id '" + currentUser + "' is not authorized to send kudos on behalf of " +
           kudos.getSenderId());
@@ -462,7 +462,7 @@ public class KudosService {
                                             long startDateInSeconds,
                                             long endDateInSeconds) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
+    Identity identity = identityManager.getIdentity(identityId);
     if (identity == null) {
       return 0;
     }
@@ -497,7 +497,7 @@ public class KudosService {
                                                  long endDateInSeconds,
                                                  int limit) {
     KudosPeriod kudosPeriod = new KudosPeriod(startDateInSeconds, endDateInSeconds);
-    Identity identity = identityManager.getIdentity(String.valueOf(identityId));
+    Identity identity = identityManager.getIdentity(identityId);
     if (identity == null) {
       return Collections.emptyList();
     }

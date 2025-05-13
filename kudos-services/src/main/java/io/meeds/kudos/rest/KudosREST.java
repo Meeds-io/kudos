@@ -23,7 +23,6 @@ import static io.meeds.kudos.service.utils.Utils.getCurrentUserId;
 import static io.meeds.kudos.service.utils.Utils.timeFromSeconds;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,11 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.portal.application.localization.LocalizationFilter;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.utils.MentionUtils;
 
 import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.model.KudosList;
@@ -52,6 +49,7 @@ import io.meeds.kudos.model.KudosPeriod;
 import io.meeds.kudos.model.KudosPeriodType;
 import io.meeds.kudos.model.exception.KudosAlreadyLinkedException;
 import io.meeds.kudos.service.KudosService;
+import io.meeds.kudos.service.utils.Utils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -92,7 +90,7 @@ public class KudosREST {
       dateInSeconds = System.currentTimeMillis() / 1000;
     }
     List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriodOfDate(dateInSeconds, getLimit(limit));
-    translateRoleMentions(allKudosByPeriod.toArray(new Kudos[0]));
+    transformKudos(allKudosByPeriod.toArray(new Kudos[0]));
     return allKudosByPeriod;
   }
 
@@ -117,7 +115,7 @@ public class KudosREST {
                                     @RequestParam(name = "limit", required = false, defaultValue = "10")
                                     int limit) {
     List<Kudos> allKudosByEntity = kudosService.getKudosByEntity(entityType, entityId, getLimit(limit));
-    translateRoleMentions(allKudosByEntity.toArray(new Kudos[0]));
+    transformKudos(allKudosByEntity.toArray(new Kudos[0]));
     return allKudosByEntity;
   }
 
@@ -137,7 +135,7 @@ public class KudosREST {
                                     String activityId) {
     try {
       Kudos kudos = kudosService.getKudosByActivityId(getActivityId(activityId), getCurrentIdentity());
-      translateRoleMentions(kudos);
+      transformKudos(kudos);
       return kudos;
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -163,7 +161,7 @@ public class KudosREST {
     org.exoplatform.services.security.Identity currentUser = getCurrentIdentity();
     try {
       List<Kudos> kudosList = kudosService.getKudosListOfActivity(activityId, currentUser);
-      translateRoleMentions(kudosList.toArray(new Kudos[0]));
+      transformKudos(kudosList.toArray(new Kudos[0]));
       return kudosList;
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -214,7 +212,7 @@ public class KudosREST {
                                      @RequestParam(name = "limit", required = false, defaultValue = "10")
                                      int limit) {
     List<Kudos> allKudosByPeriod = kudosService.getKudosByPeriod(startDateInSeconds, endDateInSeconds, getLimit(limit));
-    translateRoleMentions(allKudosByPeriod.toArray(new Kudos[0]));
+    transformKudos(allKudosByPeriod.toArray(new Kudos[0]));
     return allKudosByPeriod;
   }
 
@@ -264,7 +262,7 @@ public class KudosREST {
                                                                  period.getStartDateInSeconds(),
                                                                  period.getEndDateInSeconds(),
                                                                  getLimit(limit));
-    translateRoleMentions(kudos.toArray(new Kudos[0]));
+    transformKudos(kudos.toArray(new Kudos[0]));
     kudosList.setKudos(kudos);
     return kudosList;
   }
@@ -312,7 +310,7 @@ public class KudosREST {
                                                                period.getStartDateInSeconds(),
                                                                period.getEndDateInSeconds(),
                                                                getLimit(limit));
-    translateRoleMentions(kudos.toArray(new Kudos[0]));
+    transformKudos(kudos.toArray(new Kudos[0]));
     kudosList.setKudos(kudos);
     return kudosList;
   }
@@ -342,7 +340,7 @@ public class KudosREST {
     try {
       kudos.setSenderId(getCurrentUserId());
       Kudos kudosSent = kudosService.createKudos(kudos, getCurrentUserId());
-      translateRoleMentions(kudosSent);
+      transformKudos(kudosSent);
       return kudosSent;
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -406,15 +404,12 @@ public class KudosREST {
     return (commentId == null || commentId.trim().isEmpty()) ? null : Long.valueOf(commentId.replace("comment", ""));
   }
 
-  private void translateRoleMentions(Kudos... kudosList) {
+  private void transformKudos(Kudos... kudosList) {
     if (ArrayUtils.isEmpty(kudosList)) {
       return;
     }
-    Locale userLocale = LocalizationFilter.getCurrentLocale();
     for (Kudos kudos : kudosList) {
-      if (kudos != null) {
-        kudos.setMessage(MentionUtils.substituteUsernames(kudos.getMessage(), userLocale));
-      }
+      Utils.transformKudosMessage(kudos);
     }
   }
 
