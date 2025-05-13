@@ -19,7 +19,9 @@
  */
 package io.meeds.kudos.notification.plugin;
 
-import static io.meeds.kudos.service.utils.Utils.*;
+import static io.meeds.kudos.service.utils.Utils.KUDOS_DETAILS_PARAMETER;
+import static io.meeds.kudos.service.utils.Utils.KUDOS_RECEIVER_NOTIFICATION_ID;
+import static io.meeds.kudos.service.utils.Utils.getNotificationReceiversUsers;
 
 import java.util.List;
 
@@ -32,10 +34,10 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
-import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
 import io.meeds.kudos.model.Kudos;
+import io.meeds.kudos.service.utils.Utils;
 
 public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
 
@@ -71,6 +73,7 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
     if (activity != null && activity.isComment()) {
       activity = activityManager.getActivity(activity.getParentId());
     }
+    Utils.transformKudosMessage(kudos);
 
     return NotificationInfo.instance()
                            .to(toList)
@@ -83,7 +86,7 @@ public class KudosReceiverNotificationPlugin extends BaseNotificationPlugin {
                            .with("RECEIVER_TYPE", receiverType)
                            .with("KUDOS_ID", String.valueOf(kudos.getTechnicalId()))
                            .with("KUDOS_MESSAGE",
-                                 kudos.getMessage() == null ? "" : MentionUtils.substituteUsernames(kudos.getMessage()))
+                                 kudos.getMessage() == null ? "" : kudos.getMessage())
                            .key(getId())
                            .end();
   }

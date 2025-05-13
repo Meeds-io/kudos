@@ -19,12 +19,13 @@
  */
 package io.meeds.test.kudos.mock;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.social.common.RealtimeListAccess;
@@ -37,53 +38,43 @@ import org.exoplatform.social.core.manager.ActivityManager;
 
 public class ActivityManagerMock implements ActivityManager {
 
-  private Map<String, ExoSocialActivity> activities = new HashMap<>();
+  private static final Random            RANDOM     = new Random();
 
-  public ActivityManagerMock() {
-    System.out.println("ActivityManagerMock instanciated");
-  }
+  private Map<String, ExoSocialActivity> activities = new HashMap<>();
 
   public void saveActivityNoReturn(Identity streamOwner, ExoSocialActivity activity) {
     saveActivityNoReturn(activity);
   }
 
   public void saveActivityNoReturn(ExoSocialActivity activity) {
-    String id = String.valueOf(RandomUtils.nextLong());
+    String id = String.valueOf(RANDOM.nextLong());
     activities.put(id, activity);
     activity.setId(id);
-  }
-
-  public void saveActivity(Identity streamOwner, String type, String title) {
-    // TODO Auto-generated method stub
   }
 
   public ExoSocialActivity getActivity(String activityId) {
     return activities.get(activityId);
   }
 
-  public boolean isActivityViewable(ExoSocialActivity activity, org.exoplatform.services.security.Identity viewer) {
+  public boolean isActivityViewable(ExoSocialActivity activity, org.exoplatform.services.security.Identity viewer) { // NOSONAR
     return activity != null && activity.getUserId() != null
-        && ArrayUtils.contains(StringUtils.split(activity.getUserId()), viewer.getUserId());
+           && ArrayUtils.contains(StringUtils.split(activity.getUserId()), viewer.getUserId());
   }
 
   public ExoSocialActivity getParentActivity(ExoSocialActivity comment) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public void updateActivity(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
-
+//No implementation to mock
   }
 
   public void deleteActivity(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
-
+    // No implementation to mock
   }
 
   public void deleteActivity(String activityId) {
-    // TODO Auto-generated method stub
-
+    // No implementation to mock
   }
 
   public void saveComment(ExoSocialActivity activity, ExoSocialActivity newComment) {
@@ -91,112 +82,107 @@ public class ActivityManagerMock implements ActivityManager {
   }
 
   public RealtimeListAccess<ExoSocialActivity> getCommentsWithListAccess(ExoSocialActivity activity) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getCommentsWithListAccess(ExoSocialActivity activity, boolean loadSubComments) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public void deleteComment(String activityId, String commentId) {
-    // TODO Auto-generated method stub
-
+    // No implementation to mock
   }
 
   public void deleteComment(ExoSocialActivity activity, ExoSocialActivity comment) {
-    // TODO Auto-generated method stub
-
+    // No implementation to mock
   }
 
   public void saveLike(ExoSocialActivity activity, Identity identity) {
-    // TODO Auto-generated method stub
-
+    // No implementation to mock
   }
 
   public void deleteLike(ExoSocialActivity activity, Identity identity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
 
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesWithListAccess(Identity identity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesWithListAccess(Identity ownerIdentity, Identity viewerIdentity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesOfConnectionsWithListAccess(Identity identity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesOfSpaceWithListAccess(Identity spaceIdentity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesOfUserSpacesWithListAccess(Identity identity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivityFeedWithListAccess(Identity identity) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesByPoster(Identity poster) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public RealtimeListAccess<ExoSocialActivity> getActivitiesByPoster(Identity posterIdentity, String... activityTypes) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public void addProcessor(ActivityProcessor activityProcessor) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
 
   }
 
   public void addProcessorPlugin(BaseActivityProcessorPlugin activityProcessorPlugin) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
 
   }
 
   public void addActivityEventListener(ActivityListenerPlugin activityListenerPlugin) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
 
   }
 
   public RealtimeListAccess<ExoSocialActivity> getAllActivitiesWithListAccess() {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return null;
   }
 
   public List<ExoSocialActivity> getSubComments(ExoSocialActivity comment) {
-    // TODO Auto-generated method stub
-    return null;
+    // No implementation to mock
+    return Collections.emptyList();
   }
 
   public int getMaxUploadSize() {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return 0;
   }
 
   public List<ExoSocialActivity> getActivities(List<String> activityIdList) {
-    // TODO Auto-generated method stub
-    return null;
+    // No implementation to mock
+    return Collections.emptyList();
   }
 
   public boolean isActivityEditable(ExoSocialActivity activity, org.exoplatform.services.security.Identity viewer) {
-    // TODO Auto-generated method stub
+    // No implementation to mock
     return false;
   }
 

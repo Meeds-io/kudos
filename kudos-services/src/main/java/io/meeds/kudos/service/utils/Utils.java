@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.portal.application.localization.LocalizationFilter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -58,6 +60,8 @@ import io.meeds.kudos.model.Kudos;
 import io.meeds.kudos.model.KudosEntityType;
 import io.meeds.kudos.model.KudosPeriod;
 import io.meeds.kudos.model.KudosPeriodType;
+import io.meeds.social.html.model.HtmlTransformerContext;
+import io.meeds.social.html.utils.HtmlUtils;
 
 public class Utils {
   private static final Log                   LOG                                   = ExoLogger.getLogger(Utils.class);
@@ -275,8 +279,9 @@ public class Utils {
     senderLink = StringEscapeUtils.unescapeHtml4(senderLink);
     String receiverLink = "<a href='" + kudos.getReceiverURL() + "'>" + kudos.getReceiverFullName() + "</a>";
     receiverLink = StringEscapeUtils.unescapeHtml4(receiverLink);
+    transformKudosMessage(kudos);
 
-    String kudosMessage = MentionUtils.substituteUsernames(kudos.getMessage());
+    String kudosMessage = kudos.getMessage();
     String message = StringUtils.isBlank(kudosMessage) ? "." : ": " + kudosMessage;
 
     if (activity.getTemplateParams() != null) {
@@ -312,7 +317,7 @@ public class Utils {
 
   private static Identity getIdentityById(long identityId) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    return identityManager.getIdentity(String.valueOf(identityId));
+    return identityManager.getIdentity(identityId);
   }
 
   private static String getAvatar(Identity identity, Space space) {
@@ -331,7 +336,28 @@ public class Utils {
     return avatarUrl;
   }
 
+  public static void transformKudosMessage(Kudos kudos) {
+    transformKudosMessage(kudos, null);
+  }
+
+  public static void transformKudosMessage(Kudos kudos, Locale userLocale) {
+    transformKudosMessage(kudos, null, userLocale);
+  }
+
+  public static void transformKudosMessage(Kudos kudos, org.exoplatform.services.security.Identity identity, Locale userLocale) {
+    if (kudos != null) {
+      if (userLocale == null) {
+        userLocale = LocalizationFilter.getCurrentLocale();
+      }
+      if (identity == null && ConversationState.getCurrent() != null) {
+        identity = ConversationState.getCurrent().getIdentity();
+      }
+      kudos.setMessage(MentionUtils.substituteUsernames(kudos.getMessage(), userLocale));
+      kudos.setMessage(HtmlUtils.transform(kudos.getMessage(), new HtmlTransformerContext(identity, userLocale)));
+    }
+  }
+
   public static long getActivityId(String id) {
-    return StringUtils.isBlank(id) ? null : Long.valueOf(id.replace(ACTIVITY_COMMENT_ID_PREFIX, ""));
+    return StringUtils.isBlank(id) ? null : Long.valueOf(id.replace(ACTIVITY_COMMENT_ID_PREFIX, "")); // NOSONAR
   }
 }
