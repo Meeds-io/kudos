@@ -107,7 +107,7 @@ public class KudosService {
   public GlobalSettings getGlobalSettings() {
     SettingValue<?> globalSettingsValue = settingService.get(KUDOS_CONTEXT, KUDOS_SCOPE, SETTINGS_KEY_NAME);
     if (globalSettingsValue == null || StringUtils.isBlank(globalSettingsValue.getValue().toString())) {
-      return new GlobalSettings(defaultKudosPerPeriod, KudosPeriodType.DEFAULT);
+      return new GlobalSettings(defaultKudosPerPeriod, KudosPeriodType.DEFAULT, 0,0);
     } else {
       return GlobalSettings.parseStringToObject(globalSettingsValue.getValue().toString());
     }
