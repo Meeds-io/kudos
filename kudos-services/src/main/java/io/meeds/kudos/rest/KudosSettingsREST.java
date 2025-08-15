@@ -35,6 +35,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDateTime;
+
+import static io.meeds.kudos.service.utils.Utils.getPeriodOfTime;
+
 @RestController
 @RequestMapping("settings")
 @Tag(name = "/kudos/rest/settings", description = "Manages Kudos global settings")
@@ -51,7 +55,10 @@ public class KudosSettingsREST {
                           @ApiResponse(responseCode = "403", description = "Unauthorized operation"),
                           @ApiResponse(responseCode = "500", description = "Internal server error") })
   public GlobalSettings getSettings() {
-    return kudosService.getGlobalSettings();
+    GlobalSettings globalSettings = kudosService.getGlobalSettings();
+    globalSettings.setStartPeriodDateInSeconds(getPeriodOfTime(globalSettings, LocalDateTime.now()).getStartDateInSeconds());
+    globalSettings.setEndPeriodDateInSeconds(getPeriodOfTime(globalSettings, LocalDateTime.now()).getEndDateInSeconds());
+    return globalSettings;
   }
 
   @PostMapping
