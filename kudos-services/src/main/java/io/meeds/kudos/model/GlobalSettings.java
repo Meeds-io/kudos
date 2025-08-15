@@ -44,6 +44,10 @@ public class GlobalSettings implements Cloneable {
 
   KudosPeriodType             kudosPeriodType                    = KudosPeriodType.DEFAULT;
 
+  long                        startPeriodDateInSeconds;
+
+  long                        endPeriodDateInSeconds;
+
   public JSONObject toJSONObject(boolean includeTransient) {
     JSONObject jsonObject = new JSONObject();
     try {
@@ -90,7 +94,7 @@ public class GlobalSettings implements Cloneable {
 
   @Override
   public GlobalSettings clone() { // NOSONAR
-    return new GlobalSettings(kudosPerPeriod, kudosPeriodType);
+    return new GlobalSettings(kudosPerPeriod, kudosPeriodType, startPeriodDateInSeconds, endPeriodDateInSeconds);
   }
 
 }
