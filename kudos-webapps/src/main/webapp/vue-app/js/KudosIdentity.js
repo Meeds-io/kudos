@@ -132,7 +132,7 @@ export function getKudosByActivity(activityId) {
 }
 
 /*
- * Search spaces from eXo Platform, used for suggester
+ * Search spaces from Platform, used for suggester
  */
 export function searchSpaces(filter) {
   const params = $.param({fields: ['id', 'prettyName', 'displayName', 'avatarUrl'], keyword: filter});
