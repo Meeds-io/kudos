@@ -102,7 +102,7 @@ export default {
             type = 'SPACE';
           }
           // FIXME disable TIPTIP button to send Kudos to a space because of a limitation
-          // in eXo Platform REST Services that couldn't retrieve Space details by prettyName
+          // in Platform REST Services that couldn't retrieve Space details by prettyName
           if (type === 'USER') {
             divUIAction.append(`<a title="${sendKudosLabel}"
                 class="sendKudosTipTipButton"
