@@ -27,7 +27,7 @@
         @click="openSendKudosDrawer">
         <v-icon
           size="20px"
-          color="primary">
+          class="icon-default-color">
           fa-award
         </v-icon>
       </v-btn>
