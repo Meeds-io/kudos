@@ -1,2 +1,1 @@
-io.meeds.appcenter.entity.ApplicationEntity
-io.meeds.appcenter.entity.FavoriteApplicationEntity
+io.meeds.kudos.entity.KudosEntity
