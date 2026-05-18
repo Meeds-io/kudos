@@ -77,10 +77,13 @@ public class ProfileUpdateListener extends ProfileListenerPlugin {
                                                                        0,
                                                                        System.currentTimeMillis(),
                                                                        (int) count);
-      if (kudosList == null || kudosList.isEmpty())
-        return;
-      kudosList.stream()
-               .forEach(kudos -> ((CachedActivityStorage) activityStorage).clearActivityCached(String.valueOf(kudos.getActivityId())));
+      if (kudosList != null
+          && !kudosList.isEmpty()
+          && activityStorage instanceof CachedActivityStorage cachedActivityStorage) {
+        kudosList.stream()
+                 .filter(k -> k.getActivityId() > 0)
+                 .forEach(kudos -> cachedActivityStorage.clearActivityCached(String.valueOf(kudos.getActivityId())));
+      }
     }
   }
 

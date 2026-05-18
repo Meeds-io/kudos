@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -45,19 +45,19 @@ public class KudosActivityChildPluginTest extends BaseKudosTest {
 
   private static final String KUDOS_MESSAGE        = "KUDOS_MESSAGE";
 
-  @Mock
+  @MockitoBean
   private KudosService        kudosService;
 
-  @Mock
+  @MockitoBean
   private NotificationContext ctx;
 
-  @Mock
+  @MockitoBean
   private InitParams          initParams;
 
-  @Mock
+  @MockitoBean
   private NotificationInfo    notification;
 
-  @Mock
+  @MockitoBean
   private Kudos               kudos;
 
   @Test
@@ -83,7 +83,7 @@ public class KudosActivityChildPluginTest extends BaseKudosTest {
     when(ctx.getNotificationInfo()).thenReturn(notification);
     when(notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey())).thenReturn(String.valueOf(KUDOS_BY_ACTIVITY_ID));
 
-    assertTrue(StringUtils.contains(kudosActivityChildPlugin.makeContent(ctx), KUDOS_MESSAGE));
+    assertTrue(Strings.CS.contains(kudosActivityChildPlugin.makeContent(ctx), KUDOS_MESSAGE));
   }
 
 }
