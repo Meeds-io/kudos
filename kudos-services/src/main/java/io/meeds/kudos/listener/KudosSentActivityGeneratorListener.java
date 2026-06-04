@@ -138,8 +138,8 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
     ExoSocialActivityImpl activity = new ExoSocialActivityImpl();
     activity.setParentCommentId(parentCommentId);
     activity.setType(KUDOS_ACTIVITY_COMMENT_TYPE);
-    activity.setTitle(kudos.getMessage());
-    activity.setBody("Kudos to " + kudos.getReceiverFullName());
+    activity.setTitle("Kudos to " + kudos.getReceiverFullName());
+    activity.setBody(kudos.getMessage());
     activity.setUserId(kudos.getSenderIdentityId());
     computeKudosActivityProperties(activity, kudos);
     return activity;
