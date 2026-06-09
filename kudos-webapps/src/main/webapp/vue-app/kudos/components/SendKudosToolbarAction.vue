@@ -15,7 +15,10 @@
   Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <v-tooltip v-if="!spaceId" bottom>
+  <v-tooltip
+    v-if="!spaceId"
+    :disabled="isMobile"
+    bottom>
     <template #activator="{ on, attrs }">
       <v-btn
         id="kudosBtnToolbar"
@@ -58,6 +61,11 @@ export default {
     return {
       spaceId: eXo.env.portal.spaceId,
     };
+  },
+  computed: {
+    isMobile() {
+      return this.$vuetify?.breakpoint?.smAndDown;
+    },
   },
   methods: {
     openSendKudosDrawer() {
