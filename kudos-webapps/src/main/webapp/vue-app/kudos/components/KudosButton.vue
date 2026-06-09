@@ -7,10 +7,10 @@
         <div
           class="d-flex"
           v-bind="{
-              ...attrs,
-              role: null,
-              'aria-haspopup': null,
-              'aria-expanded': null}"
+            ...attrs,
+            role: null,
+            'aria-haspopup': null,
+            'aria-expanded': null}"
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
