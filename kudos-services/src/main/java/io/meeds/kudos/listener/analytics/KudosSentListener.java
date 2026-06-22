@@ -141,18 +141,18 @@ public class KudosSentListener extends Listener<KudosService, Kudos> {
     statisticData.setSubModule("kudos");
     statisticData.setOperation("sendKudos");
     statisticData.setUserId(Long.parseLong(kudos.getSenderIdentityId()));
-    statisticData.addParameter("activityId", activityId);
-    statisticData.addParameter("streamIdentityId", streamIdentityId);
-    statisticData.addParameter("kudosId", kudos.getTechnicalId());
-    statisticData.addParameter("senderId", kudos.getSenderIdentityId());
-    statisticData.addParameter("receiverId", kudos.getReceiverIdentityId());
-    statisticData.addParameter("entityId", kudos.getEntityId());
-    statisticData.addParameter("entityType", kudos.getEntityType());
-    statisticData.addParameter("parentEntityId", kudos.getParentEntityId());
-    statisticData.addParameter("receiverType", kudos.getReceiverType());
-    statisticData.addParameter("messageLength", kudos.getMessage().length());
-    statisticData.addParameter("duration", kudos.getTimeInSeconds());
-    statisticData.addParameter("receiverChanged", receiverChanged);
+    statisticData.addKeyword("activityId", activityId);
+    statisticData.addKeyword("streamIdentityId", streamIdentityId);
+    statisticData.addKeyword("kudosId", kudos.getTechnicalId());
+    statisticData.addKeyword("senderId", kudos.getSenderIdentityId());
+    statisticData.addKeyword("receiverId", kudos.getReceiverIdentityId());
+    statisticData.addKeyword("entityId", kudos.getEntityId());
+    statisticData.addKeyword("entityType", kudos.getEntityType());
+    statisticData.addKeyword("parentEntityId", kudos.getParentEntityId());
+    statisticData.addKeyword("receiverType", kudos.getReceiverType());
+    statisticData.addLong("messageLength", kudos.getMessage().length());
+    statisticData.addLong("duration", kudos.getTimeInSeconds());
+    statisticData.addBoolean("receiverChanged", receiverChanged);
 
     AnalyticsUtils.addStatisticData(statisticData);
   }
