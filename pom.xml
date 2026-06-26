@@ -23,7 +23,7 @@
   <parent>
     <artifactId>addons-parent-pom</artifactId>
     <groupId>io.meeds.addons</groupId>
-    <version>20</version>
+    <version>21-M01</version>
     <relativePath/>
   </parent>
   <groupId>io.meeds.kudos</groupId>
