@@ -1,0 +1,174 @@
+{
+  "tools": [
+    {
+      "name": "send_kudos",
+      "title": "Send a kudos",
+      "description": "Send a kudos (a short public appreciation message) from the current user to a person or a space. Before calling this, check the current user still has kudos left by calling get_my_kudos_allowance. Resolve the receiver first: for a person use get_user_by_username to get the exact username, for a space use get_my_spaces to get its pretty name. Users cannot send a kudos to themselves, and sending to a space requires the current user to be a member who can post (a redactor) in that space.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "receiver_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "space"
+            ],
+            "description": "Whether the kudos is given to a person ('user') or to a space ('space') (required)."
+          },
+          "receiver_id": {
+            "type": "string",
+            "description": "The receiver identifier (required): for receiver_type 'user' this is the username (resolve with get_user_by_username); for receiver_type 'space' this is the space pretty name (resolve with get_my_spaces)."
+          },
+          "message": {
+            "type": "string",
+            "description": "The appreciation message to attach to the kudos (required)."
+          }
+        },
+        "required": [
+          "receiver_type",
+          "receiver_id",
+          "message"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "require_approval": true
+    },
+    {
+      "name": "cancel_kudos",
+      "title": "Cancel a sent kudos",
+      "description": "Cancel (delete) a kudos that the current user previously sent, identified by its kudos id. Only the sender can cancel their own kudos, and it cannot be cancelled once other kudos are linked to it. Find the kudos id with list_sent_kudos.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kudos_id": {
+            "type": "integer",
+            "description": "Technical identifier of the kudos to cancel (required). Obtain it from list_sent_kudos."
+          }
+        },
+        "required": [
+          "kudos_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "require_approval": true
+    },
+    {
+      "name": "get_my_kudos_allowance",
+      "title": "Get my kudos allowance",
+      "description": "Get how many kudos the current user can still send during the running period, along with the period type (WEEK, MONTH, QUARTER, SEMESTER or YEAR) and its start and end dates. Call this before send_kudos to make sure the user still has kudos left.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_received_kudos",
+      "title": "List received kudos",
+      "description": "List the kudos received by a user or a space during a period. If no identity_id is given, it defaults to the current user. Received kudos are public. Use get_my_user_information or search_users to resolve a user's identity id, or get_my_spaces for a space identity id.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "identity_id": {
+            "type": "integer",
+            "description": "Social identity id of the user or space whose received kudos to list. Defaults to the current user when omitted."
+          },
+          "period_type": {
+            "type": "string",
+            "enum": [
+              "WEEK",
+              "MONTH",
+              "QUARTER",
+              "SEMESTER",
+              "YEAR"
+            ],
+            "description": "Period to look at. Defaults to the platform's configured kudos period when omitted."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of kudos to return (default 10, max 50)."
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_sent_kudos",
+      "title": "List sent kudos",
+      "description": "List the kudos sent by the current user during a period, with their kudos ids (useful before cancel_kudos). Defaults to the current user; do not use it to browse other users' sent kudos.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "identity_id": {
+            "type": "integer",
+            "description": "Social identity id of the sender. Defaults to the current user when omitted; keep it omitted in normal use."
+          },
+          "period_type": {
+            "type": "string",
+            "enum": [
+              "WEEK",
+              "MONTH",
+              "QUARTER",
+              "SEMESTER",
+              "YEAR"
+            ],
+            "description": "Period to look at. Defaults to the platform's configured kudos period when omitted."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of kudos to return (default 10, max 50)."
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_kudos_on_activity",
+      "title": "List kudos on an activity",
+      "description": "List the kudos attached to an activity (or to its comments), identified by the activity id. The current user must be allowed to view the activity (e.g. be a member of its space).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "activity_id": {
+            "type": "string",
+            "description": "Identifier of the activity whose kudos to list (required)."
+          }
+        },
+        "required": [
+          "activity_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
