@@ -48,6 +48,7 @@
     <io.meeds.social.version>7.3.x-ai-contribution-SNAPSHOT</io.meeds.social.version>
     <io.meeds.platform-ui.version>7.3.x-ai-contribution-SNAPSHOT</io.meeds.platform-ui.version>
     <addon.meeds.analytics.version>7.3.x-ai-contribution-SNAPSHOT</addon.meeds.analytics.version>
+    <addon.meeds.mcp-server.version>7.3.x-ai-contribution-SNAPSHOT</addon.meeds.mcp-server.version>
 
     <!-- **************************************** -->
     <!-- Jenkins Settings -->
@@ -81,6 +82,14 @@
         <groupId>io.meeds.analytics</groupId>
         <artifactId>analytics-parent</artifactId>
         <version>${addon.meeds.analytics.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.meeds.mcp-server</groupId>
+        <artifactId>mcp-server</artifactId>
+        <version>${addon.meeds.mcp-server.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
