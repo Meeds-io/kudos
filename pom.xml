@@ -93,6 +93,14 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>io.meeds.mcp-server</groupId>
+        <artifactId>mcp-server</artifactId>
+        <version>${addon.meeds.mcp-server.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- Current project artifacts -->
       <dependency>
         <groupId>${project.groupId}</groupId>
