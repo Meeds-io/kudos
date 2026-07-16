@@ -2,7 +2,7 @@
   <div
     :class="!isComment && 'ms-xl-4 ms-lg-3'"
     class="d-inline-flex">
-    <v-tooltip :disabled="isMobile" bottom>
+    <v-tooltip :disabled="isMobile || isScheduled" bottom>
       <template #activator="{ on, attrs }">
         <div
           class="d-flex"
@@ -14,10 +14,11 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :class="textColorClass"
+            :disabled="isScheduled"
+            :class="[textColorClass, isScheduled && 'opacity-5']"
             :x-small="isComment"
             :small="!isComment"
-            :aria-label="hasSentKudos ? $t('kudos.aria.kudos'): $t('exoplatform.kudos.label.kudos')"
+            :aria-label="kudosAriaLabel"
             class="pa-0 mt-0"
             text
             link
@@ -82,6 +83,10 @@ export default {
       type: Boolean,
       default: () => false
     },
+    isScheduled: {
+      type: Boolean,
+      default: () => false
+    },
   },
   data: () => ({
     linkedKudosList: [],
@@ -123,6 +128,12 @@ export default {
     },
     textColorClass() {
       return this.hasSentKudos && 'primary--text' || '';
+    },
+    kudosAriaLabel() {
+      const label = this.hasSentKudos && this.$t('kudos.aria.kudos') || this.$t('exoplatform.kudos.label.kudos');
+      // Expose in the accessible label the disabled reason shown by the
+      // tooltip
+      return this.isScheduled && `${label}. ${this.$t('exoplatform.kudos.label.scheduledActionDisabled')}` || label;
     },
     isCommentOwner() {
       return !this.comment.identity.profile.dataEntity.enabled || this.comment.identity.deleted;
