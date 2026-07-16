@@ -646,6 +646,20 @@ public class KudosServiceTest extends BaseKudosTest {
 
   @Test
   @SneakyThrows
+  public void testCannotCreateKudosOnScheduledActivity() {
+    ExoSocialActivity scheduledActivity = new ExoSocialActivityImpl();
+    scheduledActivity.setUserId("root");
+    scheduledActivity.setPublicationStartTime(System.currentTimeMillis() + 3600000l);
+    activityManager.saveActivityNoReturn(scheduledActivity);
+
+    Kudos kudosOnScheduledActivity = newKudosDTO();
+    kudosOnScheduledActivity.setEntityType(KudosEntityType.ACTIVITY.name());
+    kudosOnScheduledActivity.setEntityId(scheduledActivity.getId());
+    assertThrows(IllegalArgumentException.class, () -> kudosService.createKudos(kudosOnScheduledActivity, SENDER_REMOTE_ID));
+  }
+
+  @Test
+  @SneakyThrows
   public void testActivityCreation() {
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
     listenerService.addListener(Utils.GAMIFICATION_GENERIC_EVENT, new Listener<KudosService, Kudos>() {
