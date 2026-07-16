@@ -108,6 +108,8 @@ public class Utils {
 
   public static final String                 KUDOS_MESSAGE_PARAM                   = "kudosMessage";
 
+  public static final String                 SCHEDULED_KUDOS_PARAMETER             = "kudosPublicationPending";
+
   public static final ArgumentLiteral<Kudos> KUDOS_DETAILS_PARAMETER               = new ArgumentLiteral<>(Kudos.class, "kudos");
 
   public static final String                 ACTIVITY_COMMENT_ID_PREFIX            = "comment";
