@@ -19,6 +19,7 @@
 package io.meeds.kudos.listener;
 
 import static io.meeds.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
+import static io.meeds.kudos.service.utils.Utils.SCHEDULED_KUDOS_PARAMETER;
 
 import java.util.List;
 
@@ -57,6 +58,24 @@ public class KudosActivityListener extends ActivityListenerPlugin {
   @PostConstruct
   public void init() {
     activityManager.addActivityEventListener(this);
+  }
+
+  @Override
+  public void saveActivity(ActivityLifeCycleEvent activityLifeCycleEvent) {
+    ExoSocialActivity activity = activityLifeCycleEvent.getSource();
+    if (activity != null
+        && StringUtils.equals(activity.getType(), KUDOS_ACTIVITY_COMMENT_TYPE)
+        && !activity.isHidden()
+        && activity.getTemplateParams() != null
+        && Boolean.parseBoolean(activity.getTemplateParams().get(SCHEDULED_KUDOS_PARAMETER))) {
+      // A scheduled kudos activity is finally published: broadcast the kudos
+      // activity event, deferred at creation time, so that notifications,
+      // gamification and analytics process the kudos once it is visible
+      activity.getTemplateParams().remove(SCHEDULED_KUDOS_PARAMETER);
+      this.activityManager.updateActivity(activity, false);
+      long activityId = io.meeds.kudos.service.utils.Utils.getActivityId(activity.getId());
+      kudosService.sendKudosActivityEvent(activityId);
+    }
   }
 
   @Override
