@@ -611,6 +611,41 @@ public class KudosServiceTest extends BaseKudosTest {
 
   @Test
   @SneakyThrows
+  public void testCreateScheduledKudos() {
+    Kudos kudosScheduledInPast = newKudosDTO();
+    kudosScheduledInPast.setPublicationStartTime(System.currentTimeMillis() - 60000l);
+    assertThrows(IllegalArgumentException.class, () -> kudosService.createKudos(kudosScheduledInPast, SENDER_REMOTE_ID));
+
+    Kudos kudosScheduledOnActivity = newKudosDTO();
+    kudosScheduledOnActivity.setEntityType(KudosEntityType.ACTIVITY.name());
+    kudosScheduledOnActivity.setPublicationStartTime(System.currentTimeMillis() + 3600000l);
+    assertThrows(IllegalArgumentException.class, () -> kudosService.createKudos(kudosScheduledOnActivity, SENDER_REMOTE_ID));
+
+    final AtomicBoolean activityEventBroadcasted = new AtomicBoolean(false);
+    listenerService.addListener(Utils.KUDOS_ACTIVITY_EVENT, new Listener<KudosService, Kudos>() {
+      @Override
+      public void onEvent(Event<KudosService, Kudos> event) throws Exception {
+        activityEventBroadcasted.set(true);
+      }
+    });
+
+    Kudos scheduledKudos = newKudosDTO();
+    scheduledKudos.setPublicationStartTime(System.currentTimeMillis() + 3600000l);
+    scheduledKudos = kudosService.createKudos(scheduledKudos, SENDER_REMOTE_ID);
+    assertNotNull(scheduledKudos);
+    restartTransaction();
+
+    // The kudos activity event mustn't be broadcasted at scheduling time: it
+    // is deferred to the publication of the generated activity
+    assertFalse(activityEventBroadcasted.get());
+
+    long activityId = kudosStorage.getKudoById(scheduledKudos.getTechnicalId()).getActivityId();
+    kudosService.sendKudosActivityEvent(activityId);
+    assertTrue(activityEventBroadcasted.get());
+  }
+
+  @Test
+  @SneakyThrows
   public void testActivityCreation() {
     final AtomicBoolean listenerInvoked = new AtomicBoolean(false);
     listenerService.addListener(Utils.GAMIFICATION_GENERIC_EVENT, new Listener<KudosService, Kudos>() {

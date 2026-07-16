@@ -20,6 +20,7 @@ package io.meeds.kudos.listener;
 
 import static io.meeds.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
 import static io.meeds.kudos.service.utils.Utils.KUDOS_SENT_EVENT;
+import static io.meeds.kudos.service.utils.Utils.SCHEDULED_KUDOS_PARAMETER;
 import static io.meeds.kudos.service.utils.Utils.SPACE_ACCOUNT_TYPE;
 import static io.meeds.kudos.service.utils.Utils.computeKudosActivityProperties;
 import static io.meeds.kudos.service.utils.Utils.getActivityId;
@@ -112,6 +113,13 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
       }
     } else {
       ExoSocialActivity activity = createActivity(kudos, null);
+      boolean scheduled = kudos.getPublicationStartTime() != null;
+      if (scheduled) {
+        activity.setPublicationStartTime(kudos.getPublicationStartTime());
+        // Marks the activity so that the kudos activity event is broadcasted
+        // once the scheduled activity is finally published
+        activity.getTemplateParams().put(SCHEDULED_KUDOS_PARAMETER, "true");
+      }
       String providerId = OrganizationIdentityProvider.NAME;
       String remoteId = kudos.getReceiverId();
       boolean isSpaceActivity = StringUtils.isNotBlank(kudos.getSpacePrettyName());
@@ -128,7 +136,8 @@ public class KudosSentActivityGeneratorListener extends Listener<KudosService, K
       } else {
         activityManager.saveActivityNoReturn(owner, activity);
         kudosService.updateKudosGeneratedActivityId(kudos.getTechnicalId(),
-                                                    getActivityId(activity.getId()));
+                                                    getActivityId(activity.getId()),
+                                                    !scheduled);
         clearActivityCached(activity.getId());
       }
     }
