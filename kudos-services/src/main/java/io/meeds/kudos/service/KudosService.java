@@ -152,6 +152,13 @@ public class KudosService {
     if (StringUtils.equals(currentUser, kudos.getReceiverId())) {
       throw new IllegalAccessException("User with username '" + currentUser + "' is not authorized to send kudos to himseld!");
     }
+    if (kudos.getPublicationStartTime() != null) {
+      if (isActivityComment(kudos)) {
+        throw new IllegalArgumentException("kudos.publicationStartTimeNotAllowedOnComment");
+      } else if (kudos.getPublicationStartTime() <= System.currentTimeMillis()) {
+        throw new IllegalArgumentException("kudos.publicationStartTimeMustBeInFuture");
+      }
+    }
     if (StringUtils.isNotBlank(kudos.getSpacePrettyName())) {
       Space space = getSpace(kudos.getSpacePrettyName());
       if (space == null) {
@@ -203,6 +210,7 @@ public class KudosService {
     kudos.setTimeInSeconds(timeToSeconds(LocalDateTime.now()));
     Kudos createdKudos = kudosStorage.createKudos(kudos);
     createdKudos.setSpacePrettyName(kudos.getSpacePrettyName());
+    createdKudos.setPublicationStartTime(kudos.getPublicationStartTime());
 
     listenerService.broadcast(KUDOS_SENT_EVENT, this, createdKudos);
 
@@ -282,14 +290,43 @@ public class KudosService {
 
   /**
    * Stores generated activity for created {@link Kudos}
-   * 
+   *
    * @param kudosId {@link Kudos} technical identifier
    * @param activityId {@link ExoSocialActivity} technical identifier
    */
   public void updateKudosGeneratedActivityId(long kudosId, long activityId) {
+    updateKudosGeneratedActivityId(kudosId, activityId, true);
+  }
+
+  /**
+   * Stores generated activity for created {@link Kudos}
+   *
+   * @param kudosId {@link Kudos} technical identifier
+   * @param activityId {@link ExoSocialActivity} technical identifier
+   * @param broadcastActivityEvent whether to broadcast the kudos activity
+   *          event; false for a scheduled activity, for which the event is
+   *          broadcasted at publication time only, so that notifications,
+   *          gamification and analytics process the kudos once it is visible
+   */
+  public void updateKudosGeneratedActivityId(long kudosId, long activityId, boolean broadcastActivityEvent) {
     kudosStorage.saveKudosActivityId(kudosId, activityId);
-    Kudos kudos = kudosStorage.getKudoById(kudosId);
-    listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+    if (broadcastActivityEvent) {
+      Kudos kudos = kudosStorage.getKudoById(kudosId);
+      listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+    }
+  }
+
+  /**
+   * Broadcasts the kudos activity event of the kudos linked to a given
+   * activity, used when a scheduled kudos activity is finally published
+   *
+   * @param activityId {@link ExoSocialActivity} technical identifier
+   */
+  public void sendKudosActivityEvent(long activityId) {
+    Kudos kudos = kudosStorage.getKudosByActivityId(activityId);
+    if (kudos != null) {
+      listenerService.broadcast(KUDOS_ACTIVITY_EVENT, this, kudos);
+    }
   }
 
   /**

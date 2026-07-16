@@ -73,4 +73,12 @@ public class Kudos implements Serializable {
   @Exclude
   private long              activityId;
 
+  /**
+   * Publication time of the activity to generate, in milliseconds; not
+   * persisted with the kudos: the schedule is carried by the generated
+   * activity
+   */
+  @Exclude
+  private Long              publicationStartTime;
+
 }

@@ -217,14 +217,89 @@
             @click="$refs.drawer.close()">
             {{ $t('Confirmation.label.Cancel') }}
           </v-btn>
-          <v-btn
-            :loading="sending"
-            :disabled="sendButtonDisabled"
-            :aria-label="$t('exoplatform.kudos.button.send')"
-            class="btn btn-primary me-2"
-            @click="send">
-            {{ $t('exoplatform.kudos.button.send') }}
-          </v-btn>
+          <v-menu
+            v-model="scheduleMode"
+            :close-on-content-click="false"
+            content-class="kudosSchedulePopup elevation-2 overflow-visible"
+            offset-y
+            top
+            left>
+            <template #activator="{ attrs }">
+              <div
+                v-bind="attrs"
+                class="d-flex">
+                <v-btn
+                  :loading="sending"
+                  :disabled="sendButtonDisabled"
+                  :aria-label="$t('exoplatform.kudos.button.send')"
+                  class="btn btn-primary"
+                  @click="send">
+                  {{ $t('exoplatform.kudos.button.send') }}
+                </v-btn>
+                <v-menu
+                  v-if="!isLinkedKudos"
+                  v-model="scheduleMenu"
+                  offset-y
+                  top
+                  left>
+                  <template #activator="{ on, attrs: menuAttrs }">
+                    <v-btn
+                      :disabled="sendButtonDisabled"
+                      :aria-label="$t('exoplatform.kudos.schedule.openMenu')"
+                      min-width="28"
+                      type="button"
+                      class="btn btn-primary px-0 ms-1 me-2"
+                      v-bind="menuAttrs"
+                      v-on="on">
+                      <v-icon size="16">fas fa-caret-down</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list
+                    class="pa-0"
+                    dense>
+                    <v-list-item
+                      :aria-label="$t('exoplatform.kudos.schedule')"
+                      class="px-2"
+                      @click="openScheduleMode">
+                      <v-list-item-icon
+                        class="me-0 my-auto">
+                        <v-icon size="16">fas fa-clock</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title>
+                        {{ $t('exoplatform.kudos.schedule') }}
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+            </template>
+            <v-card
+              class="d-flex align-center flex-nowrap pa-2"
+              flat>
+              <date-picker
+                v-model="scheduledDate"
+                :attach="false"
+                :min-value="minScheduleDate"
+                :aria-label="$t('exoplatform.kudos.schedule.date')"
+                class="flex-grow-0 me-2"
+                top
+                return-iso
+                required />
+              <time-picker
+                v-model="scheduledHour"
+                :min="minScheduleHour"
+                :aria-label="$t('exoplatform.kudos.schedule.hour')"
+                class="flex-grow-0 ms-0 me-2" />
+              <v-btn
+                :disabled="sendButtonDisabled || !scheduledDateTime"
+                :loading="sending"
+                :aria-label="$t('exoplatform.kudos.schedule.confirm')"
+                icon
+                @click="scheduleKudos">
+                <v-icon class="success--text">fas fa-check</v-icon>
+              </v-btn>
+            </v-card>
+          </v-menu>
         </div>
       </template>
     </exo-drawer>
@@ -282,7 +357,12 @@ export default {
       postToNetwork: eXo.env.portal.postToNetworkEnabled,
       audienceChoice: eXo.env.portal.postToNetworkEnabled && 'yourNetwork' ||  'oneOfYourSpaces',
       space: null,
-      noReceiverIdentityId: false
+      noReceiverIdentityId: false,
+      scheduleMenu: false,
+      scheduleMode: false,
+      scheduledDate: null,
+      scheduledHour: null,
+      pendingScheduledTime: null
     };
   },
   watch: {
@@ -462,6 +542,23 @@ export default {
     ckEditorInstance() {
       return this.drawer && this.$refs.kudosContent || null;
     },
+    minScheduleDate() {
+      // User local date, not the UTC one that toISOString would give
+      return this.$dateUtil.getISODate(new Date());
+    },
+    minScheduleHour() {
+      // Restrict selectable hours only when the selected date is today, with
+      // a one minute margin so the snapped slot is always in the future
+      return this.scheduledDate === this.minScheduleDate && new Date(Date.now() + 60000) || null;
+    },
+    scheduledDateTime() {
+      if (!this.scheduledDate || !this.scheduledHour?.getHours) {
+        return null;
+      }
+      const dateTime = this.$dateUtil.getDateObjectFromString(this.scheduledDate, true);
+      dateTime.setHours(this.scheduledHour.getHours(), this.scheduledHour.getMinutes(), 0, 0);
+      return dateTime.getTime();
+    },
   },
   created() {
     if (eXo?.env?.portal?.userName) {
@@ -604,6 +701,10 @@ export default {
     },
     async openDrawer(event) {
       this.sending = false;
+      this.scheduleMode = false;
+      this.scheduledDate = null;
+      this.scheduledHour = null;
+      this.pendingScheduledTime = null;
       if (!this.initialized) {
         await this.init();
       }
@@ -670,9 +771,26 @@ export default {
         }
       }
     },
+    openScheduleMode() {
+      const defaultSchedule = new Date();
+      defaultSchedule.setDate(defaultSchedule.getDate() + 1);
+      defaultSchedule.setHours(8, 0, 0, 0);
+      this.scheduledHour = new Date(defaultSchedule.getTime());
+      this.scheduledDate = this.$dateUtil.getISODate(defaultSchedule);
+      this.scheduleMode = true;
+    },
+    scheduleKudos() {
+      if (!this.scheduledDateTime || this.scheduledDateTime <= Date.now()) {
+        this.displayAlert(this.$t('exoplatform.kudos.schedule.mustBeInFuture'), 'warning');
+        return;
+      }
+      this.pendingScheduledTime = this.scheduledDateTime;
+      this.send();
+    },
     send() {
       this.error = null;
 
+      const publicationStartTime = this.pendingScheduledTime;
       const kudosMessage = this.ckEditorInstance.getMessage();
       this.$refs.drawer.startLoading();
       const kudos = {
@@ -682,6 +800,7 @@ export default {
         receiverType: this.receiverType || 'user',
         receiverId: this.receiverId,
         message: kudosMessage,
+        publicationStartTime: publicationStartTime || null,
         spacePrettyName: (this.audience?.providerId === 'space' && this.audience?.remoteId)
           || this.spacePrettyName || null,
       };
@@ -713,7 +832,9 @@ export default {
           this.resetAudienceChoice();
           this.noReceiverIdentityId = false;
           this.$refs.drawer.close();
-          this.displayAlert(this.$t('exoplatform.kudos.success.kudosSent'));
+          this.displayAlert(publicationStartTime
+            && this.$t('exoplatform.kudos.success.kudosScheduled')
+            || this.$t('exoplatform.kudos.success.kudosSent'));
         })
         .catch(e => {
           console.error('Error refreshing UI', e);
@@ -721,6 +842,7 @@ export default {
         })
         .finally(() => {
           window.setTimeout(() => this.sending = false, 200);
+          this.pendingScheduledTime = null;
           this.$refs.drawer.endLoading();
         });
     },
