@@ -2,7 +2,7 @@
   <div
     :class="!isComment && 'ms-xl-4 ms-lg-3'"
     class="d-inline-flex">
-    <v-tooltip :disabled="isMobile" bottom>
+    <v-tooltip :disabled="isMobile || isScheduled" bottom>
       <template #activator="{ on, attrs }">
         <div
           class="d-flex"
@@ -14,7 +14,8 @@
           v-on="on">
           <v-btn
             :id="`KudosActivity${entityId}`"
-            :class="textColorClass"
+            :disabled="isScheduled"
+            :class="[textColorClass, isScheduled && 'opacity-5']"
             :x-small="isComment"
             :small="!isComment"
             :aria-label="hasSentKudos ? $t('kudos.aria.kudos'): $t('exoplatform.kudos.label.kudos')"
@@ -79,6 +80,10 @@ export default {
       default: null,
     },
     isMobile: {
+      type: Boolean,
+      default: () => false
+    },
+    isScheduled: {
       type: Boolean,
       default: () => false
     },

@@ -159,6 +159,12 @@ public class KudosService {
         throw new IllegalArgumentException("kudos.publicationStartTimeMustBeInFuture");
       }
     }
+    if (KudosEntityType.valueOf(kudos.getEntityType()) == KudosEntityType.ACTIVITY) {
+      ExoSocialActivity targetActivity = activityManager.getActivity(kudos.getEntityId());
+      if (targetActivity != null && targetActivity.getPublicationStartTime() != null) {
+        throw new IllegalArgumentException("kudos.notAllowedOnScheduledActivity");
+      }
+    }
     if (StringUtils.isNotBlank(kudos.getSpacePrettyName())) {
       Space space = getSpace(kudos.getSpacePrettyName());
       if (space == null) {
