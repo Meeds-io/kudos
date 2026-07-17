@@ -408,7 +408,9 @@ export function registerActivityActionExtension() {
     confirmCancelKey: 'kudos.label.button.cancel',
     rank: 50,
     isEnabled: (activity, activityTypeExtension) => {
-      return activity.type === 'exokudos:activity' && activity.canEdit === 'true' && (!activityTypeExtension.canEdit || activityTypeExtension.canEdit(activity));
+      // A still scheduled kudos post is cancelled through the generic cancel
+      // scheduling action, which deletes the linked kudos as well
+      return !activity.publicationStartTime && activity.type === 'exokudos:activity' && activity.canEdit === 'true' && (!activityTypeExtension.canEdit || activityTypeExtension.canEdit(activity));
     },
     click: (activity) => {
       const activityId = Number(activity.id);
