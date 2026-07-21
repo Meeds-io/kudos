@@ -387,7 +387,8 @@ export function registerActivityActionExtension() {
           return activityOrComment.kudos && activityOrComment.kudos.message || '';
         }
       },
-      canEdit: activityOrComment => activityOrComment.identity.id === eXo.env.portal.userIdentityId,
+      canEdit: activityOrComment => (activityOrComment.publicationStartTime && activityOrComment.canEdit === 'true')
+                                    || activityOrComment.identity.id === eXo.env.portal.userIdentityId,
       forceCanEditOverwrite: true
     },
   });
