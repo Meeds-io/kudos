@@ -20,9 +20,14 @@ package io.meeds.kudos.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.*;
-
 import org.hibernate.annotations.DynamicUpdate;
+
+import io.meeds.common.persistence.PortableSequence;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity(name = "Kudos")
 @DynamicUpdate
@@ -32,8 +37,7 @@ public class KudosEntity implements Serializable {
   private static final long serialVersionUID = -8272292325540761902L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_ADDONS_KUDOS_ID", sequenceName = "SEQ_ADDONS_KUDOS_ID", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_ADDONS_KUDOS_ID")
+  @PortableSequence(name = "SEQ_ADDONS_KUDOS_ID")
   @Column(name = "KUDOS_ID")
   private Long              id;
 
