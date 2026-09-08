@@ -6,7 +6,7 @@
         extra-class="application-body">
         <template #title>
           <div class="d-flex flex-grow-1 full-width position-relative">
-            <div v-if="hasKudos && !loading" class="widget-text-header text-truncate">
+            <div v-if="hasKudos && !loading" class="text-header text-truncate">
               {{ $t('exoplatform.kudos.button.rewardedKudos') }}
             </div>
             <div class="spacer"></div>
