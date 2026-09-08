@@ -20,7 +20,6 @@ package io.meeds.kudos.notification.builder;
 
 import static io.meeds.kudos.service.utils.Utils.*;
 
-import java.io.Writer;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -165,11 +164,6 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     }
     ctx.setException(templateContext.getException());
     return messageInfo.end();
-  }
-
-  @Override
-  protected boolean makeDigest(NotificationContext ctx, Writer writer) {
-    return false;
   }
 
   protected ExoSocialActivity getI18N(ExoSocialActivity activity, Locale locale) {
