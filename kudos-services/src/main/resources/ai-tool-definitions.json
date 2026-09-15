@@ -3,7 +3,7 @@
     {
       "name": "send_kudos",
       "title": "Send a kudos",
-      "description": "Send a kudos (a short public appreciation message) from the current user to a person or a space. Before calling this, check the current user still has kudos left by calling get_my_kudos_allowance. Resolve the receiver first: for a person use get_user_by_username to get the exact username, for a space use get_my_spaces to get its pretty name. Users cannot send a kudos to themselves, and sending to a space requires the current user to be a member who can post (a redactor) in that space.",
+      "description": "Send a kudos (a short public appreciation message) from the current user to a person or a space. Before calling this, check the current user still has kudos left by calling get_my_kudos_allowance. Resolve the receiver first: for a person use get_user_by_username to get the exact username, for a space use get_my_spaces to get its pretty name. When the user asks for the kudos to be given to a person *in a space* (for example \"send a kudos to John in the Engineering space\"), keep receiver_type 'user' and pass that space in space_pretty_name, so the kudos is published in the space stream instead of the receiver's personal stream. Users cannot send a kudos to themselves, and publishing in a space requires the current user to be a member who can post (a redactor) in that space.",
       "input_schema": {
         "type": "object",
         "properties": {
@@ -22,6 +22,10 @@
           "message": {
             "type": "string",
             "description": "The appreciation message to attach to the kudos (required)."
+          },
+          "space_pretty_name": {
+            "type": "string",
+            "description": "Pretty name of the space the kudos must be published in (optional, resolve it with get_my_spaces). Use it when the kudos is given to a person but must appear in a space stream; leave it empty to publish the kudos in the receiver's personal stream. When receiver_type is 'space' it is redundant and must either be omitted or be the receiving space itself."
           }
         },
         "required": [

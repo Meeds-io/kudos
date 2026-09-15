@@ -47,4 +47,15 @@ public class KudosResultModel {
   @JsonProperty("sent_date")
   private String sentDate;
 
+  /**
+   * Pretty name of the space the kudos was published in, null when it was
+   * published in the receiver's own stream. Returned so the agent states where
+   * the kudos actually landed instead of inferring it from the request.
+   */
+  @JsonProperty("space_pretty_name")
+  private String spacePrettyName;
+
+  @JsonProperty("space_display_name")
+  private String spaceDisplayName;
+
 }
