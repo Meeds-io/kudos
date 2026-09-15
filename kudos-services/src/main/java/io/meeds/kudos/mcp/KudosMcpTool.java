@@ -85,11 +85,17 @@ public class KudosMcpTool implements McpToolPlugin {
   }
 
   /**
-   * Sends a kudos from the current user to a user or a space.
+   * Sends a kudos from the current user to a user or a space, optionally
+   * published in a given space's activity stream. ObjectNotFoundException is
+   * not declared: KudosService.createKudos is @SneakyThrows and declares only
+   * IllegalAccessException, so the compiler cannot see the one it raises when
+   * the target space disappears between its resolution here and the write. It
+   * still propagates at runtime and still maps to a 404.
    */
   public KudosResultModel sendKudos(String receiverType,
                                     String receiverId,
-                                    String message) throws IllegalAccessException, ObjectNotFoundException {
+                                    String message,
+                                    String spacePrettyName) throws IllegalAccessException {
     if (StringUtils.isBlank(message)) {
       throw new IllegalArgumentException("message is required. A kudos must carry a short appreciation message.");
     }
@@ -103,6 +109,7 @@ public class KudosMcpTool implements McpToolPlugin {
     Kudos kudos = new Kudos();
     kudos.setSenderId(currentUser);
     kudos.setMessage(message.trim());
+    Space targetSpace = null;
 
     if (USER_RECEIVER_TYPE.equals(type)) {
       Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, receiverId.trim());
@@ -117,11 +124,19 @@ public class KudosMcpTool implements McpToolPlugin {
       kudos.setReceiverId(receiver.getRemoteId());
       kudos.setEntityType(KudosEntityType.USER_PROFILE.name());
       kudos.setEntityId(receiver.getId());
+      if (StringUtils.isNotBlank(spacePrettyName)) {
+        // The kudos stays addressed to the user, but its activity is published
+        // in the requested space's stream instead of the receiver's own stream
+        targetSpace = requireSpace(spacePrettyName);
+        kudos.setSpacePrettyName(targetSpace.getPrettyName());
+      }
     } else if (SPACE_RECEIVER_TYPE.equals(type)) {
-      Space space = resolveSpace(receiverId.trim());
-      if (space == null) {
-        throw new IllegalArgumentException("No space found matching '" + receiverId
-            + "'. Resolve the space pretty name with get_my_spaces before sending a kudos.");
+      Space space = requireSpace(receiverId);
+      targetSpace = space;
+      if (StringUtils.isNotBlank(spacePrettyName)
+          && !StringUtils.equals(space.getId(), requireSpace(spacePrettyName).getId())) {
+        throw new IllegalArgumentException("space_pretty_name must be the receiving space itself when receiver_type is"
+            + " 'space'. A kudos given to a space is always published in that space.");
       }
       Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName());
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
@@ -136,7 +151,7 @@ public class KudosMcpTool implements McpToolPlugin {
     try {
       Kudos created = kudosService.createKudos(kudos, currentUser);
       Utils.transformKudosMessage(created);
-      return toResult(created);
+      return toResult(created, targetSpace);
     } catch (IllegalAccessException e) {
       throw mapSendError(e);
     }
@@ -271,6 +286,15 @@ public class KudosMcpTool implements McpToolPlugin {
     return new IllegalStateException("Your kudos could not be sent: " + msg);
   }
 
+  private Space requireSpace(String id) {
+    Space space = resolveSpace(StringUtils.trimToEmpty(id));
+    if (space == null) {
+      throw new IllegalArgumentException("No space found matching '" + id
+          + "'. Resolve the space pretty name with get_my_spaces before sending a kudos.");
+    }
+    return space;
+  }
+
   private Space resolveSpace(String id) {
     Space space = spaceService.getSpaceByPrettyName(id);
     if (space == null && StringUtils.isNumeric(id)) {
@@ -312,13 +336,15 @@ public class KudosMcpTool implements McpToolPlugin {
     return Math.min(limit, MAX_LIST_LIMIT);
   }
 
-  private KudosResultModel toResult(Kudos kudos) {
+  private KudosResultModel toResult(Kudos kudos, Space space) {
     return new KudosResultModel(kudos.getTechnicalId(),
                                 kudos.getSenderId(),
                                 kudos.getReceiverId(),
                                 kudos.getReceiverType(),
                                 kudos.getMessage(),
-                                formatSeconds(kudos.getTimeInSeconds()));
+                                formatSeconds(kudos.getTimeInSeconds()),
+                                space == null ? null : space.getPrettyName(),
+                                space == null ? null : space.getDisplayName());
   }
 
   private String formatSeconds(long seconds) {
