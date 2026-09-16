@@ -20,6 +20,7 @@ package io.meeds.kudos.mcp;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +37,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -143,7 +145,7 @@ class KudosMcpToolTest {
         .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sentKudos(RECEIVER, "user"));
 
-    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!");
+    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", null);
 
     assertNotNull(result);
     assertEquals(USERNAME, result.getSender());
@@ -163,7 +165,7 @@ class KudosMcpToolTest {
         .thenReturn(socialIdentity(SPACE_IDENTITY_ID, SPACE_PRETTY, true));
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sentKudos(SPACE_PRETTY, "space"));
 
-    KudosResultModel result = kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!");
+    KudosResultModel result = kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!", null);
 
     assertNotNull(result);
     assertEquals(SPACE_PRETTY, result.getReceiver());
@@ -172,31 +174,114 @@ class KudosMcpToolTest {
   }
 
   @Test
+  void sendKudosToUserInSpacePublishesInThatSpace() throws Exception {
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    Space space = new Space();
+    space.setId("500");
+    space.setPrettyName(SPACE_PRETTY);
+    when(spaceService.getSpaceByPrettyName(SPACE_PRETTY)).thenReturn(space);
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sentKudos(RECEIVER, "user"));
+
+    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", SPACE_PRETTY);
+
+    assertNotNull(result);
+    assertEquals("user", result.getReceiverType());
+    assertEquals(RECEIVER, result.getReceiver());
+    // The result names the space the kudos actually landed in, so the agent
+    // does not have to infer it from the request it made
+    assertEquals(SPACE_PRETTY, result.getSpacePrettyName());
+    ArgumentCaptor<Kudos> captor = ArgumentCaptor.forClass(Kudos.class);
+    verify(kudosService).createKudos(captor.capture(), eq(USERNAME));
+    Kudos sent = captor.getValue();
+    // The activity owner is the space as soon as spacePrettyName is set
+    // (KudosSentActivityGeneratorListener), while the receiver stays the user
+    assertEquals(SPACE_PRETTY, sent.getSpacePrettyName());
+    assertEquals("user", sent.getReceiverType());
+    assertEquals(RECEIVER, sent.getReceiverId());
+  }
+
+  @Test
+  void sendKudosToUserWithoutSpaceStaysPersonal() throws Exception {
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sentKudos(RECEIVER, "user"));
+
+    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", "  ");
+
+    assertNull(result.getSpacePrettyName());
+    ArgumentCaptor<Kudos> captor = ArgumentCaptor.forClass(Kudos.class);
+    verify(kudosService).createKudos(captor.capture(), eq(USERNAME));
+    assertNull(captor.getValue().getSpacePrettyName());
+  }
+
+  @Test
+  void sendKudosToUserInUnknownSpaceFails() {
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    when(spaceService.getSpaceByPrettyName("nowhere")).thenReturn(null);
+    when(spaceService.getSpaceByGroupId(any())).thenReturn(null);
+
+    assertThrows(IllegalArgumentException.class,
+                 () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", "nowhere"));
+  }
+
+  @Test
+  void sendKudosToUserInSpaceNotRedactorFails() throws Exception {
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    Space space = new Space();
+    space.setId("500");
+    space.setPrettyName(SPACE_PRETTY);
+    when(spaceService.getSpaceByPrettyName(SPACE_PRETTY)).thenReturn(space);
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
+        .thenThrow(new IllegalAccessException("User cannot redact on space"));
+
+    assertThrows(IllegalStateException.class,
+                 () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", SPACE_PRETTY));
+  }
+
+  @Test
+  void sendKudosToSpaceWithAnotherSpaceFails() {
+    Space receiverSpace = new Space();
+    receiverSpace.setId("500");
+    receiverSpace.setPrettyName(SPACE_PRETTY);
+    Space otherSpace = new Space();
+    otherSpace.setId("501");
+    otherSpace.setPrettyName("marketing");
+    when(spaceService.getSpaceByPrettyName(SPACE_PRETTY)).thenReturn(receiverSpace);
+    when(spaceService.getSpaceByPrettyName("marketing")).thenReturn(otherSpace);
+
+    assertThrows(IllegalArgumentException.class,
+                 () -> kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!", "marketing"));
+  }
+
+  @Test
   void sendKudosBlankMessageFails() {
-    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "  "));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "  ", null));
   }
 
   @Test
   void sendKudosBlankReceiverFails() {
-    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", " ", "Great work!"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", " ", "Great work!", null));
   }
 
   @Test
   void sendKudosInvalidTypeFails() {
-    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("group", RECEIVER, "Great work!"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("group", RECEIVER, "Great work!", null));
   }
 
   @Test
   void sendKudosToUnknownUserFails() {
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER)).thenReturn(null);
-    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", null));
   }
 
   @Test
   void sendKudosToSelfFails() {
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, USERNAME))
         .thenReturn(socialIdentity(OWN_IDENTITY_ID, USERNAME, true));
-    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("user", USERNAME, "Great work!"));
+    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("user", USERNAME, "Great work!", null));
   }
 
   @Test
@@ -205,7 +290,7 @@ class KudosMcpToolTest {
         .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
         .thenThrow(new IllegalAccessException("User having username'" + USERNAME + "' is not authorized to send more kudos"));
-    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!"));
+    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", null));
   }
 
   @Test
@@ -218,7 +303,7 @@ class KudosMcpToolTest {
         .thenReturn(socialIdentity(SPACE_IDENTITY_ID, SPACE_PRETTY, true));
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
         .thenThrow(new IllegalAccessException("User cannot redact on space"));
-    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!"));
+    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!", null));
   }
 
   // --- cancel_kudos --------------------------------------------------------
