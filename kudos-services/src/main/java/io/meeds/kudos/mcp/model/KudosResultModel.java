@@ -58,4 +58,10 @@ public class KudosResultModel {
   @JsonProperty("space_display_name")
   private String spaceDisplayName;
 
+  /**
+   * Absolute link to the activity the kudos generated, on this platform's own
+   * origin; null when no activity was generated.
+   */
+  private String url;
+
 }
