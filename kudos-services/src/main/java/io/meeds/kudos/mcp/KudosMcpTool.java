@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
@@ -48,6 +49,9 @@ import io.meeds.kudos.model.exception.KudosAlreadyLinkedException;
 import io.meeds.kudos.service.KudosService;
 import io.meeds.kudos.service.utils.Utils;
 import io.meeds.mcp.server.plugin.McpToolPlugin;
+import io.meeds.portal.permlink.model.PermanentLinkObject;
+import io.meeds.portal.permlink.service.PermanentLinkService;
+import io.meeds.social.activity.plugin.ActivityPermanentLinkPlugin;
 
 /**
  * MCP tools exposing the Kudos add-on to the AI agent (EVA). Every method acts
@@ -74,14 +78,18 @@ public class KudosMcpTool implements McpToolPlugin {
 
   private final ActivityManager activityManager;
 
+  private final PermanentLinkService permanentLinkService;
+
   public KudosMcpTool(KudosService kudosService,
                       SpaceService spaceService,
                       IdentityManager identityManager,
-                      ActivityManager activityManager) {
+                      ActivityManager activityManager,
+                      PermanentLinkService permanentLinkService) {
     this.kudosService = kudosService;
     this.spaceService = spaceService;
     this.identityManager = identityManager;
     this.activityManager = activityManager;
+    this.permanentLinkService = permanentLinkService;
   }
 
   /**
@@ -336,6 +344,14 @@ public class KudosMcpTool implements McpToolPlugin {
     return Math.min(limit, MAX_LIST_LIMIT);
   }
 
+  /**
+   * Maps a sent kudos to the model returned to the agent.
+   *
+   * @param kudos the kudos, as read back after its creation
+   * @param space the space its activity was published in, null for the
+   *          receiver's own stream
+   * @return the result model
+   */
   private KudosResultModel toResult(Kudos kudos, Space space) {
     return new KudosResultModel(kudos.getTechnicalId(),
                                 kudos.getSenderId(),
@@ -344,7 +360,30 @@ public class KudosMcpTool implements McpToolPlugin {
                                 kudos.getMessage(),
                                 formatSeconds(kudos.getTimeInSeconds()),
                                 space == null ? null : space.getPrettyName(),
-                                space == null ? null : space.getDisplayName());
+                                space == null ? null : space.getDisplayName(),
+                                getActivityUrl(kudos));
+  }
+
+  /**
+   * Builds the absolute link to the activity a sent kudos generated, the way
+   * the platform links any activity: its permanent link, resolved by the
+   * activity permanent-link plugin.
+   *
+   * @param kudos the sent kudos
+   * @return the activity's absolute URL, or null when the kudos has no
+   *         generated activity or its link can't be resolved
+   */
+  private String getActivityUrl(Kudos kudos) {
+    if (kudos.getActivityId() <= 0) {
+      return null;
+    }
+    try {
+      return CommonsUtils.getCurrentDomain()
+          + permanentLinkService.getLink(new PermanentLinkObject(ActivityPermanentLinkPlugin.OBJECT_TYPE,
+                                                                 String.valueOf(kudos.getActivityId())));
+    } catch (ObjectNotFoundException e) {
+      return null;
+    }
   }
 
   private String formatSeconds(long seconds) {
