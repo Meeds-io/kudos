@@ -30,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -42,6 +43,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
@@ -60,6 +62,8 @@ import io.meeds.kudos.model.KudosPeriodType;
 import io.meeds.kudos.model.exception.KudosAlreadyLinkedException;
 import io.meeds.kudos.service.KudosService;
 import io.meeds.kudos.service.utils.Utils;
+import io.meeds.portal.permlink.model.PermanentLinkObject;
+import io.meeds.portal.permlink.service.PermanentLinkService;
 
 class KudosMcpToolTest {
 
@@ -85,11 +89,15 @@ class KudosMcpToolTest {
 
   private ActivityManager                                       activityManager;
 
+  private PermanentLinkService                                  permanentLinkService;
+
   private Identity                                              currentIdentity;
 
   private KudosMcpTool                                          kudosMcpTool;
 
   private MockedStatic<Utils>                                   utilsMock;
+
+  private MockedStatic<CommonsUtils>                            commonsUtilsMock;
 
   @BeforeEach
   void setUp() {
@@ -98,8 +106,11 @@ class KudosMcpToolTest {
     identityManager = mock(IdentityManager.class);
     activityManager = mock(ActivityManager.class);
     currentIdentity = new Identity(USERNAME);
+    permanentLinkService = mock(PermanentLinkService.class);
     utilsMock = mockStatic(Utils.class);
-    kudosMcpTool = new KudosMcpTool(kudosService, spaceService, identityManager, activityManager) {
+    commonsUtilsMock = mockStatic(CommonsUtils.class);
+    commonsUtilsMock.when(CommonsUtils::getCurrentDomain).thenReturn("http://localhost:8080");
+    kudosMcpTool = new KudosMcpTool(kudosService, spaceService, identityManager, activityManager, permanentLinkService) {
       @Override
       public Identity getCurrentUserAclIdentity() {
         return currentIdentity;
@@ -110,6 +121,7 @@ class KudosMcpToolTest {
   @AfterEach
   void tearDown() {
     utilsMock.close();
+    commonsUtilsMock.close();
   }
 
   private org.exoplatform.social.core.identity.model.Identity socialIdentity(String id, String remoteId, boolean enabled) {
@@ -152,6 +164,43 @@ class KudosMcpToolTest {
     assertEquals(RECEIVER, result.getReceiver());
     assertEquals("user", result.getReceiverType());
     verify(kudosService).createKudos(any(Kudos.class), eq(USERNAME));
+  }
+
+  /**
+   * The kudos comes back with the absolute link to the activity it generated,
+   * resolved through the activity permanent link, so a caller can open it.
+   */
+  @Test
+  void sendKudosReturnsTheLinkToItsActivity() throws Exception {
+    Kudos sent = sentKudos(RECEIVER, "user");
+    sent.setActivityId(321L);
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sent);
+    when(permanentLinkService.getLink(any(PermanentLinkObject.class))).thenReturn("/portal/dw/activity?id=321");
+
+    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", null);
+
+    assertEquals("http://localhost:8080/portal/dw/activity?id=321", result.getUrl());
+    ArgumentCaptor<PermanentLinkObject> linkCaptor = ArgumentCaptor.forClass(PermanentLinkObject.class);
+    verify(permanentLinkService).getLink(linkCaptor.capture());
+    assertEquals("activity", linkCaptor.getValue().getObjectType());
+    assertEquals("321", linkCaptor.getValue().getObjectId());
+  }
+
+  /**
+   * A kudos with no generated activity comes back without a link.
+   */
+  @Test
+  void sendKudosWithoutActivityReturnsNoLink() throws Exception {
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, RECEIVER))
+        .thenReturn(socialIdentity(USER_IDENTITY_ID, RECEIVER, true));
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenReturn(sentKudos(RECEIVER, "user"));
+
+    KudosResultModel result = kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", null);
+
+    assertNull(result.getUrl());
+    verifyNoInteractions(permanentLinkService);
   }
 
   @Test
