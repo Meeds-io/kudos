@@ -290,8 +290,10 @@ class KudosMcpToolTest {
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
         .thenThrow(new IllegalAccessException("User cannot redact on space"));
 
-    assertThrows(IllegalStateException.class,
-                 () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", SPACE_PRETTY));
+    IllegalStateException error = assertThrows(IllegalStateException.class,
+                                               () -> kudosMcpTool.sendKudos("user", RECEIVER, "Great work!", SPACE_PRETTY));
+    assertEquals("You are not allowed to post kudos in that space. You must be a space member who is allowed to post (a redactor).", error.getMessage());
+    assertFalse(error.getMessage().contains("must be able to see it"));
   }
 
   @Test
@@ -356,7 +358,10 @@ class KudosMcpToolTest {
         .thenReturn(socialIdentity(SPACE_IDENTITY_ID, SPACE_PRETTY, true));
     when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
         .thenThrow(new IllegalAccessException("User cannot redact on space"));
-    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!", null));
+    IllegalStateException error = assertThrows(IllegalStateException.class,
+                                               () -> kudosMcpTool.sendKudos("space", SPACE_PRETTY, "Great work!", null));
+    assertEquals("You are not allowed to post kudos in that space. You must be a space member who is allowed to post (a redactor).", error.getMessage());
+    assertFalse(error.getMessage().contains("must be able to see it"));
   }
 
   // --- cancel_kudos --------------------------------------------------------
