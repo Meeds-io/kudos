@@ -366,6 +366,11 @@ public class KudosMcpTool implements McpToolPlugin {
         throw new IllegalArgumentException("The kudos behind activity " + activity.getId()
             + " could not be found, so its receiver is unknown.");
       }
+      if (USER_RECEIVER_TYPE.equals(targetKudos.getReceiverType())) {
+        Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME,
+                                                                targetKudos.getReceiverId());
+        requireEnabledUser(receiver, "The receiver of this kudos can no longer receive kudos.");
+      }
       kudos.setReceiverType(targetKudos.getReceiverType());
       kudos.setReceiverId(targetKudos.getReceiverId());
       return;
@@ -377,11 +382,25 @@ public class KudosMcpTool implements McpToolPlugin {
     if (poster.isSpace()) {
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
     } else if (poster.isUser()) {
+      requireEnabledUser(poster, "The author of this post can no longer receive kudos.");
       kudos.setReceiverType(USER_RECEIVER_TYPE);
     } else {
       throw new IllegalArgumentException("The author of activity " + activity.getId() + " can't receive a kudos.");
     }
     kudos.setReceiverId(poster.getRemoteId());
+  }
+
+  /**
+   * Refuses a user that can't receive a kudos, as {@code sendKudos} does for
+   * its receiver, instead of letting the service raise an unmapped error.
+   *
+   * @param user the identity of the user, possibly null
+   * @param message the refusal, written for the agent
+   */
+  private void requireEnabledUser(Identity user, String message) {
+    if (user == null || !user.isEnable() || user.isDeleted()) {
+      throw new IllegalStateException(message);
+    }
   }
 
   /**
