@@ -348,10 +348,12 @@ public class KudosMcpTool implements McpToolPlugin {
    *
    * @param kudos the kudos under construction
    * @param activity the targeted post
-   * @throws IllegalAccessException when the current user can't view the kudos
+   * @throws IllegalStateException when the current user can't view the kudos
    *           the post stands for
+   * @throws IllegalArgumentException when the receiver can't be determined or
+   *           can't receive a kudos
    */
-  private void setActivityReceiver(Kudos kudos, ExoSocialActivity activity) throws IllegalAccessException {
+  private void setActivityReceiver(Kudos kudos, ExoSocialActivity activity) {
     if (StringUtils.equals(Utils.KUDOS_ACTIVITY_COMMENT_TYPE, activity.getType())) {
       Kudos targetKudos;
       try {
