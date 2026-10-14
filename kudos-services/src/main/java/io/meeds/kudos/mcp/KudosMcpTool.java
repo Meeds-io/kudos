@@ -376,8 +376,18 @@ public class KudosMcpTool implements McpToolPlugin {
                                                                 targetKudos.getReceiverId());
         requireEnabledUser(receiver, "The receiver of this kudos can no longer receive kudos.");
       }
+      String receiverId = targetKudos.getReceiverId();
+      if (SPACE_RECEIVER_TYPE.equals(targetKudos.getReceiverType())) {
+        // The kudos stores the pretty name of the space, the UI passes its numeric id
+        Space receiverSpace = spaceService.getSpaceByPrettyName(receiverId);
+        if (receiverSpace == null) {
+          throw new IllegalStateException("The space that received this kudos no longer exists,"
+              + " so you cannot send a kudos on it.");
+        }
+        receiverId = receiverSpace.getId();
+      }
       kudos.setReceiverType(targetKudos.getReceiverType());
-      kudos.setReceiverId(targetKudos.getReceiverId());
+      kudos.setReceiverId(receiverId);
       return;
     }
     Identity poster = StringUtils.isBlank(activity.getPosterId()) ? null : identityManager.getIdentity(activity.getPosterId());
