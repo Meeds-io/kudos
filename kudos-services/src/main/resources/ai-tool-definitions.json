@@ -45,7 +45,7 @@
     {
       "name": "send_kudos_on_activity",
       "title": "Send a kudos on a post of a space",
-      "description": "Send a kudos (a short public appreciation message) on a post of a space, identified by its activity id. The receiver is never chosen by the caller: it is the author of the post (or, when the post is itself a kudos, the receiver of that kudos), and the kudos is published in the space of the post. Use it to appreciate what someone posted in the space. The kudos is sent from the current user and counts on their kudos allowance. A user cannot send a kudos on their own post, and the current user must be allowed to post in the post's space (a redactor). The id must be that of a post, not of a comment. The result carries the link to the kudos.",
+      "description": "Send a kudos (a short public appreciation message) on a post of a space, identified by its activity id. The receiver is never chosen by the caller: it is the author of the post (or, when the post is itself a kudos, the receiver of that kudos), and the kudos is published in the space of the post. Use it to appreciate what someone posted in the space. The kudos is sent from the current user and counts on their kudos allowance. A user cannot send a kudos to themselves (on a kudos post, the receiver is the person who received that kudos), and the current user must be able to see the post's space. The id must be that of a post, not of a comment. The result carries the link to the kudos.",
       "input_schema": {
         "type": "object",
         "properties": {
