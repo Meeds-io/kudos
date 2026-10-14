@@ -223,7 +223,10 @@ class KudosMcpToolTest {
     assertNotNull(result);
     assertEquals(SPACE_PRETTY, result.getReceiver());
     assertEquals("space", result.getReceiverType());
-    verify(kudosService).createKudos(any(Kudos.class), eq(USERNAME));
+    Kudos kudos = createdKudos();
+    assertEquals("500", kudos.getReceiverId());
+    assertEquals("space", kudos.getReceiverType());
+    assertEquals(SPACE_PRETTY, kudos.getSpacePrettyName());
   }
 
   @Test
@@ -697,6 +700,23 @@ class KudosMcpToolTest {
     receiver.setEnable(true);
     receiver.setDeleted(true);
     assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * A post whose posting space is gone is refused with a plain sentence
+   * before the service is reached.
+   */
+  @Test
+  void sendKudosOnAPostOfAMissingPostingSpaceIsRefused() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, SPACE_IDENTITY_ID));
+    when(identityManager.getIdentity(SPACE_IDENTITY_ID)).thenReturn(providerIdentity(SpaceIdentityProvider.NAME,
+                                                                                     SPACE_IDENTITY_ID,
+                                                                                     "gone"));
+
+    IllegalStateException refused = assertThrows(IllegalStateException.class,
+                                                 () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("The space that posted activity 100 no longer exists, so it cannot receive a kudos.", refused.getMessage());
     verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
   }
 
