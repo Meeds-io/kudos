@@ -213,6 +213,11 @@ public class KudosMcpTool implements McpToolPlugin {
       throw new IllegalStateException("You are not allowed to view this activity, so you cannot send a kudos on it.");
     }
 
+    if (activity.getPublicationStartTime() != null) {
+      throw new IllegalStateException("Activity " + activityId.trim() + " is a scheduled post that is not published yet."
+          + " A kudos can only be sent on a published post.");
+    }
+
     Kudos kudos = new Kudos();
     kudos.setSenderId(currentUser);
     kudos.setMessage(message.trim());
