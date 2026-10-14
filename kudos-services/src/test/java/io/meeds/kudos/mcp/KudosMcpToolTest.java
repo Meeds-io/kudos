@@ -19,6 +19,7 @@
 package io.meeds.kudos.mcp;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -667,6 +668,26 @@ class KudosMcpToolTest {
 
     assertEquals("You cannot send a kudos to yourself.", error.getMessage());
     assertEquals(USERNAME, createdKudos().getReceiverId());
+  }
+
+  /**
+   * On a post, the space right is that of seeing the space: the refusal is
+   * worded so, not as a redactor requirement.
+   */
+  @Test
+  void sendKudosOnActivityNotAllowedInSpaceMentionsViewingNotRedactor() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, POSTER_ID));
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                             POSTER_ID,
+                                                                             RECEIVER));
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
+        .thenThrow(new IllegalAccessException("User cannot redact on space"));
+
+    IllegalStateException error = assertThrows(IllegalStateException.class,
+                                               () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+
+    assertEquals("You are not allowed to send kudos in that space: you must be able to see it.", error.getMessage());
+    assertFalse(error.getMessage().contains("redactor"));
   }
 
   /**
