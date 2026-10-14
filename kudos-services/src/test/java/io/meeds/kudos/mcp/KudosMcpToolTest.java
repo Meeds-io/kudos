@@ -822,6 +822,23 @@ class KudosMcpToolTest {
   }
 
   /**
+   * A scheduled post, not published yet, is refused with a plain sentence
+   * before the service is reached, rather than the service's bare code.
+   */
+  @Test
+  void sendKudosOnAScheduledPostIsRefused() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setPublicationStartTime(System.currentTimeMillis() + 3_600_000L);
+    stubPostInSpace(activity);
+
+    IllegalStateException refused = assertThrows(IllegalStateException.class,
+                                                 () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("Activity 100 is a scheduled post that is not published yet."
+        + " A kudos can only be sent on a published post.", refused.getMessage());
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
    * A post the current user can't view is refused before anything is sent.
    */
   @Test
