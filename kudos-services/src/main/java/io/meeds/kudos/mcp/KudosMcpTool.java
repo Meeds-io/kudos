@@ -149,7 +149,9 @@ public class KudosMcpTool implements McpToolPlugin {
       }
       Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName());
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
-      kudos.setReceiverId(space.getPrettyName());
+      // The UI passes the numeric id of the space, which cannot be mistaken
+      // for another space when a pretty name is made of digits only
+      kudos.setReceiverId(space.getId());
       kudos.setSpacePrettyName(space.getPrettyName());
       kudos.setEntityType(KudosEntityType.SPACE_PROFILE.name());
       kudos.setEntityId(spaceIdentity == null ? space.getId() : spaceIdentity.getId());
@@ -354,9 +356,12 @@ public class KudosMcpTool implements McpToolPlugin {
    * @param kudos the kudos under construction
    * @param activity the targeted post
    * @throws IllegalStateException when the current user can't view the kudos
-   *           the post stands for
-   * @throws IllegalArgumentException when the receiver can't be determined or
-   *           can't receive a kudos
+   *           the post stands for, when the receiver is a user who is disabled
+   *           or deleted, or when the receiving space (the space that posted,
+   *           or the space credited by the kudos) no longer exists
+   * @throws IllegalArgumentException when the receiver can't be determined:
+   *           the kudos or the author of the post is not found, or the author
+   *           is neither a user nor a space
    */
   private void setActivityReceiver(Kudos kudos, ExoSocialActivity activity) {
     if (StringUtils.equals(Utils.KUDOS_ACTIVITY_COMMENT_TYPE, activity.getType())) {
@@ -399,7 +404,8 @@ public class KudosMcpTool implements McpToolPlugin {
       // resolves first; a pretty name may itself be made of digits only
       Space posterSpace = spaceService.getSpaceByPrettyName(poster.getRemoteId());
       if (posterSpace == null) {
-        throw new IllegalArgumentException("The space that posted activity " + activity.getId() + " could not be found.");
+        throw new IllegalStateException("The space that posted activity " + activity.getId() + " no longer exists,"
+            + " so it cannot receive a kudos.");
       }
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
       kudos.setReceiverId(posterSpace.getId());
