@@ -43,6 +43,42 @@
       "require_approval": true
     },
     {
+      "name": "send_kudos_on_activity",
+      "title": "Send a kudos on a post of a space",
+      "description": "Send a kudos (a short public appreciation message) on a post of a space, identified by its activity id. The receiver is never chosen by the caller: it is the author of the post (or, when the post is itself a kudos, the receiver of that kudos), and the kudos is published in the space of the post. Use it to appreciate what someone posted in the space. The kudos is sent from the current user and counts on their kudos allowance. A user cannot send a kudos on their own post, and the current user must be allowed to post in the post's space (a redactor). The id must be that of a post, not of a comment. The result carries the link to the kudos.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "activity_id": {
+            "type": "string",
+            "description": "Identifier of the post of the space to send the kudos on (required). It must be an activity id, not a comment id."
+          },
+          "message": {
+            "type": "string",
+            "description": "The appreciation message to attach to the kudos (required)."
+          }
+        },
+        "required": [
+          "activity_id",
+          "message"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "space_scope": {
+        "object_arg": "activity_id",
+        "resolver": "activity",
+        "allowed_args": [
+          "message"
+        ]
+      },
+      "require_approval": true
+    },
+    {
       "name": "cancel_kudos",
       "title": "Cancel a sent kudos",
       "description": "Cancel (delete) a kudos that the current user previously sent, identified by its kudos id. Only the sender can cancel their own kudos, and it cannot be cancelled once other kudos are linked to it. Find the kudos id with list_sent_kudos.",
@@ -172,6 +208,10 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "space_scope": {
+        "object_arg": "activity_id",
+        "resolver": "activity"
       }
     }
   ]
