@@ -701,6 +701,47 @@ class KudosMcpToolTest {
   }
 
   /**
+   * A kudos post whose receiver is a space credits that space by its numeric
+   * id, as the UI does, not by the pretty name the kudos stores.
+   */
+  @Test
+  void sendKudosOnAKudosPostOfASpaceReceiverGivesTheNumericId() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setType("exokudos:activity");
+    stubPostInSpace(activity);
+    when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(sentKudos("receivers", "space"));
+    Space receiver = new Space();
+    receiver.setId("9");
+    receiver.setPrettyName("receivers");
+    when(spaceService.getSpaceByPrettyName("receivers")).thenReturn(receiver);
+
+    kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi");
+
+    Kudos kudos = createdKudos();
+    assertEquals("9", kudos.getReceiverId());
+    assertEquals("space", kudos.getReceiverType());
+    assertEquals(SPACE_PRETTY, kudos.getSpacePrettyName());
+  }
+
+  /**
+   * A kudos post whose receiving space is gone is refused with a plain
+   * sentence before the service is reached.
+   */
+  @Test
+  void sendKudosOnAKudosPostOfAMissingSpaceReceiverIsRefused() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setType("exokudos:activity");
+    stubPostInSpace(activity);
+    when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(sentKudos("gone", "space"));
+
+    IllegalStateException refused = assertThrows(IllegalStateException.class,
+                                                 () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("The space that received this kudos no longer exists, so you cannot send a kudos on it.",
+                 refused.getMessage());
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
    * A kudos activity whose kudos can't be found is refused rather than
    * falling back to its poster.
    */
