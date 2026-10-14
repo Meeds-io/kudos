@@ -380,14 +380,21 @@ public class KudosMcpTool implements McpToolPlugin {
       throw new IllegalArgumentException("The author of activity " + activity.getId() + " could not be found.");
     }
     if (poster.isSpace()) {
+      // The UI passes the numeric id of the space, which Utils.getSpace
+      // resolves first; a pretty name may itself be made of digits only
+      Space posterSpace = spaceService.getSpaceByPrettyName(poster.getRemoteId());
+      if (posterSpace == null) {
+        throw new IllegalArgumentException("The space that posted activity " + activity.getId() + " could not be found.");
+      }
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
+      kudos.setReceiverId(posterSpace.getId());
     } else if (poster.isUser()) {
       requireEnabledUser(poster, "The author of this post can no longer receive kudos.");
       kudos.setReceiverType(USER_RECEIVER_TYPE);
+      kudos.setReceiverId(poster.getRemoteId());
     } else {
       throw new IllegalArgumentException("The author of activity " + activity.getId() + " can't receive a kudos.");
     }
-    kudos.setReceiverId(poster.getRemoteId());
   }
 
   /**
