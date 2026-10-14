@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -45,6 +46,8 @@ import org.mockito.Mockito;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
@@ -491,6 +494,258 @@ class KudosMcpToolTest {
     when(kudosService.getKudosListOfActivity(eq("123"), any(Identity.class)))
         .thenThrow(new IllegalAccessException("denied"));
     assertThrows(IllegalStateException.class, () -> kudosMcpTool.listKudosOnActivity("123"));
+  }
+
+  // --- send_kudos_on_activity ----------------------------------------------
+
+  private static final String ACTIVITY_ID = "100";
+
+  private static final String SPACE_ID    = "5";
+
+  private static final String POSTER_ID   = "42";
+
+  /**
+   * @param id the activity id
+   * @param posterIdentityId the identity id of its poster
+   * @return a post of the space {@link #SPACE_ID}
+   */
+  private ExoSocialActivity spacePost(String id, String posterIdentityId) {
+    ExoSocialActivityImpl activity = new ExoSocialActivityImpl();
+    activity.setId(id);
+    activity.setPosterId(posterIdentityId);
+    activity.setSpaceId(SPACE_ID);
+    activity.setType("DEFAULT_ACTIVITY");
+    return activity;
+  }
+
+  /**
+   * @param providerId the identity provider
+   * @param id the identity id
+   * @param remoteId the remote id
+   * @return a social identity
+   */
+  private org.exoplatform.social.core.identity.model.Identity providerIdentity(String providerId, String id, String remoteId) {
+    org.exoplatform.social.core.identity.model.Identity identity =
+        new org.exoplatform.social.core.identity.model.Identity(providerId, remoteId);
+    identity.setId(id);
+    return identity;
+  }
+
+  /**
+   * Stubs the space of the post, the post, its viewability for the current
+   * user and the creation of the kudos by the service, which echoes the
+   * receiver it is given.
+   *
+   * @param activity the post
+   */
+  private void stubPostInSpace(ExoSocialActivity activity) throws Exception {
+    Space space = new Space();
+    space.setId(SPACE_ID);
+    space.setPrettyName(SPACE_PRETTY);
+    space.setDisplayName("Engineering");
+    when(spaceService.getSpaceById(SPACE_ID)).thenReturn(space);
+    when(activityManager.getActivity(activity.getId())).thenReturn(activity);
+    when(activityManager.isActivityViewable(eq(activity), any(Identity.class))).thenReturn(true);
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME))).thenAnswer(invocation -> {
+      Kudos given = invocation.getArgument(0);
+      return sentKudos(given.getReceiverId(), given.getReceiverType());
+    });
+  }
+
+  /**
+   * @return the kudos handed to the service by the call under test
+   */
+  private Kudos createdKudos() throws Exception {
+    ArgumentCaptor<Kudos> captor = ArgumentCaptor.forClass(Kudos.class);
+    verify(kudosService).createKudos(captor.capture(), eq(USERNAME));
+    return captor.getValue();
+  }
+
+  /**
+   * The receiver is the poster of the post, read from the activity and never
+   * from an argument; the kudos is built as the UI builds an activity kudos:
+   * type ACTIVITY, the activity as entity, no parent, the space of the
+   * activity, the current user as sender. A poster who has since left the
+   * space still receives it: no membership is read.
+   */
+  @Test
+  void sendKudosOnActivityGoesToThePosterOfThePost() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, POSTER_ID));
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                             POSTER_ID,
+                                                                             RECEIVER));
+
+    KudosResultModel result = kudosMcpTool.sendKudosOnActivity(" " + ACTIVITY_ID + " ", " Well done ");
+
+    Kudos kudos = createdKudos();
+    assertEquals(RECEIVER, kudos.getReceiverId());
+    assertEquals("user", kudos.getReceiverType());
+    assertEquals(USERNAME, kudos.getSenderId());
+    assertEquals("ACTIVITY", kudos.getEntityType());
+    assertEquals(ACTIVITY_ID, kudos.getEntityId());
+    assertEquals("", kudos.getParentEntityId());
+    assertEquals(SPACE_PRETTY, kudos.getSpacePrettyName());
+    assertEquals("Well done", kudos.getMessage());
+    assertEquals(RECEIVER, result.getReceiver());
+    assertEquals(SPACE_PRETTY, result.getSpacePrettyName());
+    verify(spaceService, never()).isMember(any(Space.class), any(String.class));
+    verify(spaceService, never()).isMember(any(String.class), any(String.class));
+  }
+
+  /**
+   * A post that the space itself posted, as a space-owned activity, is
+   * handled as the UI handles it: the receiver is that space.
+   */
+  @Test
+  void sendKudosOnASpaceOwnedActivityGoesToTheSpace() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, SPACE_IDENTITY_ID));
+    when(identityManager.getIdentity(SPACE_IDENTITY_ID)).thenReturn(providerIdentity(SpaceIdentityProvider.NAME,
+                                                                                     SPACE_IDENTITY_ID,
+                                                                                     SPACE_PRETTY));
+
+    kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Great space");
+
+    Kudos kudos = createdKudos();
+    assertEquals(SPACE_PRETTY, kudos.getReceiverId());
+    assertEquals("space", kudos.getReceiverType());
+    assertEquals(SPACE_PRETTY, kudos.getSpacePrettyName());
+  }
+
+  /**
+   * When the post is itself a kudos activity, the receiver of that kudos is
+   * credited, not the poster of the activity.
+   */
+  @Test
+  void sendKudosOnAKudosActivityCreditsItsReceiver() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setType("exokudos:activity");
+    stubPostInSpace(activity);
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                             POSTER_ID,
+                                                                             "theposter"));
+    when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(sentKudos("original", "user"));
+
+    kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Well deserved");
+
+    Kudos kudos = createdKudos();
+    assertEquals("original", kudos.getReceiverId());
+    assertEquals("user", kudos.getReceiverType());
+    assertEquals("ACTIVITY", kudos.getEntityType());
+  }
+
+  /**
+   * A kudos activity whose kudos can't be found is refused rather than
+   * falling back to its poster.
+   */
+  @Test
+  void sendKudosOnAKudosActivityWithoutKudosIsRefused() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setType("exokudos:activity");
+    stubPostInSpace(activity);
+    when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(null);
+
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Well deserved"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * The worker's own post is handed to the service with the worker as
+   * receiver, and the service's refusal is reported: the tool doesn't decide
+   * it.
+   */
+  @Test
+  void sendKudosOnOwnPostIsRefusedByTheService() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, OWN_IDENTITY_ID));
+    when(identityManager.getIdentity(OWN_IDENTITY_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                                   OWN_IDENTITY_ID,
+                                                                                   USERNAME));
+    when(kudosService.createKudos(any(Kudos.class), eq(USERNAME)))
+        .thenThrow(new IllegalAccessException("User with username 'testuser1' is not authorized to send kudos to himseld!"));
+
+    IllegalStateException error = assertThrows(IllegalStateException.class,
+                                               () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Me"));
+
+    assertEquals("You cannot send a kudos to yourself.", error.getMessage());
+    assertEquals(USERNAME, createdKudos().getReceiverId());
+  }
+
+  /**
+   * A missing activity, a comment and a post of no space stream are refused
+   * before anything is sent.
+   */
+  @Test
+  void sendKudosOnAMissingActivityACommentOrAPostOfNoSpaceIsRefused() throws Exception {
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("999", "Hi"));
+
+    ExoSocialActivity userStreamPost = spacePost("300", POSTER_ID);
+    userStreamPost.setSpaceId(null);
+    when(activityManager.getActivity("300")).thenReturn(userStreamPost);
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("300", "Hi"));
+
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "  "));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity(" ", "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * A comment is refused on its own account: it is in a space, viewable and
+   * with a known poster, so only the rule "a post, not a comment" stops it,
+   * whether it is flagged a comment, has a parent, or is named by a
+   * {@code comment<id>} id.
+   */
+  @Test
+  void sendKudosOnACommentIsRefusedWhateverItsSpace() throws Exception {
+    ExoSocialActivity post = spacePost(ACTIVITY_ID, POSTER_ID);
+    stubPostInSpace(post);
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                             POSTER_ID,
+                                                                             RECEIVER));
+    ExoSocialActivity comment = spacePost("200", POSTER_ID);
+    comment.isComment(true);
+    ExoSocialActivity reply = spacePost("201", POSTER_ID);
+    reply.setParentId(ACTIVITY_ID);
+    ExoSocialActivity namedComment = spacePost("comment202", POSTER_ID);
+    namedComment.isComment(true);
+    for (ExoSocialActivity target : List.of(comment, reply, namedComment)) {
+      when(activityManager.getActivity(target.getId())).thenReturn(target);
+      when(activityManager.isActivityViewable(eq(target), any(Identity.class))).thenReturn(true);
+    }
+
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("200", "Hi"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("201", "Hi"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("comment202", "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * An id that isn't a plain number is refused as such, even when the
+   * activity lookup would resolve it to a post of the space.
+   */
+  @Test
+  void sendKudosOnANonNumericIdIsRefused() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, POSTER_ID));
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                             POSTER_ID,
+                                                                             RECEIVER));
+    ExoSocialActivity odd = spacePost("100abc", POSTER_ID);
+    when(activityManager.getActivity("100abc")).thenReturn(odd);
+    when(activityManager.isActivityViewable(eq(odd), any(Identity.class))).thenReturn(true);
+
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("100abc", "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * A post the current user can't view is refused before anything is sent.
+   */
+  @Test
+  void sendKudosOnAPostThatCannotBeViewedIsRefused() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    stubPostInSpace(activity);
+    when(activityManager.isActivityViewable(eq(activity), any(Identity.class))).thenReturn(false);
+
+    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
   }
 
 }

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
@@ -166,6 +167,70 @@ public class KudosMcpTool implements McpToolPlugin {
   }
 
   /**
+   * Sends a kudos from the current user on a post of a space's stream. The
+   * receiver is never an argument: it is derived, at execution, from the
+   * activity the way the Kudos UI does ({@code KudosIdentity.js getReceiver},
+   * {@code KudosButton.vue}): the receiver of the kudos when the post is
+   * itself a kudos activity, else the identity that posted it (a user, or the
+   * space when the space posted it). Whether the poster is still a member of
+   * the space is not checked: the post belongs to the space and its poster
+   * still receives the kudos. The sender, the allowance, the refusal to
+   * send to oneself and the right to post in the space are checked by
+   * {@link KudosService#createKudos(Kudos, String)}. ObjectNotFoundException
+   * is not declared for the reason given on
+   * {@link #sendKudos(String, String, String, String)}.
+   *
+   * @param activityId the id of the post (an activity, not a comment)
+   * @param message the appreciation message
+   * @return the sent kudos, with the link to the activity it generated
+   * @throws IllegalAccessException never thrown as such: a refusal of the
+   *           service is mapped to an {@link IllegalStateException}
+   */
+  public KudosResultModel sendKudosOnActivity(String activityId, String message) throws IllegalAccessException {
+    if (StringUtils.isBlank(message)) {
+      throw new IllegalArgumentException("message is required. A kudos must carry a short appreciation message.");
+    }
+    if (StringUtils.isBlank(activityId) || !StringUtils.isNumeric(activityId.trim())) {
+      throw new IllegalArgumentException("activity_id is required and must be the numeric id of a post."
+          + " A comment id is not accepted: kudos are sent on a post.");
+    }
+    String currentUser = getCurrentUserName();
+    ExoSocialActivity activity = activityManager.getActivity(activityId.trim());
+    if (activity == null) {
+      throw new IllegalArgumentException("No activity found with id " + activityId.trim() + ".");
+    }
+    if (activity.isComment() || activity.getParentId() != null) {
+      throw new IllegalArgumentException("Activity " + activityId.trim() + " is a comment. Kudos are sent on a post,"
+          + " not on a comment.");
+    }
+    Space space = StringUtils.isNumeric(activity.getSpaceId()) ? spaceService.getSpaceById(activity.getSpaceId()) : null;
+    if (space == null) {
+      throw new IllegalArgumentException("Activity " + activityId.trim() + " is not a post of a space stream."
+          + " Kudos can only be sent on a post of a space.");
+    }
+    if (!activityManager.isActivityViewable(activity, getCurrentUserAclIdentity())) {
+      throw new IllegalStateException("You are not allowed to view this activity, so you cannot send a kudos on it.");
+    }
+
+    Kudos kudos = new Kudos();
+    kudos.setSenderId(currentUser);
+    kudos.setMessage(message.trim());
+    kudos.setEntityType(KudosEntityType.ACTIVITY.name());
+    kudos.setEntityId(activity.getId());
+    kudos.setParentEntityId("");
+    kudos.setSpacePrettyName(space.getPrettyName());
+    setActivityReceiver(kudos, activity);
+
+    try {
+      Kudos created = kudosService.createKudos(kudos, currentUser);
+      Utils.transformKudosMessage(created);
+      return toResult(created, space);
+    } catch (IllegalAccessException e) {
+      throw mapSendError(e);
+    }
+  }
+
+  /**
    * Cancels (deletes) a kudos previously sent by the current user.
    */
   public String cancelKudos(Long kudosId) throws ObjectNotFoundException {
@@ -273,6 +338,47 @@ public class KudosMcpTool implements McpToolPlugin {
       throw new IllegalStateException("You are not allowed to view kudos on this activity."
           + " You must be able to view the activity (e.g. be a member of its space).");
     }
+  }
+
+  /**
+   * Sets the receiver of a kudos sent on a post, the way the Kudos UI derives
+   * it: the receiver of the kudos when the post is itself a kudos activity,
+   * else the identity that posted it, as a space when the space posted it.
+   *
+   * @param kudos the kudos under construction
+   * @param activity the targeted post
+   * @throws IllegalAccessException when the current user can't view the kudos
+   *           the post stands for
+   */
+  private void setActivityReceiver(Kudos kudos, ExoSocialActivity activity) throws IllegalAccessException {
+    if (StringUtils.equals(Utils.KUDOS_ACTIVITY_COMMENT_TYPE, activity.getType())) {
+      Kudos targetKudos;
+      try {
+        targetKudos = kudosService.getKudosByActivityId(Long.parseLong(activity.getId()), getCurrentUserAclIdentity());
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("You are not allowed to view this kudos, so you cannot send a kudos on it.");
+      }
+      if (targetKudos == null || StringUtils.isBlank(targetKudos.getReceiverId())
+          || StringUtils.isBlank(targetKudos.getReceiverType())) {
+        throw new IllegalArgumentException("The kudos behind activity " + activity.getId()
+            + " could not be found, so its receiver is unknown.");
+      }
+      kudos.setReceiverType(targetKudos.getReceiverType());
+      kudos.setReceiverId(targetKudos.getReceiverId());
+      return;
+    }
+    Identity poster = StringUtils.isBlank(activity.getPosterId()) ? null : identityManager.getIdentity(activity.getPosterId());
+    if (poster == null || StringUtils.isBlank(poster.getRemoteId())) {
+      throw new IllegalArgumentException("The author of activity " + activity.getId() + " could not be found.");
+    }
+    if (poster.isSpace()) {
+      kudos.setReceiverType(SPACE_RECEIVER_TYPE);
+    } else if (poster.isUser()) {
+      kudos.setReceiverType(USER_RECEIVER_TYPE);
+    } else {
+      throw new IllegalArgumentException("The author of activity " + activity.getId() + " can't receive a kudos.");
+    }
+    kudos.setReceiverId(poster.getRemoteId());
   }
 
   private IllegalStateException mapSendError(IllegalAccessException e) {
