@@ -600,7 +600,9 @@ class KudosMcpToolTest {
 
   /**
    * A post that the space itself posted, as a space-owned activity, is
-   * handled as the UI handles it: the receiver is that space.
+   * handled as the UI handles it: the receiver is that space, given by its
+   * numeric id as the UI gives it, the pretty name staying the space of the
+   * activity.
    */
   @Test
   void sendKudosOnASpaceOwnedActivityGoesToTheSpace() throws Exception {
@@ -609,10 +611,15 @@ class KudosMcpToolTest {
                                                                                      SPACE_IDENTITY_ID,
                                                                                      SPACE_PRETTY));
 
+    Space poster = new Space();
+    poster.setId(SPACE_ID);
+    poster.setPrettyName(SPACE_PRETTY);
+    when(spaceService.getSpaceByPrettyName(SPACE_PRETTY)).thenReturn(poster);
+
     kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Great space");
 
     Kudos kudos = createdKudos();
-    assertEquals(SPACE_PRETTY, kudos.getReceiverId());
+    assertEquals(SPACE_ID, kudos.getReceiverId());
     assertEquals("space", kudos.getReceiverType());
     assertEquals(SPACE_PRETTY, kudos.getSpacePrettyName());
   }
