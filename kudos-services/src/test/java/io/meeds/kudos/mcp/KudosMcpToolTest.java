@@ -690,8 +690,7 @@ class KudosMcpToolTest {
   /**
    * A comment is refused on its own account: it is in a space, viewable and
    * with a known poster, so only the rule "a post, not a comment" stops it,
-   * whether it is flagged a comment, has a parent, or is named by a
-   * {@code comment<id>} id.
+   * whether it is flagged a comment or has a parent.
    */
   @Test
   void sendKudosOnACommentIsRefusedWhateverItsSpace() throws Exception {
@@ -704,16 +703,13 @@ class KudosMcpToolTest {
     comment.isComment(true);
     ExoSocialActivity reply = spacePost("201", POSTER_ID);
     reply.setParentId(ACTIVITY_ID);
-    ExoSocialActivity namedComment = spacePost("comment202", POSTER_ID);
-    namedComment.isComment(true);
-    for (ExoSocialActivity target : List.of(comment, reply, namedComment)) {
+    for (ExoSocialActivity target : List.of(comment, reply)) {
       when(activityManager.getActivity(target.getId())).thenReturn(target);
       when(activityManager.isActivityViewable(eq(target), any(Identity.class))).thenReturn(true);
     }
 
     assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("200", "Hi"));
     assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("201", "Hi"));
-    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("comment202", "Hi"));
     verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
   }
 
@@ -727,11 +723,14 @@ class KudosMcpToolTest {
     when(identityManager.getIdentity(POSTER_ID)).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
                                                                              POSTER_ID,
                                                                              RECEIVER));
-    ExoSocialActivity odd = spacePost("100abc", POSTER_ID);
-    when(activityManager.getActivity("100abc")).thenReturn(odd);
-    when(activityManager.isActivityViewable(eq(odd), any(Identity.class))).thenReturn(true);
+    for (String id : List.of("100abc", "comment202")) {
+      ExoSocialActivity odd = spacePost(id, POSTER_ID);
+      when(activityManager.getActivity(id)).thenReturn(odd);
+      when(activityManager.isActivityViewable(eq(odd), any(Identity.class))).thenReturn(true);
+    }
 
     assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("100abc", "Hi"));
+    assertThrows(IllegalArgumentException.class, () -> kudosMcpTool.sendKudosOnActivity("comment202", "Hi"));
     verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
   }
 
