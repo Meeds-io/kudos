@@ -162,7 +162,7 @@ public class KudosMcpTool implements McpToolPlugin {
       Utils.transformKudosMessage(created);
       return toResult(created, targetSpace);
     } catch (IllegalAccessException e) {
-      throw mapSendError(e);
+      throw mapSendError(e, true);
     }
   }
 
@@ -227,7 +227,7 @@ public class KudosMcpTool implements McpToolPlugin {
       Utils.transformKudosMessage(created);
       return toResult(created, space);
     } catch (IllegalAccessException e) {
-      throw mapSendError(e);
+      throw mapSendError(e, false);
     }
   }
 
@@ -382,7 +382,16 @@ public class KudosMcpTool implements McpToolPlugin {
     kudos.setReceiverId(poster.getRemoteId());
   }
 
-  private IllegalStateException mapSendError(IllegalAccessException e) {
+  /**
+   * Maps a refusal of the service to a message the agent can act on.
+   *
+   * @param e the refusal of {@link KudosService}
+   * @param redactorRequired true when sending needs the right to post in the
+   *          space (a kudos published in a space stream), false when seeing
+   *          the space is enough (a kudos on a post)
+   * @return the exception to throw
+   */
+  private IllegalStateException mapSendError(IllegalAccessException e, boolean redactorRequired) {
     String msg = StringUtils.trimToEmpty(e.getMessage());
     if (msg.contains("himseld") || msg.contains("himself")) {
       return new IllegalStateException("You cannot send a kudos to yourself.");
@@ -390,6 +399,9 @@ public class KudosMcpTool implements McpToolPlugin {
     if (msg.contains("send more kudos")) {
       return new IllegalStateException("You have no kudos left for the current period."
           + " Call get_my_kudos_allowance to see how many remain and when your allowance resets.");
+    }
+    if (msg.contains("redact on space") && !redactorRequired) {
+      return new IllegalStateException("You are not allowed to send kudos in that space: you must be able to see it.");
     }
     if (msg.contains("redact on space")) {
       return new IllegalStateException("You are not allowed to post kudos in that space."
