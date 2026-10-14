@@ -630,6 +630,10 @@ class KudosMcpToolTest {
                                                                              POSTER_ID,
                                                                              "theposter"));
     when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(sentKudos("original", "user"));
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME,
+                                             "original")).thenReturn(providerIdentity(OrganizationIdentityProvider.NAME,
+                                                                                      "77",
+                                                                                      "original"));
 
     kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Well deserved");
 
@@ -637,6 +641,56 @@ class KudosMcpToolTest {
     assertEquals("original", kudos.getReceiverId());
     assertEquals("user", kudos.getReceiverType());
     assertEquals("ACTIVITY", kudos.getEntityType());
+  }
+
+  /**
+   * A post whose author is disabled or deleted is refused with an actionable
+   * message before the service is reached, instead of the service's unmapped
+   * "valid and enabled social identity" error.
+   */
+  @Test
+  void sendKudosOnAPostOfADisabledOrDeletedAuthorIsRefused() throws Exception {
+    stubPostInSpace(spacePost(ACTIVITY_ID, POSTER_ID));
+    org.exoplatform.social.core.identity.model.Identity poster =
+        providerIdentity(OrganizationIdentityProvider.NAME, POSTER_ID, RECEIVER);
+    when(identityManager.getIdentity(POSTER_ID)).thenReturn(poster);
+
+    poster.setEnable(false);
+    IllegalStateException disabled = assertThrows(IllegalStateException.class,
+                                                  () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("The author of this post can no longer receive kudos.", disabled.getMessage());
+
+    poster.setEnable(true);
+    poster.setDeleted(true);
+    IllegalStateException deleted = assertThrows(IllegalStateException.class,
+                                                 () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("The author of this post can no longer receive kudos.", deleted.getMessage());
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
+  }
+
+  /**
+   * The receiver of a kudos post, a user who has since been disabled or
+   * deleted, is refused the same way.
+   */
+  @Test
+  void sendKudosOnAKudosPostOfADisabledOrDeletedReceiverIsRefused() throws Exception {
+    ExoSocialActivity activity = spacePost(ACTIVITY_ID, POSTER_ID);
+    activity.setType("exokudos:activity");
+    stubPostInSpace(activity);
+    when(kudosService.getKudosByActivityId(eq(100L), any(Identity.class))).thenReturn(sentKudos("original", "user"));
+    org.exoplatform.social.core.identity.model.Identity receiver =
+        providerIdentity(OrganizationIdentityProvider.NAME, "77", "original");
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "original")).thenReturn(receiver);
+
+    receiver.setEnable(false);
+    IllegalStateException disabled = assertThrows(IllegalStateException.class,
+                                                  () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    assertEquals("The receiver of this kudos can no longer receive kudos.", disabled.getMessage());
+
+    receiver.setEnable(true);
+    receiver.setDeleted(true);
+    assertThrows(IllegalStateException.class, () -> kudosMcpTool.sendKudosOnActivity(ACTIVITY_ID, "Hi"));
+    verify(kudosService, never()).createKudos(any(Kudos.class), any(String.class));
   }
 
   /**
