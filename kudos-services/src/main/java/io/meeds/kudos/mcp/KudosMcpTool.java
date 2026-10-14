@@ -56,7 +56,7 @@ import io.meeds.social.activity.plugin.ActivityPermanentLinkPlugin;
 
 /**
  * MCP tools exposing the Kudos add-on to the AI agent (EVA). Every method acts
- * as the current user, so allowance, self-send bans and space redactor rights
+ * as the current user, so allowance, self-send bans and space rights
  * are enforced by {@link KudosService}.
  */
 @Service
@@ -175,7 +175,8 @@ public class KudosMcpTool implements McpToolPlugin {
    * space when the space posted it). Whether the poster is still a member of
    * the space is not checked: the post belongs to the space and its poster
    * still receives the kudos. The sender, the allowance, the refusal to
-   * send to oneself and the right to post in the space are checked by
+   * send to oneself (the receiver being the one derived above) and the right
+   * to send in the space (seeing it is enough for a post) are checked by
    * {@link KudosService#createKudos(Kudos, String)}. ObjectNotFoundException
    * is not declared for the reason given on
    * {@link #sendKudos(String, String, String, String)}.
