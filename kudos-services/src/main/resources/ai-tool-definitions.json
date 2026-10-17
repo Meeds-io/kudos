@@ -3,7 +3,7 @@
     {
       "name": "send_kudos",
       "title": "Send a kudos",
-      "description": "Send a kudos (a short public appreciation message) from the current user to a person or a space. Before calling this, check the current user still has kudos left by calling get_my_kudos_allowance. Resolve the receiver first: for a person use get_user_by_username to get the exact username, for a space use get_my_spaces to get its pretty name. When the user asks for the kudos to be given to a person *in a space* (for example \"send a kudos to John in the Engineering space\"), keep receiver_type 'user' and pass that space in space_pretty_name, so the kudos is published in the space stream instead of the receiver's personal stream. Users cannot send a kudos to themselves, and publishing in a space requires the current user to be a member who can post (a redactor) in that space.",
+      "description": "Send a kudos (a short public appreciation message) from the account running this tool (in a thread, the digital worker) to a person or a space. Before calling this, check that account still has kudos left by calling get_my_kudos_allowance. Resolve the receiver first: for a person use get_user_by_username to get the exact username, for a space use get_my_spaces to get its pretty name. When the user asks for the kudos to be given to a person *in a space* (for example \"send a kudos to John in the Engineering space\"), keep receiver_type 'user' and pass that space in space_pretty_name, so the kudos is published in the space stream instead of the receiver's personal stream. It is refused when the receiver is the account running the tool, and publishing in a space requires that account to be a member who can post (a redactor) in that space.",
       "input_schema": {
         "type": "object",
         "properties": {
@@ -39,6 +39,42 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false
+      },
+      "require_approval": true
+    },
+    {
+      "name": "send_kudos_on_activity",
+      "title": "Send a kudos on a post of a space",
+      "description": "Send a kudos (a short public appreciation message) on a post of a space, identified by its activity id. The kudos is sent by the account running this tool (in a thread, the digital worker) and counts on that account's kudos allowance. It is received by the author of the post (on a post that is itself a kudos, by the receiver of that kudos), never by someone the caller picks, and it is published in the post's space. As to who sends and who receives, it is refused only when the account running the tool is that receiver or has no kudos left: the person who asked for the kudos may well be the post's author. That account must also be able to see the post. The id must be that of a post, not of a comment. The result carries the link to the kudos.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "activity_id": {
+            "type": "string",
+            "description": "Identifier of the post of the space to send the kudos on (required). It must be an activity id, not a comment id."
+          },
+          "message": {
+            "type": "string",
+            "description": "The appreciation message to attach to the kudos (required)."
+          }
+        },
+        "required": [
+          "activity_id",
+          "message"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "space_scope": {
+        "object_arg": "activity_id",
+        "resolver": "activity",
+        "allowed_args": [
+          "message"
+        ]
       },
       "require_approval": true
     },
@@ -172,6 +208,10 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false
+      },
+      "space_scope": {
+        "object_arg": "activity_id",
+        "resolver": "activity"
       }
     }
   ]
