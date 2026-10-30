@@ -74,7 +74,8 @@
         "resolver": "activity",
         "allowed_args": [
           "message"
-        ]
+        ],
+        "space_role": "member"
       },
       "require_approval": true
     },
