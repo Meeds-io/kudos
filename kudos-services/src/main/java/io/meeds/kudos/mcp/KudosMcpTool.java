@@ -149,8 +149,12 @@ public class KudosMcpTool implements McpToolPlugin {
       }
       Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName());
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
-      // The UI passes the numeric id of the space, which cannot be mistaken
-      // for another space when a pretty name is made of digits only
+      // The receiver is the numeric id of the space, as the UI passes it, so
+      // that it cannot be mistaken for another space when a pretty name is made
+      // of digits only. The space pretty name below keeps the UI's form too:
+      // KudosService resolves it with Utils.getSpace, id first, so a
+      // digits-only pretty name equal to another space's id still resolves to
+      // that other space there.
       kudos.setReceiverId(space.getId());
       kudos.setSpacePrettyName(space.getPrettyName());
       kudos.setEntityType(KudosEntityType.SPACE_PROFILE.name());
