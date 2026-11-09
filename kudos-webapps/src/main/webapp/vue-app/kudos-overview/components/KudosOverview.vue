@@ -3,7 +3,9 @@
     <v-hover v-model="hover">
       <widget-wrapper
         id="kudosOverviewHeader"
-        extra-class="application-body">
+        extra-class="application-body"
+        @focusin.native="onFocusIn"
+        @focusout.native="onFocusOut">
         <template #title>
           <div class="d-flex flex-grow-1 full-width position-relative">
             <div v-if="hasKudos && !loading" class="text-header text-truncate">
@@ -21,6 +23,7 @@
                 v-if="hasKudos"
                 :icon="hoverEdit"
                 :small="hoverEdit"
+                :aria-label="$t('kudosOverview.seeAll')"
                 height="auto"
                 min-width="auto"
                 class="pa-0"
@@ -34,16 +37,16 @@
                 </v-icon>
                 <span v-else class="primary--text text-none">{{ $t('kudosOverview.seeAll') }}</span>
               </v-btn>
-              <v-fab-transition hide-on-leave>
-                <v-btn
-                  v-show="hoverEdit"
-                  :title="$t('kudosOverview.settings.editTooltip')"
-                  small
-                  icon
-                  @click="$root.$emit('kudos-overview-settings')">
-                  <v-icon size="18">fa-cog</v-icon>
-                </v-btn>
-              </v-fab-transition>
+              <v-btn
+                v-if="$root.canEdit"
+                :class="{ 'd-sr-only-focusable': !hoverEdit }"
+                :title="$t('kudosOverview.settings.editTooltip')"
+                :aria-label="$t('kudosOverview.settings.editTooltip')"
+                small
+                icon
+                @click="$root.$emit('kudos-overview-settings')">
+                <v-icon size="18">fa-cog</v-icon>
+              </v-btn>
             </div>
           </div>
         </template>
@@ -67,10 +70,19 @@ export default {
     loading: true,
     hasKudos: false,
     hover: false,
+    focused: false,
   }),
   computed: {
     hoverEdit() {
-      return this.$root.canEdit && this.hover;
+      return this.$root.canEdit && (this.hover || this.focused);
+    },
+  },
+  methods: {
+    onFocusIn(event) {
+      this.focused = event.target.matches(':focus-visible');
+    },
+    onFocusOut(event) {
+      this.focused = !!(event.relatedTarget && event.currentTarget.contains(event.relatedTarget));
     },
   },
 };
