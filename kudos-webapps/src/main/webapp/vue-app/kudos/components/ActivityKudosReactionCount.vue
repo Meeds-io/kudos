@@ -19,8 +19,12 @@
 <template>
   <a
     v-if="kudosNumber>0"
-    class="my-1 me-2 KudosNumber"
-    @click="openKudosList">
+    class="my-1 me-2 KudosNumber primary--text"
+    role="button"
+    tabindex="0"
+    @click="openKudosList"
+    @keydown.enter.prevent="openKudosList"
+    @keydown.space.prevent="openKudosList">
     {{ kudosNumber }} {{ $t('exoplatform.kudos.label.kudos') }}</a>
 </template>
 
