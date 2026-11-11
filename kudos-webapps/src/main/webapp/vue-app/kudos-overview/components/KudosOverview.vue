@@ -23,6 +23,7 @@
               <v-btn
                 v-if="hasKudos"
                 :tabindex="$root.canEdit && -1 || null"
+                :aria-hidden="$root.canEdit ? 'true' : null"
                 :class="$root.canEdit && 'hover-swap-default'"
                 class="pa-0"
                 height="auto"
