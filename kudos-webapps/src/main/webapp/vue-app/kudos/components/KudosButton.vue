@@ -47,18 +47,18 @@
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
-      <template #activator="{ on, attrs }">
+      <template #activator="{ on }">
         <v-btn
           v-show="kudosCount && !isMobile"
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
           :x-small="isComment"
+          :aria-label="`${kudosCount} ${$t('exoplatform.kudos.label.kudos')}`"
           class="primary--text font-weight-bold baseline-vertical-align mt-0"
           icon
-          v-bind="attrs"
           v-on="on"
           @click="openKudosList">
-          ({{ kudosCount }})
+          <span aria-hidden="true">({{ kudosCount }})</span>
         </v-btn>
       </template>
       <span>
