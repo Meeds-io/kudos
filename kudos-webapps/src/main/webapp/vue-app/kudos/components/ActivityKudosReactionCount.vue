@@ -26,7 +26,7 @@
     @click="openKudosList"
     @keydown.enter.prevent="openKudosList"
     @keydown.space.prevent="openKudosList">
-    {{ kudosNumber }} {{ $t('exoplatform.kudos.label.kudos') }}</a>
+    {{ kudosNumberText }}</a>
 </template>
 
 <script>
@@ -41,11 +41,15 @@ export default {
     kudosNumber: 0,
   }),
   computed: {
+    kudosNumberText() {
+      return `${this.kudosNumber} ${this.$t('exoplatform.kudos.label.kudos')}`;
+    },
     kudosNumberAriaLabel() {
-      // Starts with the visible text, then names the action
+      // The visible text is passed whole, so that the name contains the
+      // label shown in every language, then the action is named
       return this.kudosNumber === 1
-        && this.$t('kudos.aria.kudosReactionCount.one', {0: this.kudosNumber})
-        || this.$t('kudos.aria.kudosReactionCount.many', {0: this.kudosNumber});
+        && this.$t('kudos.aria.kudosReactionCount.one', {0: this.kudosNumberText})
+        || this.$t('kudos.aria.kudosReactionCount.many', {0: this.kudosNumberText});
     },
   },
   created() {
