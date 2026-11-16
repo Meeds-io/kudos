@@ -19,6 +19,7 @@
 <template>
   <a
     v-if="kudosNumber>0"
+    :aria-label="kudosNumberAriaLabel"
     class="my-1 me-2 KudosNumber primary--text"
     role="button"
     tabindex="0"
@@ -39,6 +40,14 @@ export default {
   data: () => ({
     kudosNumber: 0,
   }),
+  computed: {
+    kudosNumberAriaLabel() {
+      // Starts with the visible text, then names the action
+      return this.kudosNumber === 1
+        && this.$t('kudos.aria.kudosReactionCount.one', {0: this.kudosNumber})
+        || this.$t('kudos.aria.kudosReactionCount.many', {0: this.kudosNumber});
+    },
+  },
   created() {
     this.$root.$on('kudos-refresh-comment', this.getKudosCount);
     this.getKudosCount();
