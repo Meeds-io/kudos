@@ -49,7 +49,7 @@
     <v-tooltip :disabled="isMobile" bottom>
       <template #activator="{ on }">
         <v-btn
-          v-show="kudosCount && !isMobile"
+          v-show="kudosCount && !isMobile && (isComment || !$root.reducedWidth)"
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
           :x-small="isComment"
