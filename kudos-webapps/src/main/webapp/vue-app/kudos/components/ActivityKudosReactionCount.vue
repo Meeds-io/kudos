@@ -19,13 +19,14 @@
 <template>
   <a
     v-if="kudosNumber>0"
+    :aria-label="kudosNumberAriaLabel"
     class="my-1 me-2 KudosNumber primary--text"
     role="button"
     tabindex="0"
     @click="openKudosList"
     @keydown.enter.prevent="openKudosList"
     @keydown.space.prevent="openKudosList">
-    {{ kudosNumber }} {{ $t('exoplatform.kudos.label.kudos') }}</a>
+    {{ kudosNumberText }}</a>
 </template>
 
 <script>
@@ -39,6 +40,18 @@ export default {
   data: () => ({
     kudosNumber: 0,
   }),
+  computed: {
+    kudosNumberText() {
+      return `${this.kudosNumber} ${this.$t('exoplatform.kudos.label.kudos')}`;
+    },
+    kudosNumberAriaLabel() {
+      // The visible text is passed whole, so that the name contains the
+      // label shown in every language, then the action is named
+      return this.kudosNumber === 1
+        && this.$t('kudos.aria.kudosReactionCount.one', {0: this.kudosNumberText})
+        || this.$t('kudos.aria.kudosReactionCount.many', {0: this.kudosNumberText});
+    },
+  },
   created() {
     this.$root.$on('kudos-refresh-comment', this.getKudosCount);
     this.getKudosCount();
