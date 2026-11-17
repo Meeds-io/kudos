@@ -47,7 +47,7 @@
       </v-col>
     </v-row>
     <div v-else-if="!loading" class="d-flex flex-column align-center justify-center">
-      <v-icon color="tertiary" size="60">fa-award</v-icon>
+      <v-icon color="secondary" size="60">fa-award</v-icon>
       <span
         v-if="isOwner"
         v-html="emptyKudosSummaryText"
