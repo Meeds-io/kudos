@@ -26,6 +26,7 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.AbstractNotificationChildPlugin;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.notification.mail.MailPalette;
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
@@ -61,7 +62,11 @@ public class KudosActivityChildPlugin extends AbstractNotificationChildPlugin {
                                 LocaleUtils.toLocale(language));
     String message = kudos.getMessage();
     TemplateContext templateContext = new TemplateContext(getId(), language);
-    templateContext.put("MESSAGE", message);
+    // a context of its own: the recipient's palette is bound again, so the message follows the recipient's mode
+    if (notification.getTo() != null) {
+      MailPalette.bind(templateContext, notification.getTo());
+    }
+    templateContext.put("MESSAGE", SocialNotificationUtils.withContentColors(templateContext, message));
     return TemplateUtils.processGroovy(templateContext);
   }
 

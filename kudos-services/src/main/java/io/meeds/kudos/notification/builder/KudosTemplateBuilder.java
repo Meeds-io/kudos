@@ -117,7 +117,8 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     if (StringUtils.isBlank(message)) {
       message = "";
     }
-    templateContext.put("KUDOS_MESSAGE", message);
+    // the message and the activity titles are user content: their black and white text follows the recipient's mode
+    templateContext.put("KUDOS_MESSAGE", SocialNotificationUtils.withContentColors(templateContext, message));
     String title = "";
     String notificationURL = CommonsUtils.getCurrentDomain();
 
@@ -149,10 +150,10 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     // body construction must be made after subject building
     if (activity != null) {
       if (StringUtils.isNotBlank(activity.getParentCommentId())) {
-        String parentCommentTitle = getActivityTitle(activity.getParentCommentId(), language);
+        String parentCommentTitle = getActivityTitle(templateContext, activity.getParentCommentId(), language);
         templateContext.put(ACTIVITY_PARAM, parentCommentTitle);
       } else if (StringUtils.isNotBlank(activity.getParentId())) {
-        String parentActivityTitle = getActivityTitle(activity.getParentId(), language);
+        String parentActivityTitle = getActivityTitle(templateContext, activity.getParentId(), language);
         templateContext.put(ACTIVITY_PARAM, parentActivityTitle);
       } else {
         templateContext.put(ACTIVITY_PARAM, "");
@@ -175,9 +176,11 @@ public class KudosTemplateBuilder extends AbstractTemplateBuilder {
     return activity;
   }
 
-  private String getActivityTitle(String activityId, String language) {
-    return MentionUtils.substituteRoleWithLocale(Utils.getActivityManager().getActivityTitle(activityId),
-                                                 Locale.forLanguageTag(language));
+  private String getActivityTitle(TemplateContext templateContext, String activityId, String language) {
+    return SocialNotificationUtils.withContentColors(templateContext,
+                                                     MentionUtils.substituteRoleWithLocale(Utils.getActivityManager()
+                                                                                                .getActivityTitle(activityId),
+                                                                                           Locale.forLanguageTag(language)));
   }
 
 }

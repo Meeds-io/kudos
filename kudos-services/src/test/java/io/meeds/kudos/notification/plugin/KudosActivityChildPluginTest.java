@@ -22,16 +22,30 @@ import static io.meeds.kudos.service.utils.Utils.KUDOS_ACTIVITY_COMMENT_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
+import org.exoplatform.commons.api.notification.service.template.TemplateContext;
+import org.exoplatform.commons.notification.mail.MailPalette;
+import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.portal.branding.BrandingService;
 import org.exoplatform.social.notification.plugin.SocialNotificationUtils;
 
 import io.meeds.kudos.BaseKudosTest;
@@ -84,6 +98,37 @@ public class KudosActivityChildPluginTest extends BaseKudosTest {
     when(notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey())).thenReturn(String.valueOf(KUDOS_BY_ACTIVITY_ID));
 
     assertTrue(Strings.CS.contains(kudosActivityChildPlugin.makeContent(ctx), KUDOS_MESSAGE));
+  }
+
+  @Test
+  public void testMakeContentIsWrittenInTheRecipientsPalette() {
+    KudosActivityChildPlugin kudosActivityChildPlugin = new KudosActivityChildPlugin(initParams);
+    kudosActivityChildPlugin.kudosService = kudosService;
+    when(kudosService.getKudosByActivityId(KUDOS_BY_ACTIVITY_ID)).thenReturn(kudos);
+    when(kudos.getMessage()).thenReturn("<p style=\"color:#000000\">thanks</p>");
+    when(ctx.getNotificationInfo()).thenReturn(notification);
+    when(notification.getTo()).thenReturn("mary");
+    when(notification.getValueOwnerParameter(SocialNotificationUtils.ACTIVITY_ID.getKey())).thenReturn(String.valueOf(KUDOS_BY_ACTIVITY_ID));
+    BrandingService brandingService = mock(BrandingService.class);
+    when(brandingService.getDisplayMode("mary")).thenReturn("dark");
+    when(brandingService.getMailPalette(true)).thenReturn(new HashMap<>(Map.of("surface", "#1E2328")));
+    AtomicReference<TemplateContext> rendered = new AtomicReference<>();
+
+    try (MockedStatic<CommonsUtils> commonsUtils = mockStatic(CommonsUtils.class);
+         MockedStatic<NotificationPluginUtils> pluginUtils = mockStatic(NotificationPluginUtils.class);
+         MockedStatic<TemplateUtils> templateUtils = mockStatic(TemplateUtils.class)) {
+      commonsUtils.when(() -> CommonsUtils.getService(BrandingService.class)).thenReturn(brandingService);
+      pluginUtils.when(() -> NotificationPluginUtils.getLanguage("mary")).thenReturn("en");
+      templateUtils.when(() -> TemplateUtils.processGroovy(any(TemplateContext.class))).thenAnswer(call -> {
+        rendered.set(call.getArgument(0));
+        return "";
+      });
+      kudosActivityChildPlugin.makeContent(ctx);
+    }
+
+    assertEquals("dark", MailPalette.of(rendered.get()).get(MailPalette.MODE));
+    assertEquals("#1E2328", MailPalette.of(rendered.get()).get("surface"));
+    assertEquals("<p>thanks</p>", rendered.get().get("MESSAGE"));
   }
 
 }
