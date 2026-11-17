@@ -27,7 +27,7 @@
     v-else-if="!loading"
     class="d-flex flex-column align-center justify-center ma-8"
     flat>
-    <v-icon color="tertiary" size="60">fa-award</v-icon>
+    <v-icon color="secondary" size="60">fa-award</v-icon>
     <span v-if="kudosType === 'received' || !isOwner" class="mt-4">{{ placeholder }}</span>
     <span
       v-else
