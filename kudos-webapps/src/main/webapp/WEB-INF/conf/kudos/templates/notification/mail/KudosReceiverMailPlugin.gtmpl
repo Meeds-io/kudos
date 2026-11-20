@@ -1,4 +1,4 @@
-<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="width:100%;overflow-wrap:anywhere;word-break:break-word;background-color: #ffffff; font-size: 15px;color: #1d2327;line-height: 1.7;font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};" dir="${io.meeds.portal.mail.EmailLayout.dir(_ctx.language)}">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="width:100%;overflow-wrap:anywhere;word-break:break-word;background-color: #ffffff; font-size: 15px;color: #1d2327;line-height: 1.7;font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};" dir="${io.meeds.portal.mail.util.EmailLayout.dir(_ctx.language)}">
     <%
       _templateContext.put("header_title", _ctx.appRes("Notification.title.KudosReceiverNotificationPlugin"));
       _ctx.include("war:/notification/templates/mail/NotificationHeader.gtmpl", _templateContext);
@@ -10,14 +10,14 @@
                     <td bgcolor="#ffffff" style="background-color: #ffffff;">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="background-color: #ffffff; color: #1d2327;line-height: 1.7;">
                             <tr>
-                                <td align="${io.meeds.portal.mail.EmailLayout.start(_ctx.language)}" bgcolor="#ffffff" style="background-color: #ffffff;padding: 30px 0 10px 0;">
-                                    <p style="margin: 0 0 14px; font-size: 15px; color: #1d2327; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};"><%=_ctx.appRes("Notification.label.SayHello")%> <%=_ctx.escapeHTML(FIRSTNAME)%>,</p>
-                                    <p style="margin:0 0 14px; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};" dir="auto">
+                                <td align="${io.meeds.portal.mail.util.EmailLayout.start(_ctx.language)}" bgcolor="#ffffff" style="background-color: #ffffff;padding: 30px 0 10px 0;">
+                                    <p style="margin: 0 0 14px; font-size: 15px; color: #1d2327; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};"><%=_ctx.appRes("Notification.label.SayHello")%> <%=_ctx.escapeHTML(FIRSTNAME)%>,</p>
+                                    <p style="margin:0 0 14px; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};" dir="auto">
                                     <%
                                       String message = "";
-                                      String profileUrl = "<a target=\"_blank\" style=\"color: ${io.meeds.portal.mail.EmailLayout.linkColor()}; text-decoration: none; font-weight: bold; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};\" href=\""+ PROFILE_URL + "\">" + _ctx.escapeHTML(USER) + "</a>";
+                                      String profileUrl = "<a target=\"_blank\" style=\"color: ${io.meeds.portal.mail.util.EmailLayout.linkColor()}; text-decoration: none; font-weight: bold; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};\" href=\""+ PROFILE_URL + "\">" + _ctx.escapeHTML(USER) + "</a>";
                                       if (Boolean.parseBoolean(IS_SPACE_RECEIVER)) {
-                                        String spaceUrl = "<a target=\"_blank\" style=\"color: ${io.meeds.portal.mail.EmailLayout.linkColor()}; text-decoration: none; font-weight: bold; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};\" href=\""+ SPACE_URL +"\">" + _ctx.escapeHTML(SPACE) + "</a>";
+                                        String spaceUrl = "<a target=\"_blank\" style=\"color: ${io.meeds.portal.mail.util.EmailLayout.linkColor()}; text-decoration: none; font-weight: bold; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};\" href=\""+ SPACE_URL +"\">" + _ctx.escapeHTML(SPACE) + "</a>";
                                         message = _ctx.appRes("Notification.kudos.spaceReceived", spaceUrl, profileUrl);
                                       } else {
                                         message = _ctx.appRes("Notification.kudos.received", profileUrl);
@@ -32,19 +32,19 @@
                                       <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="background-color: #ffffff; font-size: 15px;color: #1d2327;line-height: 1.7;">
                                           <tbody>
                                               <tr>
-                                                  <td align="${io.meeds.portal.mail.EmailLayout.start(_ctx.language)}" bgcolor="#ffffff" style="background-color: #ffffff; padding: 0;" dir="auto">
-                                                      <p style="margin:0; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};" dir="auto">$ACTIVITY</p>
+                                                  <td align="${io.meeds.portal.mail.util.EmailLayout.start(_ctx.language)}" bgcolor="#ffffff" style="background-color: #ffffff; padding: 0;" dir="auto">
+                                                      <p style="margin:0; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};" dir="auto">$ACTIVITY</p>
                                                   </td>
                                               </tr>
                                           </tbody>
                                       </table>
                                     <% } %>
                                     <% if(org.apache.commons.lang3.StringUtils.isNotBlank(KUDOS_MESSAGE)) { %>
-                                      <%=io.meeds.portal.mail.EmailLayout.quoteStart(false, _ctx.language)%><p style="margin:0; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.EmailLayout.fontStack()};" dir="auto">$KUDOS_MESSAGE</p><%=io.meeds.portal.mail.EmailLayout.quoteEnd()%>
+                                      <%=io.meeds.portal.mail.util.EmailLayout.quoteStart(false, _ctx.language)%><p style="margin:0; color:#1d2327; line-height:1.7; font-size:15px; font-family: ${io.meeds.portal.mail.util.EmailLayout.fontStack()};" dir="auto">$KUDOS_MESSAGE</p><%=io.meeds.portal.mail.util.EmailLayout.quoteEnd()%>
                                     <% } %>
                                     <% if(org.apache.commons.lang3.StringUtils.isNotBlank(ACTIVITY)) { %>
-                                      <div dir="${io.meeds.portal.mail.EmailLayout.dir(_ctx.language)}" style="margin: 20px 0 8px 0;">
-                                          <%=io.meeds.portal.mail.EmailLayout.actionLink(_ctx.appRes("Notification.label.ViewFullDiscussion"), "$VIEW_FULL_DISCUSSION_ACTION_URL", true)%>
+                                      <div dir="${io.meeds.portal.mail.util.EmailLayout.dir(_ctx.language)}" style="margin: 20px 0 8px 0;">
+                                          <%=io.meeds.portal.mail.util.EmailLayout.actionLink(_ctx.appRes("Notification.label.ViewFullDiscussion"), "$VIEW_FULL_DISCUSSION_ACTION_URL", true)%>
                                       </div>
                                     <% } %>
                                 </td>
