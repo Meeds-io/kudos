@@ -47,18 +47,18 @@
       </span>
     </v-tooltip>
     <v-tooltip :disabled="isMobile" bottom>
-      <template #activator="{ on, attrs }">
+      <template #activator="{ on }">
         <v-btn
-          v-show="kudosCount && !isMobile"
+          v-show="kudosCount && !isMobile && (isComment || !$root.reducedWidth)"
           :id="`KudusCountLink${commentId}`"
           :small="!isComment"
           :x-small="isComment"
-          class="primary--text font-weight-bold baseline-vertical-align mt-0"
+          :aria-label="kudosCountAriaLabel"
+          class="activityKudosCount primary--text font-weight-bold baseline-vertical-align mt-0"
           icon
-          v-bind="attrs"
           v-on="on"
           @click="openKudosList">
-          ({{ kudosCount }})
+          <span aria-hidden="true">({{ kudosCount }})</span>
         </v-btn>
       </template>
       <span>
@@ -119,6 +119,13 @@ export default {
     },
     kudosCount() {
       return this.linkedKudosList.length;
+    },
+    kudosCountAriaLabel() {
+      // Names the action as well as the count, so that the counter is not
+      // read as a second "Send kudos" button
+      return this.kudosCount === 1
+        && this.$t('kudos.aria.kudosCount.one', {0: this.kudosCount})
+        || this.$t('kudos.aria.kudosCount.many', {0: this.kudosCount});
     },
     hasSentKudos() {
       return this.linkedKudosList.find(kudos => kudos.senderIdentityId === eXo.env.portal.userIdentityId);
