@@ -54,7 +54,7 @@
           :small="!isComment"
           :x-small="isComment"
           :aria-label="kudosCountAriaLabel"
-          class="primary--text font-weight-bold baseline-vertical-align mt-0"
+          class="activityKudosCount primary--text font-weight-bold baseline-vertical-align mt-0"
           icon
           v-on="on"
           @click="openKudosList">
