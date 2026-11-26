@@ -29,6 +29,10 @@
   <packaging>pom</packaging>
   <name>Meeds:: Add-on:: eXo Kudos - Packaging</name>
   <description>Meeds Add-on:: eXo Kudos - Packaging</description>
+  <properties>
+    <!-- Generate and publish the CycloneDX SBOM of the deliverable zip -->
+    <sbom.skip>false</sbom.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
