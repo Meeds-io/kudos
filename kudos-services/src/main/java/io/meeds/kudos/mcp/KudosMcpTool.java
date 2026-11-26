@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
@@ -55,7 +56,7 @@ import io.meeds.social.activity.plugin.ActivityPermanentLinkPlugin;
 
 /**
  * MCP tools exposing the Kudos add-on to the AI agent (EVA). Every method acts
- * as the current user, so allowance, self-send bans and space redactor rights
+ * as the current user, so allowance, self-send bans and space rights
  * are enforced by {@link KudosService}.
  */
 @Service
@@ -148,7 +149,13 @@ public class KudosMcpTool implements McpToolPlugin {
       }
       Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName());
       kudos.setReceiverType(SPACE_RECEIVER_TYPE);
-      kudos.setReceiverId(space.getPrettyName());
+      // The receiver is the numeric id of the space, as the UI passes it, so
+      // that it cannot be mistaken for another space when a pretty name is made
+      // of digits only. The space pretty name below keeps the UI's form too:
+      // KudosService resolves it with Utils.getSpace, id first, so a
+      // digits-only pretty name equal to another space's id still resolves to
+      // that other space there.
+      kudos.setReceiverId(space.getId());
       kudos.setSpacePrettyName(space.getPrettyName());
       kudos.setEntityType(KudosEntityType.SPACE_PROFILE.name());
       kudos.setEntityId(spaceIdentity == null ? space.getId() : spaceIdentity.getId());
@@ -161,7 +168,77 @@ public class KudosMcpTool implements McpToolPlugin {
       Utils.transformKudosMessage(created);
       return toResult(created, targetSpace);
     } catch (IllegalAccessException e) {
-      throw mapSendError(e);
+      throw mapSendError(e, true);
+    }
+  }
+
+  /**
+   * Sends a kudos from the current user on a post of a space's stream. The
+   * receiver is never an argument: it is derived, at execution, from the
+   * activity the way the Kudos UI does ({@code KudosIdentity.js getReceiver},
+   * {@code KudosButton.vue}): the receiver of the kudos when the post is
+   * itself a kudos activity, else the identity that posted it (a user, or the
+   * space when the space posted it). Whether the poster is still a member of
+   * the space is not checked: the post belongs to the space and its poster
+   * still receives the kudos. The sender, the allowance, the refusal to
+   * send to oneself (the receiver being the one derived above) and the right
+   * to send in the space (seeing it is enough for a post) are checked by
+   * {@link KudosService#createKudos(Kudos, String)}. ObjectNotFoundException
+   * is not declared for the reason given on
+   * {@link #sendKudos(String, String, String, String)}.
+   *
+   * @param activityId the id of the post (an activity, not a comment)
+   * @param message the appreciation message
+   * @return the sent kudos, with the link to the activity it generated
+   * @throws IllegalAccessException never thrown as such: a refusal of the
+   *           service is mapped to an {@link IllegalStateException}
+   */
+  public KudosResultModel sendKudosOnActivity(String activityId, String message) throws IllegalAccessException {
+    if (StringUtils.isBlank(message)) {
+      throw new IllegalArgumentException("message is required. A kudos must carry a short appreciation message.");
+    }
+    if (StringUtils.isBlank(activityId) || !StringUtils.isNumeric(activityId.trim())) {
+      throw new IllegalArgumentException("activity_id is required and must be the numeric id of a post."
+          + " A comment id is not accepted: kudos are sent on a post.");
+    }
+    String currentUser = getCurrentUserName();
+    ExoSocialActivity activity = activityManager.getActivity(activityId.trim());
+    if (activity == null) {
+      throw new IllegalArgumentException("No activity found with id " + activityId.trim() + ".");
+    }
+    if (activity.isComment() || activity.getParentId() != null) {
+      throw new IllegalArgumentException("Activity " + activityId.trim() + " is a comment. Kudos are sent on a post,"
+          + " not on a comment.");
+    }
+    Space space = StringUtils.isNumeric(activity.getSpaceId()) ? spaceService.getSpaceById(activity.getSpaceId()) : null;
+    if (space == null) {
+      throw new IllegalArgumentException("Activity " + activityId.trim() + " is not a post of a space stream."
+          + " Kudos can only be sent on a post of a space.");
+    }
+    if (!activityManager.isActivityViewable(activity, getCurrentUserAclIdentity())) {
+      throw new IllegalStateException("You are not allowed to view this activity, so you cannot send a kudos on it.");
+    }
+
+    if (activity.getPublicationStartTime() != null) {
+      throw new IllegalStateException("Activity " + activityId.trim() + " is a scheduled post that is not published yet."
+          + " A kudos can only be sent on a published post.");
+    }
+
+    Kudos kudos = new Kudos();
+    kudos.setSenderId(currentUser);
+    kudos.setMessage(message.trim());
+    kudos.setEntityType(KudosEntityType.ACTIVITY.name());
+    kudos.setEntityId(activity.getId());
+    kudos.setParentEntityId("");
+    kudos.setSpacePrettyName(space.getPrettyName());
+    setActivityReceiver(kudos, activity);
+
+    try {
+      Kudos created = kudosService.createKudos(kudos, currentUser);
+      Utils.transformKudosMessage(created);
+      return toResult(created, space);
+    } catch (IllegalAccessException e) {
+      throw mapSendError(e, false);
     }
   }
 
@@ -275,7 +352,99 @@ public class KudosMcpTool implements McpToolPlugin {
     }
   }
 
-  private IllegalStateException mapSendError(IllegalAccessException e) {
+  /**
+   * Sets the receiver of a kudos sent on a post, the way the Kudos UI derives
+   * it: the receiver of the kudos when the post is itself a kudos activity,
+   * else the identity that posted it, as a space when the space posted it.
+   *
+   * @param kudos the kudos under construction
+   * @param activity the targeted post
+   * @throws IllegalStateException when the current user can't view the kudos
+   *           the post stands for, when the receiver is a user who is disabled
+   *           or deleted, or when the receiving space (the space that posted,
+   *           or the space credited by the kudos) no longer exists
+   * @throws IllegalArgumentException when the receiver can't be determined:
+   *           the kudos or the author of the post is not found, or the author
+   *           is neither a user nor a space
+   */
+  private void setActivityReceiver(Kudos kudos, ExoSocialActivity activity) {
+    if (StringUtils.equals(Utils.KUDOS_ACTIVITY_COMMENT_TYPE, activity.getType())) {
+      Kudos targetKudos;
+      try {
+        targetKudos = kudosService.getKudosByActivityId(Long.parseLong(activity.getId()), getCurrentUserAclIdentity());
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("You are not allowed to view this kudos, so you cannot send a kudos on it.");
+      }
+      if (targetKudos == null || StringUtils.isBlank(targetKudos.getReceiverId())
+          || StringUtils.isBlank(targetKudos.getReceiverType())) {
+        throw new IllegalArgumentException("The kudos behind activity " + activity.getId()
+            + " could not be found, so its receiver is unknown.");
+      }
+      if (USER_RECEIVER_TYPE.equals(targetKudos.getReceiverType())) {
+        Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME,
+                                                                targetKudos.getReceiverId());
+        requireEnabledUser(receiver, "The receiver of this kudos can no longer receive kudos.");
+      }
+      String receiverId = targetKudos.getReceiverId();
+      if (SPACE_RECEIVER_TYPE.equals(targetKudos.getReceiverType())) {
+        // The kudos stores the pretty name of the space, the UI passes its numeric id
+        Space receiverSpace = spaceService.getSpaceByPrettyName(receiverId);
+        if (receiverSpace == null) {
+          throw new IllegalStateException("The space that received this kudos no longer exists,"
+              + " so you cannot send a kudos on it.");
+        }
+        receiverId = receiverSpace.getId();
+      }
+      kudos.setReceiverType(targetKudos.getReceiverType());
+      kudos.setReceiverId(receiverId);
+      return;
+    }
+    Identity poster = StringUtils.isBlank(activity.getPosterId()) ? null : identityManager.getIdentity(activity.getPosterId());
+    if (poster == null || StringUtils.isBlank(poster.getRemoteId())) {
+      throw new IllegalArgumentException("The author of activity " + activity.getId() + " could not be found.");
+    }
+    if (poster.isSpace()) {
+      // The UI passes the numeric id of the space, which Utils.getSpace
+      // resolves first; a pretty name may itself be made of digits only
+      Space posterSpace = spaceService.getSpaceByPrettyName(poster.getRemoteId());
+      if (posterSpace == null) {
+        throw new IllegalStateException("The space that posted activity " + activity.getId() + " no longer exists,"
+            + " so it cannot receive a kudos.");
+      }
+      kudos.setReceiverType(SPACE_RECEIVER_TYPE);
+      kudos.setReceiverId(posterSpace.getId());
+    } else if (poster.isUser()) {
+      requireEnabledUser(poster, "The author of this post can no longer receive kudos.");
+      kudos.setReceiverType(USER_RECEIVER_TYPE);
+      kudos.setReceiverId(poster.getRemoteId());
+    } else {
+      throw new IllegalArgumentException("The author of activity " + activity.getId() + " can't receive a kudos.");
+    }
+  }
+
+  /**
+   * Refuses a user that can't receive a kudos, as {@code sendKudos} does for
+   * its receiver, instead of letting the service raise an unmapped error.
+   *
+   * @param user the identity of the user, possibly null
+   * @param message the refusal, written for the agent
+   */
+  private void requireEnabledUser(Identity user, String message) {
+    if (user == null || !user.isEnable() || user.isDeleted()) {
+      throw new IllegalStateException(message);
+    }
+  }
+
+  /**
+   * Maps a refusal of the service to a message the agent can act on.
+   *
+   * @param e the refusal of {@link KudosService}
+   * @param redactorRequired true when sending needs the right to post in the
+   *          space (a kudos published in a space stream), false when seeing
+   *          the space is enough (a kudos on a post)
+   * @return the exception to throw
+   */
+  private IllegalStateException mapSendError(IllegalAccessException e, boolean redactorRequired) {
     String msg = StringUtils.trimToEmpty(e.getMessage());
     if (msg.contains("himseld") || msg.contains("himself")) {
       return new IllegalStateException("You cannot send a kudos to yourself.");
@@ -283,6 +452,9 @@ public class KudosMcpTool implements McpToolPlugin {
     if (msg.contains("send more kudos")) {
       return new IllegalStateException("You have no kudos left for the current period."
           + " Call get_my_kudos_allowance to see how many remain and when your allowance resets.");
+    }
+    if (msg.contains("redact on space") && !redactorRequired) {
+      return new IllegalStateException("You are not allowed to send kudos in that space: you must be able to see it.");
     }
     if (msg.contains("redact on space")) {
       return new IllegalStateException("You are not allowed to post kudos in that space."
